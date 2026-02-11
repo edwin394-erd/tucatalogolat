@@ -83,6 +83,9 @@
         </div>
     @endforeach
 </div>
+<p> Selecciona un tema de colores para tu catálogo:</p><br>
+<div class="flex items-center space-x-4 mb-6">
+</div>
             <div class="flex justify-end p-0 m-0">
                 <button type="button" wire:click="saveChanges" class="px-4 py-2 bg-indigo-600 text-white rounded ransition">Guardar Cambios</button>
             </div>

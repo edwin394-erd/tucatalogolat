@@ -79,6 +79,7 @@ class Register extends Component
         Catalogo::create([
             'name' => $this->name,
             'user_id' => $user->id,
+            'telefono_contacto' => $this->telephone,
         ]);
 
         // Redirect or show a success message

@@ -1,134 +1,93 @@
-<div class="bg-gray-100 min-h-screen pb-10">
+{{-- Definimos el color desde la BD, con un valor por defecto si es nulo --}}
+@php
+    $primaryColor = $catalogo->primary_color ?? '#4F46E5'; // Un azul por defecto
+    $bgcolor = $catalogo->background_color ?? '#F2F2F2';
+@endphp
+
+<div class="bg-gray-100 min-h-screen pb-10" style="--main-color: {{ $primaryColor }}; background-color: {{ $bgcolor }};">
     {{-- Configuración Button --}}
     @if (auth()->check() && auth()->user()->catalogo->name == $catalogo->name)
-        <a wire:navigate href="{{ route('configuracion')}}" class="bg-white text-gray-800 px-4 py-2 rounded fixed top-4 left-4 shadow-lg flex items-center gap-2 z-50">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+        <a wire:navigate href="{{ route('configuracion')}}" class="bg-white text-gray-800 px-4 py-2 rounded fixed top-4 left-4 shadow-lg flex items-center gap-2 z-50 border-b-2 border-[var(--main-color)]">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-[var(--main-color)]">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
             </svg>
             Configuración
-             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                            </svg>
         </a>
     @endif
 
     {{-- Banner & Logo --}}
     <div class="relative">
-        @if ($catalogo->banner_url != null && $catalogo->logo_url != null)
-        <img src="{{ asset('storage/' . $catalogo->banner_url) }}" alt="Banner" class="w-full h-60 object-cover rounded-b-3xl shadow-md">
-        <div class="absolute left-1/2 -bottom-16 transform -translate-x-1/2">
-            <img src="{{ asset('storage/' . $catalogo->logo_url) }}" alt="Logo" class="w-36 h-36 rounded-full border-4 border-white shadow-lg object-cover bg-white">
-        </div>
+        @if ($catalogo->banner_url && $catalogo->logo_url)
+            <div class="w-full h-48 sm:h-64 lg:h-80 overflow-hidden rounded-b-[2rem] lg:rounded-b-[3rem] shadow-lg">
+                <img src="{{ asset('storage/' . $catalogo->banner_url) }}" alt="Banner" class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105">
+            </div>
+            <div class="absolute left-1/2 -bottom-12 sm:-bottom-16 lg:-bottom-20 transform -translate-x-1/2">
+                <div class="relative">
+                    <img src="{{ asset('storage/' . $catalogo->logo_url) }}" alt="Logo" class="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full border-4 border-white shadow-xl object-cover bg-white">
+                </div>
+            </div>
         @else
-            <div class="w-full h-60 bg-gray-200 flex items-center justify-center rounded-b-3xl text-gray-500 shadow-md">Sin banner o logo</div>
-            
-
+            <div class="w-full h-48 sm:h-64 bg-gradient-to-r from-gray-200 to-[var(--main-color)] opacity-20 flex items-center justify-center rounded-b-[2rem] shadow-inner italic">
+                Sin banner o logo configurado
+            </div>
         @endif
     </div>
 
     {{-- Catalog Title --}}
-    <div class="mt-20 mb-8 text-center px-20">
-        <h1 class="text-4xl font-extrabold text-gray-800 mb-2">{{ $catalogo->name }}</h1>
-        <p class="text-lg text-gray-500">{{ $catalogo->description }}</p>
+    <div class="mt-16 sm:mt-20 lg:mt-24 mb-8 text-center px-6 sm:px-12 lg:px-20">
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-800 mb-2 tracking-tight">{{ $catalogo->name }}</h1>
+        <p class="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed line-clamp-3">{{ $catalogo->description }}</p>
     </div>
- 
+
     {{-- Search --}}
     <div class="max-w-7xl mx-auto px-4 mb-8 md:w-1/2">
-        <input type="text" wire:model.live="search" placeholder="Buscar productos..." class="bg-gray-200 inset-shadow-sm w-full p-3 rounded-2xl border border-gray-300 focus:ring-gray-500 focus:border-gray-500 text-gray-900" />
+        <input type="text" wire:model.live="search" placeholder="Buscar productos..." class="bg-gray-200 inset-shadow-sm w-full p-3 rounded-2xl border border-gray-300 focus:ring-[var(--main-color)] focus:border-[var(--main-color)] text-gray-900" />
     </div>
 
     {{-- Categorías --}}
     <div class="max-w-7xl mx-auto px-4">
-        <!-- Scrollable pills for categories (compact & practical) -->
         <div class="flex items-center gap-3 overflow-x-auto py-4 no-scrollbar">
             <button
                 type="button"
                 wire:click="clearCategoryFilter"
-                wire:loading.attr="disabled"
-                aria-pressed="{{ isset($selectedCategory) ? ($selectedCategory === null ? 'true' : 'false') : 'false' }}"
                 class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-colors duration-150
-                       {{ (isset($selectedCategory) && $selectedCategory === null) ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-800 border-gray-200 hover:bg-gray-50' }}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M3 6h18M3 18h18"/>
-                </svg>
+                       {{ (isset($selectedCategory) && $selectedCategory === null) ? 'bg-[var(--main-color)] text-white border-[var(--main-color)]' : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50' }}">
                 Todas
             </button>
 
-            @forelse ($catalogo->categories as $category)
+            @foreach ($catalogo->categories as $category)
                 <button
                     type="button"
                     wire:click="filterByCategory({{ $category->id }})"
-                    wire:loading.attr="disabled"
-                    aria-pressed="{{ (isset($selectedCategory) && $selectedCategory == $category->id) ? 'true' : 'false' }}"
                     class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-colors duration-150
-                           {{ (isset($selectedCategory) && $selectedCategory == $category->id) ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-800 border-gray-200 hover:bg-gray-50' }}">
-                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-white/10 text-white/90 text-xs">
-                        {{ strtoupper(substr($category->name, 0, 1)) }}
-                    </span>
+                           {{ (isset($selectedCategory) && $selectedCategory == $category->id) ? 'bg-[var(--main-color)] text-white border-[var(--main-color)]' : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50' }}">
                     <span class="truncate max-w-[10rem] text-sm">{{ $category->name }}</span>
-                    <span class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                        {{ $category->products->count() }}
-                    </span>
                 </button>
-            @empty
-                <div class="text-gray-400 py-4">
-                    No hay categorías en este catálogo.
-                </div>
-            @endforelse
+            @endforeach
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4">
-        {{ $catalogo->products->links(data: ['scrollTo' => false]) }}
-    </div>
     {{-- Productos --}}
     <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-2xl font-bold text-gray-700 mb-6">Productos</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             @forelse ($catalogo->products as $item)
-                <div 
-                    class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-row lg:flex-col  items-stretch"
-                >
-                    <a href="#" class="block sm:w-40 sm:flex-shrink-0 lg:w-full">
-                        <img 
-                            class="rounded-t-2xl w-full h-48 object-cover"
-                            src="{{ asset('storage/' . $item->fotos[0]->url) }}" 
-                            alt="{{ $item->name }}" 
-                        />
+                <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col items-stretch overflow-hidden">
+                    <a href="#" class="block">
+                        <img class="w-full h-48 object-cover" src="{{ asset('storage/' . $item->fotos[0]->url) }}" alt="{{ $item->name }}" />
                     </a>
                     <div class="p-5 flex flex-col flex-1">
-                        <a href="#">
-                            <h5 class="text-lg font-semibold text-gray-900 mb-2 truncate">{{ $item->name }}</h5>
-                        </a>
-                        <div class="flex items-center mb-3">
-                            {{-- Stars --}}
-                            {{-- <div class="flex items-center space-x-1">
-                                @for ($i = 0; $i < 5; $i++)
-                                    <svg class="w-4 h-4 {{ $i < 4 ? 'text-yellow-400' : 'text-gray-200' }}" fill="currentColor" viewBox="0 0 22 20">
-                                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                    </svg>
-                                @endfor
-                            </div>
-                            <span class="ml-2 bg-gray-100 text-gray-800 text-xs font-semibold px-2.5 py-0.5 rounded">5.0</span> --}}
-                        </div>
-                        <div>
-                            <p class="text-gray-600 text-sm mb-4 flex-1">{{ Str::limit($item->description, 100) }}</p>
-                        </div>
+                        <h5 class="text-lg font-semibold text-gray-900 mb-2 truncate">{{ $item->name }}</h5>
+                        <p class="text-gray-600 text-sm mb-4 flex-1">{{ Str::limit($item->description, 80) }}</p>
                         <div class="flex items-center justify-between mt-auto">
                             <span class="text-2xl font-bold text-gray-900">${{ $item->price }}</span>
-                            <div class="flex">
-
-@php
-    $mensaje = "Hola! Me interesa el producto: " . $item->name . "\nPrecio: $" . $item->price . "\n¿Podrías darme más información al respecto?" . "\nLink del producto: " . route('product-show', ['name' => $catalogo->name, 'id' => $item->id]);
-@endphp
-                               
-                                <a href="https://wa.me/{{$catalogo->telefono_contacto}}?text={{ urlencode($mensaje) }}" target="_blank" class="ml-2 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center transition-colors duration-200">
-                                <svg fill="#fff" width="22px" height="22px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>whatsapp</title> <path d="M26.576 5.363c-2.69-2.69-6.406-4.354-10.511-4.354-8.209 0-14.865 6.655-14.865 14.865 0 2.732 0.737 5.291 2.022 7.491l-0.038-0.070-2.109 7.702 7.879-2.067c2.051 1.139 4.498 1.809 7.102 1.809h0.006c8.209-0.003 14.862-6.659 14.862-14.868 0-4.103-1.662-7.817-4.349-10.507l0 0zM16.062 28.228h-0.005c-0 0-0.001 0-0.001 0-2.319 0-4.489-0.64-6.342-1.753l0.056 0.031-0.451-0.267-4.675 1.227 1.247-4.559-0.294-0.467c-1.185-1.862-1.889-4.131-1.889-6.565 0-6.822 5.531-12.353 12.353-12.353s12.353 5.531 12.353 12.353c0 6.822-5.53 12.353-12.353 12.353h-0zM22.838 18.977c-0.371-0.186-2.197-1.083-2.537-1.208-0.341-0.124-0.589-0.185-0.837 0.187-0.246 0.371-0.958 1.207-1.175 1.455-0.216 0.249-0.434 0.279-0.805 0.094-1.15-0.466-2.138-1.087-2.997-1.852l0.010 0.009c-0.799-0.74-1.484-1.587-2.037-2.521l-0.028-0.052c-0.216-0.371-0.023-0.572 0.162-0.757 0.167-0.166 0.372-0.434 0.557-0.65 0.146-0.179 0.271-0.384 0.366-0.604l0.006-0.017c0.043-0.087 0.068-0.188 0.068-0.296 0-0.131-0.037-0.253-0.101-0.357l0.002 0.003c-0.094-0.186-0.836-2.014-1.145-2.758-0.302-0.724-0.609-0.625-0.836-0.637-0.216-0.010-0.464-0.012-0.712-0.012-0.395 0.010-0.746 0.188-0.988 0.463l-0.001 0.002c-0.802 0.761-1.3 1.834-1.3 3.023 0 0.026 0 0.053 0.001 0.079l-0-0.004c0.131 1.467 0.681 2.784 1.527 3.857l-0.012-0.015c1.604 2.379 3.742 4.282 6.251 5.564l0.094 0.043c0.548 0.248 1.25 0.513 1.968 0.74l0.149 0.041c0.442 0.14 0.951 0.221 1.479 0.221 0.303 0 0.601-0.027 0.889-0.078l-0.031 0.004c1.069-0.223 1.956-0.868 2.497-1.749l0.009-0.017c0.165-0.366 0.261-0.793 0.261-1.242 0-0.185-0.016-0.366-0.047-0.542l0.003 0.019c-0.092-0.155-0.34-0.247-0.712-0.434z"></path> </g></svg>
+                            <div class="flex gap-2">
+                                <a href="https://wa.me/{{$catalogo->telefono_contacto}}?text={{ urlencode('Hola! Me interesa: ' . $item->name) }}" target="_blank" class="text-white bg-green-600 hover:bg-green-700 p-2.5 rounded-lg transition-colors">
+                                    <svg fill="#fff" width="20px" height="20px" viewBox="0 0 32 32"><path d="M26.576 5.363c-2.69-2.69-6.406-4.354-10.511-4.354-8.209 0-14.865 6.655-14.865 14.865 0 2.732 0.737 5.291 2.022 7.491l-0.038-0.070-2.109 7.702 7.879-2.067c2.051 1.139 4.498 1.809 7.102 1.809h0.006c8.209-0.003 14.862-6.659 14.862-14.868 0-4.103-1.662-7.817-4.349-10.507zM16.062 28.228h-0.005c-2.319 0-4.489-0.64-6.342-1.753l-0.451-0.267-4.675 1.227 1.247-4.559-0.294-0.467c-1.185-1.862-1.889-4.131-1.889-6.565 0-6.822 5.531-12.353 12.353-12.353s12.353 5.531 12.353 12.353c0 6.822-5.53 12.353-12.353 12.353z"></path></svg>
                                 </a>
-                                <a href="#" class="ml-2 text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center transition-colors duration-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <a href="#" class="text-white bg-[var(--main-color)] hover:opacity-90 p-2.5 rounded-lg transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                                     </svg>
                                 </a>
@@ -136,12 +95,9 @@
                         </div>
                     </div>
                 </div>
-                @empty
-                    <div class="col-span-full text-center text-gray-400 py-10">
-                        No hay productos en este catálogo.
-                    </div>
-                @endforelse
-           
+            @empty
+                <div class="col-span-full text-center text-gray-400 py-10">No hay productos disponibles.</div>
+            @endforelse
         </div>
     </div>
 </div>

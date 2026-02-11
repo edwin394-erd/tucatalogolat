@@ -9,6 +9,8 @@ use App\Models\Descuento;
 use App\Models\Product;
 use App\Models\Foto;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ProductForm extends Component
 {
@@ -38,7 +40,7 @@ class ProductForm extends Component
         'visible' => 'required|boolean',
         'description' => 'nullable|string',
         'images' => 'array',
-        'images.*' => 'mimes:jpeg,png,jpg,gif|max:2048',
+        'images.*' => 'mimes:jpeg,png,jpg,gif,webp|max:2048',
     ];
 
     protected $messages = [
@@ -105,80 +107,60 @@ class ProductForm extends Component
     }
  
     
-    public function save()
-    {
-        $this->validate();
+  public function save()
+{
+    $this->validate();
 
-        // Validación personalizada para asegurar al menos una imagen.
-        if (count($this->images) + count($this->existingImages) === 0) {
-             $this->addError('images', 'El producto debe tener al menos una imagen.');
-             return;
-        }
-
-        if ($this->ItemId) {
-            $product = Product::find($this->ItemId);
-            if ($product) {
-
-
-                $product->update([
-                    'name' => $this->name,
-                    'price' => $this->price,
-                    'category_id' => $this->category,
-                    'descuento_id' => $this->descuento,
-                    'stock' => $this->stock,
-                    'visible' => (int) $this->visible,
-                    'description' => $this->description,
-                ]);
-
-                // Procesa las imágenes marcadas para eliminación.
-                foreach ($this->imagesToDelete as $imageId) {
-                    $image = Foto::find($imageId);
-                    if ($image) {
-                        Storage::disk('public')->delete($image->url);
-                        $image->delete();
-                    }
-                }
-                
-                // Sube y asocia las nuevas imágenes.
-                foreach ($this->images as $image) {
-                    $path = $image->store('products', 'public');
-                    $product->fotos()->create([
-                        'url' => $path,
-                        'imageable_type' => Product::class,
-                    ]);
-                }
-
-                session()->flash('message', 'Producto actualizado con éxito.');
-            }
-        } else {
-            // Lógica para crear un nuevo producto.
-            $product = Product::create([
-                'name' => $this->name,
-                'price' => $this->price,
-                'category_id' => $this->category,
-                'descuento_id' => $this->descuento,
-                'stock' => $this->stock,
-                'visible' => (int) $this->visible,
-                'description' => $this->description,
-                'catalogo_id' => auth()->user()->catalogo->id,
-            ]);
-
-            // Sube y asocia las imágenes del nuevo producto.
-            foreach ($this->images as $image) {
-                $path = $image->store('products', 'public');
-                $product->fotos()->create([
-                    'url' => $path,
-                    'imageable_id' => $product->id,
-                    'imageable_type' => Product::class,
-                ]);
-            }
-
-            session()->flash('message', 'Producto creado con éxito.');
-            $this->reset(['name', 'price', 'category', 'descuento', 'stock', 'description', 'images', 'visible', 'existingImages']);
-        }
-
-        
-
-        $this->redirectRoute('products');
+    if (count($this->images) + count($this->existingImages) === 0) {
+        $this->addError('images', 'El producto debe tener al menos una imagen.');
+        return;
     }
+
+    // Datos base para crear o actualizar
+    $data = [
+        'name' => $this->name,
+        'price' => $this->price,
+        'category_id' => $this->category,
+        'descuento_id' => $this->descuento,
+        'stock' => $this->stock,
+        'visible' => (int) $this->visible,
+        'description' => $this->description,
+    ];
+
+    if ($this->ItemId) {
+        $product = Product::find($this->ItemId);
+        $product->update($data);
+
+        foreach ($this->imagesToDelete as $imageId) {
+            $image = Foto::find($imageId);
+            if ($image) {
+                Storage::disk('public')->delete($image->url);
+                $image->delete();
+            }
+        }
+    } else {
+        $data['catalogo_id'] = auth()->user()->catalogo->id;
+        $product = Product::create($data);
+    }
+
+    // Optimización y guardado de nuevas imágenes
+    $manager = new ImageManager(new Driver());
+    foreach ($this->images as $image) {
+        $name = 'products/' . uniqid() . '.webp';
+        // Redimensiona proporcionalmente y comprime
+        $img = $manager->read($image->getRealPath())
+                       ->scale(width: 800) 
+                       ->toWebp(80);
+
+        Storage::disk('public')->put($name, $img);
+
+        $product->fotos()->create([
+            'url' => $name,
+            'imageable_type' => Product::class,
+        ]);
+    }
+
+    session()->flash('message', $this->ItemId ? 'Producto actualizado.' : 'Producto creado.');
+    $this->redirectRoute('products');
+}
 }
