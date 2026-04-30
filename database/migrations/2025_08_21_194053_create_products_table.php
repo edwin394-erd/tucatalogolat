@@ -17,10 +17,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->foreignId('catalogo_id')->constrained()->onDelete('cascade');
-            $table->foreignId('descuento_id')->nullable()->constrained()->onDelete('cascade');
+            $table->decimal('precio_descuento')->nullable();
             $table->boolean('visible')->default(true);
             $table->decimal('price', 10, 2);
-            $table->enum('stock', ['Alto', 'Medio', 'Bajo', 'Agotado'])->nullable();
             $table->timestamps();
         });
     }

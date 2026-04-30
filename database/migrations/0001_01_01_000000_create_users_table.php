@@ -41,6 +41,20 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+            // Insertar un usuario admin predeterminado
+            DB::table('users')->insert([
+                'name' => 'Admin',
+                'email' => 'edwinprobando@gmail.com',
+                'role' => 'admin',
+                'password' => bcrypt('Sept2024*'), // Cambia esta contraseña por una más segura
+                'country' => 'Venezuela',
+                'city' => 'Caracas',
+                'address' => 'Av. Principal, Caracas',
+                'telephone' => '04246054544',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
     }
 
     /**

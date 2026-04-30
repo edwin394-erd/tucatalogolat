@@ -5,7 +5,6 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Category;
-use App\Models\Descuento;
 use App\Models\Product;
 use App\Models\Foto;
 use Illuminate\Support\Facades\Storage;
@@ -20,75 +19,95 @@ class ProductForm extends Component
     public $name;
     public $price;
     public $category;
-    public $descuento;
-    public $stock;
+    public $precio_descuento;
     public $description;
     public $images = []; // Nuevas imágenes temporales
     public $existingImages = []; // Imágenes guardadas en la base de datos
     public $imagesToDelete = []; // IDs de imágenes que se marcaron para eliminar
     public $visible;
+    public $maximoProductos;
+    public $productosActuales;
+    public $variants = []; // Variantes del producto
 
     public $categories = [];
-    public $descuentos = [];
 
-    protected $rules = [
+    public function rules(): array
+{
+    return [
         'name' => 'required|string|max:255',
         'price' => 'required|numeric|min:0',
         'category' => 'required|exists:categories,id',
-        'descuento' => 'nullable|exists:descuentos,id',
-        'stock' => 'required|string',
         'visible' => 'required|boolean',
         'description' => 'nullable|string',
         'images' => 'array',
         'images.*' => 'mimes:jpeg,png,jpg,gif,webp|max:2048',
+        'variants' => 'array',
+        'variants.*.size' => 'nullable|string|max:50',
+        'variants.*.color' => 'nullable|string|max:50',
+        'variants.*.price_adjustment' => 'nullable|numeric',
+        'variants.*.stock' => 'nullable|integer|min:0',
     ];
+}
 
-    protected $messages = [
-        'name.required' => 'El nombre del producto es obligatorio.',
-        'price.required' => 'El precio es obligatorio.',
-        'price.numeric' => 'El precio debe ser un número válido.',
-        'category.required' => 'La categoría es obligatoria.',
-        'category.exists' => 'La categoría seleccionada no es válida.',
-        'descuento.exists' => 'El descuento seleccionado no es válido.',
-        'stock.required' => 'El stock es obligatorio.',
-        'images.*.mimes' => 'Las imágenes deben ser de tipo: jpeg, png, jpg, gif.',
-        'images.*.max' => 'Las imágenes no deben pesar más de 2MB.',
+public function messages(): array
+{
+    return [
+        'name.required' => __('messages.product_name_required'),
+        'price.required' => __('messages.price_required'),
+        'price.numeric' => __('messages.price_numeric'),
+        'category.required' => __('messages.category_required'),
+        'category.exists' => __('messages.category_exists'),
+        'precio_descuento.required' => __('messages.precio_descuento_required'),
+        'images.*.mimes' => __('messages.images_mimes'),
+        'images.*.max' => __('messages.images_max'),
     ];
+}
     
     public function mount($ItemId = null)
     {
         $user = auth()->user();
+      
+        $maximoProductos = $user->subscriptions->last() ? $user->subscriptions->last()->plan->max_products : 0;
+        $this->maximoProductos = $maximoProductos;
+    
+        $productosActuales = $user->catalogo->products()->count();
+        $this->productosActuales = $productosActuales;
+
+        
+
         $this->categories = Category::where('catalogo_id', $user->catalogo->id)->get();
-        $this->descuentos = Descuento::where('catalogo_id', $user->catalogo->id)->get();
         $this->ItemId = $ItemId;
 
         if($this->visible === null && !$this->ItemId){ 
             $this->visible = true; // Valor predeterminado
         }
 
-    
 
         if ($this->ItemId) {
             
-            $product = Product::with('fotos')->find($this->ItemId);
+            $product = Product::with('fotos', 'variants')->find($this->ItemId);
             
             if ($product) {
                 $this->name = $product->name;
                 $this->price = $product->price;
                 $this->category = $product->category_id;
-                $this->descuento = $product->descuento_id;
-                $this->stock = $product->stock;
+                $this->precio_descuento = $product->precio_descuento;
                 $this->visible = (bool)$product->visible;
                 $this->description = $product->description;
                 $this->existingImages = $product->fotos->toArray();
+                $this->variants = $product->variants->toArray();
             }
         }
     }
     
     public function render()
     {
-        return view('livewire.product-form');
+
+          return view('livewire.product-form');
     }
+        
+
+    
 
     // Marca una imagen existente para ser eliminada cuando se guarde el formulario.
     public function markImageForDeletion($imageId)
@@ -105,6 +124,17 @@ class ProductForm extends Component
         unset($this->images[$index]);
         $this->images = array_values($this->images);
     }
+
+    public function addVariant()
+    {
+        $this->variants[] = ['size' => '', 'color' => '', 'price_adjustment' => 0, 'stock' => 0];
+    }
+
+    public function removeVariant($index)
+    {
+        unset($this->variants[$index]);
+        $this->variants = array_values($this->variants);
+    }
  
     
   public function save()
@@ -117,12 +147,12 @@ class ProductForm extends Component
     }
 
     // Datos base para crear o actualizar
+
     $data = [
         'name' => $this->name,
         'price' => $this->price,
         'category_id' => $this->category,
-        'descuento_id' => $this->descuento,
-        'stock' => $this->stock,
+        'precio_descuento' => $this->precio_descuento,
         'visible' => (int) $this->visible,
         'description' => $this->description,
     ];
@@ -160,7 +190,15 @@ class ProductForm extends Component
         ]);
     }
 
-    session()->flash('message', $this->ItemId ? 'Producto actualizado.' : 'Producto creado.');
+    // Manejar variantes
+    $product->variants()->delete(); // Eliminar existentes
+    foreach ($this->variants as $variant) {
+        if (!empty($variant['size']) || !empty($variant['color'])) {
+            $product->variants()->create($variant);
+        }
+    }
+
+    session()->flash('message', $this->ItemId ? __('messages.product_updated') : __('messages.product_created'));
     $this->redirectRoute('products');
 }
 }

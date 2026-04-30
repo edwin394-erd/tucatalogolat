@@ -13,13 +13,19 @@ use App\Livewire\Categories;
 use App\Livewire\Descuentos;
 use App\Livewire\Configuracion;
 use App\Livewire\Catalogo;
+use App\Livewire\Cart;
 use App\Livewire\ShowProduct;
+use App\Livewire\Cuenta;
 
-
+use App\Livewire\Usuarios;
+use App\Livewire\Planes;
+use App\Livewire\Subscripciones;
 
 
 use App\Livewire\EditItem;
 use App\Livewire\CreateItem;
+
+use App\Http\Controllers\LanguageController;
 
 
 
@@ -32,13 +38,25 @@ Route::get('/Products', Products::class)->middleware(['auth'])->name('products')
 Route::get('/Categories', Categories::class)->middleware(['auth'])->name('categories');
 Route::get('/Descuentos', Descuentos::class)->middleware(['auth'])->name('descuentos');
 Route::get('/Configuracion', Configuracion::class)->middleware(['auth'])->name('configuracion');
+ROute::get('/Cuenta', Cuenta::class)->middleware(['auth'])->name('cuenta');
+
+Route::get('/Users', Usuarios::class)->middleware(['auth'])->name('usuarios');
+Route::get('/Planes', Planes::class)->middleware(['auth'])->name('planes');
+
+Route::get('/Subscripciones', Subscripciones::class)->middleware(['auth'])->name('subscripciones');
 
 Route::get('/{name}/product/{id}', ShowProduct::class)->name('product-show');
+Route::get('/{name}/cart', Cart::class)->name('catalogo.cart');
+
+Route::get('/create/{model}', CreateItem::class)->name('create');
+Route::get('/edit/{model}/{id}', EditItem::class)->name('edit');
 
 Route::get('/{name}', Catalogo::class)->name('catalogo');
 
 Route::get('/Editar/{model}/{id}', EditItem::class)->middleware(['auth'])->name('edit');
 Route::get('/Crear/{model}', CreateItem::class)->middleware(['auth'])->name('create');
+
+Route::get('/lang/{locale}', [LanguageController::class, 'setLocale'])->name('lang.switch');
 
 
 

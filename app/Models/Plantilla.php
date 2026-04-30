@@ -4,16 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\Catalogo;
+
 class Plantilla extends Model
 {
     protected $table = 'plantillas';
 
     protected $fillable = [
-        'nombre',
+        'name',
+        'description',
+        'image_url',
     ];
 
-    // public function catalogo()
-    // {
-    //     return $this->HasMany(Catalogo::class);
-    // }
+    public function catalogos()
+    {
+        return $this->hasMany(Catalogo::class);
+    }
 }

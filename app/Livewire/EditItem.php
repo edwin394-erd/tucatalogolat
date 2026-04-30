@@ -13,6 +13,7 @@ class EditItem extends Component
     public function render()
     {
 
+
         return view('livewire.edit-item')
             ->extends('layouts.auth2')
             ->section('content')

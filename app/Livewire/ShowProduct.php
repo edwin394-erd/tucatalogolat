@@ -9,6 +9,7 @@ class ShowProduct extends Component
 {
     public $product;
     public $name;
+    public $selectedVariantId = null;
 
     public function mount($name,$id)
     {
@@ -30,8 +31,13 @@ class ShowProduct extends Component
 
     public function addToCart($productId)
     {
-        // Aquí debes implementar la lógica del carrito
-        // Ejemplo: Cart::add($this->product);
+        $catalogo = \App\Models\Catalogo::where('name', $this->name)->firstOrFail();
+        $product = Product::where('catalogo_id', $catalogo->id)->findOrFail($productId);
+
+        $cart = \App\Models\Cart::current($catalogo->id);
+        $cart->addProduct($product, 1, $this->selectedVariantId);
+
+        session()->now('message', __('messages.added_to_cart'));
     }
 
     public function render()

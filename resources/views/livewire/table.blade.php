@@ -1,14 +1,13 @@
-<div class="relative overflow-x-auto bg-white p-4 shadow-md sm:rounded-lg md:rounded-xl">
+<div class="relative overflow-x-auto bg-white p-4 shadow-md rounded-lg md:rounded-xl">
 
     <x-alert alert_type="success" />
 
-    <div class="pb-4 bg-white flex justify-between">
-        @if($model == 'Product')
-            <h2 class="text-2xl font-bold text-gray-700 ">Tus Productos</h2>
-        @elseif($model == 'Category')
-            <h2 class="text-2xl font-bold text-gray-700 ">Tus Categorías</h2>
-        @elseif($model == 'Descuento')
-            <h2 class="text-2xl font-bold text-gray-700 ">Tus Descuentos</h2>
+    <div class="pb-4 bg-white  text-center  md:flex md:justify-between">
+
+
+
+        @if ($titulo)
+            <h2 class="text-2xl font-bold text-gray-700 mb-2">{{ $titulo }}</h2>
         @endif
 
         <label for="table-search" class="sr-only">Buscar</label>
@@ -18,8 +17,9 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                 </svg>
             </div>
-            <input wire:model.live="search" type="text" placeholder="Buscar..."  id="table-search" class="block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-100 focus:ring-gray-500 inset-shadow-sm focus:border-gray-500" placeholder="Search for items">
+            <input wire:model.live="search" type="text" placeholder="{{ __('messages.search') }}"  id="table-search" class="block pt-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-100 focus:ring-gray-500 inset-shadow-sm focus:border-gray-500 w-full md:w-80" placeholder="Search for items">
         </div>
+        <br>
 
     <div>
 
@@ -28,7 +28,7 @@
     wire:navigate
     class="bg-indigo-600 shadow shadow-xl  focus:ring-blue-300 text-white rounded-lg px-4 py-2">
     
-    Agregar
+    {{ __('messages.add') }}
 </a>
 </div>
 
@@ -48,7 +48,7 @@
                         @endif
                     </th>
                 @endforeach
-                <th class="px-6 py-3 rounded-tr-xl text-right">Acciones</th>
+                <th class="px-6 py-3 rounded-tr-xl text-right">{{ __('messages.actions') }}</th>
             </tr>
         </thead>
         @forelse ($items as $index => $item)
@@ -67,6 +67,28 @@
                             @else
                                 <span class="text-gray-500">No image</span>
                             @endif
+                        @elseif ($column === 'subscription')
+                           {{ $item->subscriptions->isNotEmpty() ? $item->subscriptions->last()->plan->name : 'Sin suscripción' }}
+                        @elseif ($column === 'user_id')
+                            {{ $item->user ? $item->user->name : 'N/A' }}
+                        @elseif ($column === 'plan_id')
+                            {{ $item->plan ? $item->plan->name : 'N/A' }}
+                         
+                        @elseif ($column === 'fecha_de_corte')
+                        <div class="rounded-lg p-1 text-center @if($item->subscriptions->isNotEmpty() && $item->subscriptions->last()->expires_at < now()) bg-red-100 text-red-700 @else bg-green-100 text-green-700 @endif">
+
+                            {{ $item->subscriptions->isNotEmpty() ? $item->subscriptions->last()->expires_at->format('d/m/Y') : 'N/A' }}
+                        </div>
+                        @elseif ($column === 'status')
+                            <div class="rounded-lg p-1 text-center @if($item->status == 'active') bg-green-100 text-green-700 @elseif($item->status == 'expired') bg-red-100 text-red-700 @else bg-yellow-100 text-yellow-700 @endif">
+                                {{ ucfirst($item->status) }}
+                            </div>
+                        @elseif ($column === 'catalogo_name')
+            
+                        <a href="{{ $item->catalogo ? route('catalogo', ['name' => $item->catalogo->name]) : '#' }}" class="text-blue-600 hover:underline" target="_blanck">
+
+                            {{ $item->catalogo ? $item->catalogo->name : 'N/A' }}
+                        </a>
                         @else
                             {{ $item->$column }}
                         @endif

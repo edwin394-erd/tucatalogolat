@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('catalogos', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+
+            $table->string('name_handle')->unique();
+            $table->string('name');            
             $table->string('divisa')->default('dolar');
             $table->string('description',1000)->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -23,11 +25,14 @@ return new class extends Migration
             $table->string('logo_url')->nullable();
             $table->string('telefono_contacto')->nullable();
             $table->string('ubicacion')->nullable();
+            $table->string('ubicacion_mapa')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('twitter')->nullable();
+            $table->string('tiktok')->nullable();
             $table->string('horario')->nullable();
-
-            $table->string('color_primario')->default('#3490dc');
-            $table->string('color_secundario')->default('#ffed4a');
-            $table->string('color_fondo')->default('#ffffff');
+            $table->foreignId('theme_id')->default(1)->constrained('themes')->onDelete('restrict');
+            
             $table->timestamps();
         });
     }

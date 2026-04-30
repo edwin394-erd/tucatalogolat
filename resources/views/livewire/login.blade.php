@@ -4,18 +4,18 @@
             <div class="w-full bg-white rounded-lg shadow border border-gray-300 md:mt-0 sm:max-w-md xl:p-0">
                     <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                                    Iniciar sesión
+                                    {{ __('messages.login_title') }}
                             </h1>
                             <form class="space-y-4 md:space-y-6" wire:submit.prevent="login" novalidate>
                                     <div>
-                                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Tu email</label>
+                                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">{{ __('messages.your_email') }}</label>
                                             <input type="email" wire:model.blur="email" name="email" id="email" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5" placeholder="name@company.com" required="">
                                             @error('email')
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
                                     <div x-data="{ showPassword: false }">
-                                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Contraseña</label>
+                                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900">{{ __('messages.password') }}</label>
                                         <div class="relative">
                                                 <input x-bind:type="showPassword ? 'text' : 'password'" wire:model.blur="password" name="password" id="password" placeholder="••••••••" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5 pr-10" required="">
                                                 <button type="button" x-on:click="showPassword = !showPassword" tabindex="-1" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
@@ -39,14 +39,14 @@
                                                         <input id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-100 inset-shadow-sm focus:ring-3 focus:ring-gray-300" required="">
                                                     </div>
                                                     <div class="ml-3 text-sm">
-                                                        <label for="remember" class="text-gray-500">Recuérdame</label>
+                                                        <label for="remember" class="text-gray-500">{{ __('messages.remember_me') }}</label>
                                                     </div>
                                             </div>
-                                            <a href="#" class="text-sm font-medium text-gray-600 hover:underline">¿Olvidaste tu contraseña?</a>
+                                            <a href="#" class="text-sm font-medium text-gray-600 hover:underline">{{ __('messages.forgot_password') }}</a>
                                     </div>
-                                    <button type="submit" class="w-full text-white bg-indigo-600  focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Iniciar sesión</button>
+                                    <button type="submit" class="w-full text-white bg-indigo-600  focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">{{ __('messages.login') }}</button>
                                     <p class="text-sm font-light text-gray-500">
-                                            ¿No tienes una cuenta todavía? <a href="{{ route('register') }}" wire:navigate class="font-medium text-gray-600 hover:underline">Regístrate</a>
+                                            {{ __('messages.no_account') }} <a href="{{ route('register') }}" wire:navigate class="font-medium text-gray-600 hover:underline">{{ __('messages.register') }}</a>
                                     </p>
                             </form>
                     </div>

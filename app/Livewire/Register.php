@@ -5,6 +5,8 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\User;
 use App\Models\Catalogo;
+use App\Models\Subscription;
+
 use Illuminate\Support\Facades\Hash;
 
 class Register extends Component
@@ -19,6 +21,8 @@ class Register extends Component
     public $telephone;
     public $role = 'user';
     public $address;
+    public $area_code;
+    public $create_catalog = false;
 
     protected $rules = [
         'name' => 'required|string|max:255|unique:users,name',
@@ -29,6 +33,7 @@ class Register extends Component
         'telephone' => 'required|regex:/^[0-9]+$/|max:20',
         'role' => 'required|string|max:50',
         'address' => 'required|string|max:255',
+        'create_catalog' => 'boolean',
     ];
 
     protected $messages = [
@@ -72,15 +77,28 @@ class Register extends Component
             'country' => $this->country,
             'city' => $this->city,
             'address' => $this->address,
-            'telephone' => $this->telephone,
+            'telephone' => $this->area_code . $this->telephone,
             'role' => 'user',
         ]);
 
-        Catalogo::create([
-            'name' => $this->name,
-            'user_id' => $user->id,
-            'telefono_contacto' => $this->telephone,
-        ]);
+        if ($this->create_catalog) {
+            Catalogo::create([
+                'name' => $this->name,
+                'name_handle' => \Str::slug($this->name) . '-' . $user->id,
+                'user_id' => $user->id,
+                'telefono_contacto' => $this->area_code . $this->telephone,
+            ]);
+
+            Subscription::create([
+                'user_id' => $user->id,
+                'plan_id' => 1, // Asignar el plan gratuito
+                'status' => 'active', // Activar la suscripción
+                'starts_at' => now(),
+                'expires_at' => now()->addMonth(), // Establecer una fecha de expiración (opcional)
+            ]);
+        }
+
+        
 
         // Redirect or show a success message
         session()->flash('message', 'Registro exitoso. Por favor, inicia sesión.');

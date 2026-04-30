@@ -10,16 +10,17 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'stock',
-        'category_id',
-        'catalogo_id',
-        'visible',
-        'descuento_id',
-    ];
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($product) {
+            foreach ($product->fotos as $foto) {
+                \Storage::disk('public')->delete($foto->url);
+                $foto->delete();
+            }
+        });
+    }
 
     public function category()
     {
@@ -38,6 +39,11 @@ class Product extends Model
     public function descuento()
     {
         return $this->belongsTo(Descuento::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
     }
 
 }

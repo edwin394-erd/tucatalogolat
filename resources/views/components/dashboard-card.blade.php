@@ -1,18 +1,13 @@
 @props(['title', 'content'])
-<div class="shadow bg-white shadow-xl rounded-lg p-0 w-1/3 h-1/3" {{ $attributes }}>
-    <div class="px-4 py-2 bg-white rounded-t-lg shadow shadow-b-md">
-        <h2 class="text-xl text-gray-700 font-semibold mb-2">{{ $title }}</h2>
-
-    
+<div {{ $attributes->merge(['class' => 'shadow-xl rounded-lg bg-white flex flex-col h-full']) }}>
+    <div class="px-4 py-2 bg-white rounded-t-lg border-b border-gray-100">
+        <h2 class="text-xl text-gray-700 font-semibold">{{ $title }}</h2>
     </div>
 
-    <div class="inset-shadow-sm px-6">
-
-        <h2 class="text-gray-600 text-xl dark:text-gray-400  pt-6 mb-3">{{ $content }}</h2>
-        <div class="flex justify-end">
-            <a href="#" class="text-gray-200 text-sm rounded-lg bg-indigo-600 mb-6 p-2">Ver más</a>
+    <div class="px-6 flex flex-col flex-grow">
+        <h2 class="text-gray-600 text-xl pt-6 mb-4 flex-grow">{{ $content }}</h2>
+        <div class="flex justify-end mt-auto">
+            <a href="#" class="text-gray-200 text-sm rounded-lg bg-indigo-600 mb-6 p-2 hover:bg-indigo-700 transition">{{ __('messages.show_more') }}</a>
         </div>
     </div>
- 
-
 </div>

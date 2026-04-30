@@ -16,7 +16,7 @@
 <body class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm h-screen ">
     @vite('resources/js/app.js')
 
-
+  <x-alert alert_type="success" />
 
 <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
    <span class="sr-only">Abrir barra lateral</span>
@@ -24,6 +24,14 @@
    <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
    </svg>
 </button>
+
+    <!-- Language switch -->
+    <div class="hidden sm:block ml-4">
+      <select id="language-select" class="bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 transition">
+        <option value="es" {{ app()->getLocale() == 'es' ? 'selected' : '' }}>🇪🇸 Español</option>
+        <option value="en" {{ app()->getLocale() == 'en' ? 'selected' : '' }}>🇺🇸 English</option>
+      </select>
+    </div>
 
 
 <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
@@ -35,9 +43,26 @@
       </div>
       <ul class="space-y-2 font-medium">
          
-{{-- <button x-on:click="dark = !dark" id="theme-toggle" type="button" class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-100 group">
-    Toggle Dark Mode
-</button> --}}
+         @if(auth()->user()->subscriptions->last())
+            @if(auth()->user()->subscriptions->last()->expires_at > now())
+            
+            <div class="bg-indigo-100 text-indigo-800 text-sm font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-indigo-200 dark:text-indigo-900 mb-4" role="alert">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                  <path  fill-rule="evenodd" d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z" clip-rule="evenodd" />
+                  </svg>
+
+               <span class="ml-2">Plan {{ auth()->user()->subscriptions->last()->plan->name }}</span>
+            </div>
+            @else
+            <div class="bg-red-100 text-red-800 text-sm font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900 mb-4" role="alert">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+                  </svg>
+
+               <span class="ml-2">{{ __('messages.subscription_expired') }}</span>
+            </div>
+            @endif
+         @endif
          <li class="  w-fit h-fit">
             <a href="{{ route('dashboard') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <svg class="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
@@ -47,10 +72,29 @@
                <span class="ms-3">Dashboard</span>
             </a>
          </li>
+
+
+
+         <li class="  w-fit h-fit">
+            <a href="{{ route('cuenta') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+               <svg class="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+               </svg>
+               <span class="ms-3">{{ __('messages.account') }}</span>
+            </a>
+         </li>
+          <li class="  w-fit h-fit">
+            <a href="{{ route('planes') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+               <x-svg-plans/>
+               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.plans') }}</span>
+            </a>
+         </li>
+
+         @if(auth()->user()->role == 'user')
          <li class="  w-fit h-fit">
             <a href="{{ route('products') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
               <x-svg-products/>
-               <span class="flex-1 ms-3 whitespace-nowrap">Productos</span>
+               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.products') }}</span>
                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">{{ $productsCount }}</span>
             </a>
          </li>
@@ -58,7 +102,7 @@
          <li class="  w-fit h-fit">
             <a href="{{ route('categories') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <x-svg-categories/>
-               <span class="flex-1 ms-3 whitespace-nowrap">Categorias</span>
+               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.categories') }}</span>
             </a>
          </li>
 
@@ -79,20 +123,39 @@
             </svg>
 
 
-               <span class="flex-1 ms-3 whitespace-nowrap">Personalizar</span>
+               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.personalize') }}</span>
             </a>
          </li>
 
          <li class="  w-fit h-fit">
-            <a href="{{ route('catalogo', auth()->user()->catalogo->name) }}" wire:navigat2.hover class="px-3 flex items-centtext-lg er p-2 text-gray-900 rounded-xl hover:bg-gray-100 group" wire:current='font-bold text-blue-500'>
+            <a href="{{ route('catalogo', auth()->user()->catalogo->name) }}" wire:navigate.hover class="px-3 flex items-centtext-lg er p-2 text-gray-900 rounded-xl hover:bg-gray-100 group" wire:current='font-bold text-blue-500'>
              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900">
             <path d="M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z" />
             <path fill-rule="evenodd" d="M3 20.25v-8.755c1.42.674 3.08.673 4.5 0A5.234 5.234 0 0 0 9.75 12c.804 0 1.568-.182 2.25-.506a5.234 5.234 0 0 0 2.25.506c.804 0 1.567-.182 2.25-.506 1.42.674 3.08.675 4.5.001v8.755h.75a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1 0-1.5H3Zm3-6a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3Zm8.25-.75a.75.75 0 0 0-.75.75v5.25c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-5.25a.75.75 0 0 0-.75-.75h-3Z" clip-rule="evenodd" />
             </svg>
 
-               <span class="flex-1 ms-3 whitespace-nowrap">Catalogo</span>
+               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.catalog') }}</span>
             </a>
          </li>
+
+
+         @elseif(auth()->user()->role == 'admin')
+         <li class="  w-fit h-fit">
+            <a href="{{ route('usuarios') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+               <x-svg-users/>
+               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.users') }}</span>
+            </a>
+         </li>
+         <li class="  w-fit h-fit">
+            <a href="{{ route('subscripciones') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+               <x-svg-subscriptions/>
+               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.subscriptions') }}</span>
+            </a>
+         </li>
+        
+
+         @endif
+
 
 
          
@@ -103,7 +166,7 @@
                <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"/>
                </svg>
-               <span class="ms-3">Salir</span>
+               <span class="ms-3">{{ __('messages.logout') }}</span>
             </button>
             
          </li>
@@ -112,13 +175,13 @@
 </aside>
 
 
-<x-modal modalId="LogoutModal" modalTitle="Cerrar sesión" modal translate="logout" class="group">
+<x-modal modalId="LogoutModal" modalTitle="{{ __('messages.logout') }}" modal translate="logout" class="group">
 
-  <p class="text-lg text-gray-700 group-hover:text-gray-100">¿Estás seguro de que deseas cerrar sesión?</p>
+  <p class="text-lg text-gray-700 group-hover:text-gray-100">{{ __('messages.confirm_logout') }}</p>
   <div>
      <div class="flex justify-end gap-3 mt-6">
         <button type="button" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 hover:text-white transition-colors" data-modal-hide="LogoutModal">
-           Cancelar
+             {{ __('messages.cancel') }}
         </button>
         
         @livewire('logout')
@@ -129,7 +192,7 @@
 
 </x-modal>
 
-<div class="p-4 sm:ml-64">
+<div class="md:p-4 md:ml-64">
 
    
   @yield('content')
@@ -177,6 +240,16 @@
    document.getElementById('theme-toggle').addEventListener('click', function() {
    document.documentElement.classList.toggle('dark');
    });
+
+// language select handler
+var langSelect = document.getElementById('language-select');
+if(langSelect){
+    langSelect.addEventListener('change', function() {
+        var locale = this.value;
+        window.location.href = "{{ url('lang') }}/" + locale;
+    });
+}
+
 </script>
 
 

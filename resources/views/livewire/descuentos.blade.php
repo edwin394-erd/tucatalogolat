@@ -7,10 +7,10 @@
         @livewire('table', [
             'model' => 'Descuento',
             'columns' => ['name', 'amount','type' , 'product_id', 'start_date', 'end_date'],
-            'column_names' => ['Nombre', 'Monto', 'Tipo', 'Producto', 'Fecha de Inicio', 'Fecha de Fin'],
+            'column_names' => [__('messages.name'), __('messages.amount'), __('messages.type'), __('messages.product'), __('messages.start_date'), __('messages.end_date')],
             'filter_field' => 'catalogo_id',
             'filter_value' => auth()->user()->catalogo->id,
-            'table_type' => 'Descuentos'
+            'table_type' => __('messages.discounts')
         ])
     </div>
 

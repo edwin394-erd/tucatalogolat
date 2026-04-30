@@ -19,20 +19,26 @@ class Table extends Component
     public $filter_value;
     public $table_type;
     public $route_name;
+    public $searching_exceptions = ['foto'];
+    public $titulo = '';
 
 
 
-    public function mount($model, $columns, $column_names = null, $filter_field = null, $filter_value = null, $table_type = null)
+    public function mount($model, $columns, $column_names = null, $filter_field = null, $filter_value = null, $table_type = null, $searching_exceptions = [], $titulo = '')
     {
         // Asigna las propiedades del componente
         $this->model = $model;
         $this->columns = $columns;
         $this->column_names = $column_names ?? $columns;
+        $this->titulo = $titulo;
         $this->filter_field = $filter_field;
         $this->filter_value = $filter_value;
         $this->table_type = $table_type;
-        $this->route_name = $model === 'Product' ? 'products' : ($model === 'Category' ? 'categories' : ($model === 'Descuento' ? 'descuentos' : 'items'));
-        
+
+        $this->route_name = $model === 'Product' ? 'products' : ($model === 'Category' ? 'categories' : ($model === 'Descuento' ? 'descuentos' : ($model === 'Subscription' ? 'subscripciones' : ($model === 'Plan' ? 'planes' : 'items'))));
+
+        // $this->route_name = $model === 'Product' ? 'products' : ($model === 'Category' ? 'categories' : ($model === 'Descuento' ? 'descuentos' : 'items'));
+        $this->searching_exceptions = $searching_exceptions;
     }
 
     /**
@@ -94,8 +100,23 @@ class Table extends Component
             // Búsqueda en múltiples columnas usando una cláusula "where" anidada
             $query->where(function($q) {
                 foreach ($this->columns as $column) {
-                    // Evita la búsqueda en la columna 'foto' o cualquier otra que no sea de texto
-                    if ($column !== 'foto') {
+                   if (in_array($column, $this->searching_exceptions)) continue;
+
+                    if ($column === 'category_id') {
+                        $q->orWhereHas('category', function($subQuery) {
+                            $subQuery->where('name', 'like', '%' . $this->search . '%');
+                        });
+                    } elseif ($column === 'user_id') {
+                        $q->orWhereHas('user', function($subQuery) {
+                            $subQuery->where('name', 'like', '%' . $this->search . '%');
+                        });
+                    } elseif ($column === 'plan_id') {
+                        $q->orWhereHas('plan', function($subQuery) {
+                            $subQuery->where('name', 'like', '%' . $this->search . '%');
+                        });
+                    }
+
+                    else {
                         $q->orWhere($column, 'like', '%' . $this->search . '%');
                     }
                 }

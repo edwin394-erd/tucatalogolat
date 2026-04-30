@@ -8,10 +8,21 @@ class Catalogo extends Model
 {
     protected $fillable = [
         'name',
+        'name_handle',
         'description',
         'user_id',
         'plantilla_id',
         'telefono_contacto',
+        'ubicacion',
+        'ubicacion_mapa',
+        'instagram',
+        'facebook',
+        'twitter',
+        'tiktok',
+        'horario',
+        'theme_id',
+        'sucursal',
+        
     ];
 
     public function categories()
@@ -33,4 +44,10 @@ class Catalogo extends Model
     {
         return $this->belongsTo(Plantilla::class);
     }
+    public function theme()
+    {
+        return $this->belongsTo(Theme::class);
+    }
+
+    
 }

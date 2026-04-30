@@ -6,28 +6,28 @@
 			<!-- Hero content -->
 			<section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center py-12">
 				<div>
-					<h2 class="text-4xl font-extrabold leading-tight">Catálogos digitales para pymes por suscripción</h2>
-					<p class="mt-4 text-lg text-gray-600">Crea, publica y comparte catálogos profesionales en minutos. Aumenta ventas y presencia online sin complicaciones.</p>
+					<h2 class="text-4xl font-extrabold leading-tight">{{ __('messages.home_hero_title') }}</h2>
+					<p class="mt-4 text-lg text-gray-600">{{ __('messages.home_hero_subtitle') }}</p>
 					<div class="mt-6 flex flex-wrap gap-3">
-						<a href="{{ route('register') }}" class="inline-flex items-center px-5 py-3 bg-indigo-600 text-white rounded-md shadow">Comenzar ahora</a>
-						<a href="#pricing" class="inline-flex items-center px-5 py-3 border border-gray-200 rounded-md text-gray-700">Ver planes</a>
+						<a href="{{ route('register') }}" class="inline-flex items-center px-5 py-3 bg-indigo-600 text-white rounded-md shadow">{{ __('messages.home_start_now') }}</a>
+						<a href="#pricing" class="inline-flex items-center px-5 py-3 border border-gray-200 rounded-md text-gray-700">{{ __('messages.home_view_plans') }}</a>
 					</div>
 					<ul class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-						<li class="flex items-start gap-2"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>Plantillas profesionales</li>
-						<li class="flex items-start gap-2"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>Gestión de productos y precios</li>
-						<li class="flex items-start gap-2"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>Compartir por enlace y QR</li>
-						<li class="flex items-start gap-2"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>Estadísticas de visitas</li>
+						<li class="flex items-start gap-2"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>{{ __('messages.home_feature_templates') }}</li>
+						<li class="flex items-start gap-2"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>{{ __('messages.home_feature_management') }}</li>
+						<li class="flex items-start gap-2"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>{{ __('messages.home_feature_share') }}</li>
+						<li class="flex items-start gap-2"><svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>{{ __('messages.home_feature_stats') }}</li>
 					</ul>
 				</div>
 				<div>
 					<!-- Imagen o mockup -->
-					<img src="{{ asset('imgs/plantilla1.png') }}" alt="Mockup" class="rounded-lg shadow-lg w-full object-cover h-80"/>
+					<img src="{{ asset('imgs/plantilla1.png') }}" alt="Mockup" class="rounded-lg shadow-lg w-full w-80"/>
 				</div>
 			</section>
 
             <!-- Features -->
             <section id="features" class="py-12">
-                <h3 class="text-2xl font-bold text-center">Características destacadas</h3>
+                <h3 class="text-2xl font-bold text-center">{{ __('messages.home_features_title') }}</h3>
                 <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="bg-white p-6 rounded-lg shadow-sm">
                         <div class="flex items-start gap-3">
@@ -37,8 +37,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-semibold">Fácil Aprendizaje</h4>
-                                <p class="mt-2 text-sm text-gray-600">No necesitas conocimientos técnicos para crear catálogos profesionales.</p>
+                                <h4 class="font-semibold">{{ __('messages.home_easy_learning') }}</h4>
+                                <p class="mt-2 text-sm text-gray-600">{{ __('messages.home_easy_desc') }}</p>
                             </div>
                         </div>
                     </div>
@@ -52,8 +52,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-semibold">Personalizado</h4>
-                                <p class="mt-2 text-sm text-gray-600">Puedes escoger entre distintas plantillas de catálogos a tu gusto.</p>
+                                <h4 class="font-semibold">{{ __('messages.home_customized') }}</h4>
+                                <p class="mt-2 text-sm text-gray-600">{{ __('messages.home_customized_desc') }}</p>
                             </div>
                         </div>
                     </div>
@@ -70,8 +70,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-semibold">Integraciones</h4>
-                                <p class="mt-2 text-sm text-gray-600">Conecta con tu tienda online y redes sociales fácilmente.</p>
+                                <h4 class="font-semibold">{{ __('messages.home_integrations') }}</h4>
+                                <p class="mt-2 text-sm text-gray-600">{{ __('messages.home_integrations_desc') }}</p>
                             </div>
                         </div>
                     </div>
@@ -86,8 +86,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-semibold">Soporte y capacitación</h4>
-                                <p class="mt-2 text-sm text-gray-600">Onboarding y soporte para que empieces rápido.</p>
+                                <h4 class="font-semibold">{{ __('messages.home_support') }}</h4>
+                                <p class="mt-2 text-sm text-gray-600">{{ __('messages.home_support_desc') }}</p>
                             </div>
                         </div>
                     </div>
@@ -95,7 +95,7 @@
             </section>
 
 			<!-- Pricing -->
-			<section id="pricing" class="py-12">
+			{{-- <section id="pricing" class="py-12">
 				<h3 class="text-2xl font-bold text-center">Planes de suscripción</h3>
 				<p class="text-center text-gray-600 mt-2">Planes pensados para pymes. Cambia o cancela en cualquier momento.</p>
 				<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -122,27 +122,38 @@
 						</ul>
 						<a href="{{ route('register') }}" class="mt-6 inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded">Comenzar</a>
 					</div>
+				</div>
+			</section> --}}
 
-					{{-- <div class="bg-white p-6 rounded-lg shadow">
-						<h4 class="text-xl font-semibold">Empresa</h4>
-						<p class="mt-2 text-gray-600">Soluciones personalizadas</p>
-						<div class="mt-4 text-3xl font-bold">$79<span class="text-base font-medium text-gray-600">/mes</span></div>
-						<ul class="mt-4 text-sm text-gray-600 space-y-2">
-							<li>Catálogos ilimitados</li>
-							<li>Integraciones avanzadas</li>
-							<li>Soporte prioritario</li>
-						</ul>
-						<a href="#contact" class="mt-6 inline-block w-full text-center px-4 py-2 border border-indigo-600 text-indigo-600 rounded">Contactar</a>
-					</div> --}}
+			<section id="pricing" class="py-12">
+				<h3 class="text-2xl font-bold text-center">{{ __('messages.home_pricing_title') }}</h3>
+				<p class="text-center text-gray-600 mt-2">{{ __('messages.home_pricing_subtitle') }}</p>
+				<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+					@foreach ($plans as $plan)
+						<div class="bg-white p-6 rounded-lg shadow">
+							<h4 class="text-xl font-semibold">{{ $plan->name }}</h4>
+							<p class="mt-2 text-gray-600">{{ $plan->description }}</p>
+							<div class="mt-4 text-3xl font-bold">${{ number_format($plan->price) }}<span class="text-base font-medium text-gray-600">/mes</span></div>
+							<ul class="mt-4 text-sm text-gray-600 space-y-2">
+								@foreach (explode(';', $plan->features) as $feature)
+									<li>{{ $feature }}</li>
+								@endforeach
+							</ul>
+							
+							
+							<a href="{{ route('register') }}" class="mt-6 inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded">{{ __('messages.home_start_now') }}</a>
+						</div>
+						
+					@endforeach
 				</div>
 			</section>
 
 			<!-- CTA -->
 			<section class="py-12 bg-gradient-to-r from-indigo-50 to-white rounded-lg">
 				<div class="max-w-4xl mx-auto text-center">
-					<h3 class="text-2xl font-bold">Listo para transformar tu catálogo?</h3>
-					<p class="mt-2 text-gray-600">Prueba gratis por 14 días. Sin tarjeta de crédito.</p>
-					<a href="{{ route('register') }}" class="mt-6 inline-block px-6 py-3 bg-indigo-600 text-white rounded-md">Empieza ahora</a>
+					<h3 class="text-2xl font-bold">{{ __('messages.home_cta_title') }}</h3>
+					<p class="mt-2 text-gray-600">{{ __('messages.home_cta_subtitle') }}</p>
+					<a href="{{ route('register') }}" class="mt-6 inline-block px-6 py-3 bg-indigo-600 text-white rounded-md">{{ __('messages.home_start_now_cta') }}</a>
 				</div>
 			</section>
 
@@ -150,23 +161,23 @@
 			<footer id="contact" class="mt-12 border-t pt-8 pb-12">
 				<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
 					<div>
-						<h4 class="font-bold">CatálogosPYME</h4>
-						<p class="mt-2 text-sm text-gray-600">Haz crecer tu negocio con catálogos digitales profesionales.</p>
+						<h4 class="font-bold">{{ __('messages.home_brand') }}</h4>
+						<p class="mt-2 text-sm text-gray-600">{{ __('messages.home_brand_desc') }}</p>
 					</div>
 					<div>
-						<h5 class="font-semibold">Contacto</h5>
-						<p class="mt-2 text-sm text-gray-600">correo@tuempresa.com</p>
-						<p class="mt-1 text-sm text-gray-600">+34 600 000 000</p>
+						<h5 class="font-semibold">{{ __('messages.home_contact') }}</h5>
+						<p class="mt-2 text-sm text-gray-600">{{ __('messages.home_email') }}</p>
+						<p class="mt-1 text-sm text-gray-600">{{ __('messages.home_phone') }}</p>
 					</div>
 					<div>
-						<h5 class="font-semibold">Síguenos</h5>
+						<h5 class="font-semibold">{{ __('messages.home_follow_us') }}</h5>
 						<div class="mt-2 flex space-x-3">
-							<a href="#" class="text-gray-600 hover:text-gray-800">Twitter</a>
-							<a href="#" class="text-gray-600 hover:text-gray-800">Facebook</a>
+							<a href="#" class="text-gray-600 hover:text-gray-800">{{ __('messages.home_twitter') }}</a>
+							<a href="#" class="text-gray-600 hover:text-gray-800">{{ __('messages.home_facebook') }}</a>
 						</div>
 					</div>
 				</div>
-				<div class="mt-8 text-center text-xs text-gray-500">© {{ date('Y') }} CatálogosPYME. Todos los derechos reservados.</div>
+				<div class="mt-8 text-center text-xs text-gray-500">{{ __('messages.home_copyright', ['year' => date('Y')]) }}</div>
 			</footer>
 		</div>
 	</main>

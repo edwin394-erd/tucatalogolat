@@ -10,17 +10,25 @@ class CategoryForm extends Component
     public $name;
     public $description;
 
-    protected $rules = [
+   
+
+    public function rules(): array
+{
+    return [
         'name' => 'required|string|max:255',
         'description' => 'nullable|string',
     ];
+}
 
-    protected $messages = [
-        'name.required' => 'El nombre es obligatorio.',
-        'name.string' => 'El nombre debe ser una cadena de texto.',
-        'name.max' => 'El nombre no puede tener más de 255 caracteres.',
-        'description.string' => 'La descripción debe ser una cadena de texto.',
+public function messages(): array
+{
+    return [
+        'name.required' => __('messages.category_name_required'),
+        'name.string' => __('messages.category_name_string'),
+        'name.max' => __('messages.category_name_max'),
+        'description.string' => __('messages.category_description_string'),
     ];
+}
 
     public function mount($ItemId = null)
     {
@@ -56,7 +64,7 @@ class CategoryForm extends Component
                     'description' => $this->description,
                 ]);
             }
-            session()->flash('message', 'Categoría actualizada con éxito.');
+            session()->flash('message', __('messages.category_updated'));
         } else {
             \App\Models\Category::create([
                 'name' => $this->name,
@@ -64,7 +72,7 @@ class CategoryForm extends Component
                 'catalogo_id' => auth()->user()->catalogo->id,
         ]);
 
-        session()->flash('message', 'Categoría creada con éxito.');
+        session()->flash('message', __('messages.category_created'));
         
         $this->redirectRoute('categories');
     }
