@@ -77,6 +77,7 @@ return [
     'expiration_date' => 'Expiration Date',
     'save_discount' => 'Save Discount',
     'configure_catalog' => 'Configure your Catalog',
+    'complete_config_before_catalog' => 'Please complete the essential configuration before accessing your catalog.',
     'catalog_information' => 'Catalog Information',
     'no_banner' => 'No banner',
     'no_logo' => 'No logo',

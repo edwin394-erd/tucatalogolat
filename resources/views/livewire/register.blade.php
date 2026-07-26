@@ -180,21 +180,14 @@
 
         <input type="tel" wire:model.blur="telephone" name="telephone" id="telephone" 
             class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-2/3 p-2.5" 
-            placeholder="{{ __('messages.telephone') }}" required>
+            placeholder="{{ __('messages.telephone') }}" pattern="[0-9]*" required>
     </div>
 
     @error('area_code') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
     @error('telephone') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
 </div>
-<br>
-<div class="flex items-start">
-    <div class="flex items-center h-5">
-        <input id="create_catalog" wire:model="create_catalog" aria-describedby="create_catalog" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-100 inset-shadow-sm focus:ring-3 focus:ring-primary-300">
-    </div>
-    <div class="ml-3 text-sm">
-        <label for="create_catalog" class="font-light text-gray-500">¿Deseas crear un catálogo? (Opcional)</label>
-    </div>
-</div>
+
+
 <br>
                                     <div class="flex items-start">
                                             <div class="flex items-center h-5">

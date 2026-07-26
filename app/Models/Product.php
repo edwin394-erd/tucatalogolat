@@ -10,8 +10,18 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'description',
+        'price',
+        'category_id',
+        'catalogo_id',
+        'descuento_id',
+    ];
+
     protected static function boot()
     {
+        
         parent::boot();
 
         static::deleting(function ($product) {

@@ -81,7 +81,7 @@ class Register extends Component
             'role' => 'user',
         ]);
 
-        if ($this->create_catalog) {
+        if (true) {
             Catalogo::create([
                 'name' => $this->name,
                 'name_handle' => \Str::slug($this->name) . '-' . $user->id,

@@ -3,7 +3,7 @@
     $bgColor = $catalogo->theme->bg_color ?? '#ffffff';
     $sColor = $catalogo->theme->secondary_color ?? '#f0f0f0';
     $pFont  = $catalogo->theme->primary_font_color ?? '#333333';
-    $sFont  = $catalogo->theme->secondary_font_color ?? '#666666';
+    $sFont  = $catalogo->theme->secondary_font_color ?? '#fff';
 @endphp
 
   @php
@@ -49,7 +49,7 @@
                 <div class="w-20 h-20 rounded-full border-4 flex items-center justify-center text-[10px] opacity-50 mb-3" 
                      style="border-color: var(--primary-btn); background-color: var(--bg-main);">{{__('messages.no_logo')}}</div>
             @endif
-            <h2 class="text-lg font-black text-center leading-tight line-clamp-1" style="color: var(--text-secondary);">{{ $catalogo->name }}</h2>
+            <h2 class="text-lg font-black text-center leading-tight line-clamp-1" style="color: var(--text-primary);">{{ $catalogo->name }}</h2>
             {{-- Solución Problema 1: Descripción muy larga --}}
             {{-- <p class="text-xs text-center mt-2 opacity-80 line-clamp-3 px-2" style="color: var(--text-secondary);">{{ $catalogo->description }}</p> --}}
         </div>
@@ -58,7 +58,7 @@
 
         {{-- Solución Problema 2: Muchas categorías (Select en móvil, Lista en desktop) --}}
 <nav class="flex-1 lg:overflow-y-auto pr-2 custom-scrollbar">
-    <li class="mb-3 opacity-50 text-[10px] font-bold uppercase tracking-widest list-none" style="color: var(--text-secondary);">{{__('messages.categories')}}</li>
+    <li class="mb-3 opacity-50 text-[10px] font-bold uppercase tracking-widest list-none" style="color: var(--text-primary);">{{__('messages.categories')}}</li>
     
     <div class="lg:hidden mb-6">
         <select wire:change="filterByCategory($event.target.value)" 
@@ -75,7 +75,7 @@
         <li>
             <a href="javascript:void(0)" wire:click="filterByCategory(null)" 
                class="flex items-center py-2 px-4 rounded-lg text-sm transition-all hover:translate-x-1 {{ is_null($selectedCategory) ? 'font-bold' : '' }}"
-               style="color: var(--text-secondary); {{ is_null($selectedCategory) ? 'border-left: 4px solid var(--primary-btn); background-color: rgba(0,0,0,0.05);' : '' }}">
+               style="color: var(--text-primary); {{ is_null($selectedCategory) ? 'border-left: 4px solid var(--primary-btn); background-color: rgba(0,0,0,0.05);' : '' }}">
                {{__('messages.all')}}
             </a>
         </li>
@@ -83,7 +83,7 @@
             <li>
                 <a href="javascript:void(0)" wire:click="filterByCategory({{ $categoria->id }})" 
                    class="flex items-center py-2 px-4 rounded-lg text-sm transition-all hover:translate-x-1 hover:bg-black/5 {{ $selectedCategory == $categoria->id ? 'font-bold' : '' }}"
-                   style="color: var(--text-secondary); {{ $selectedCategory == $categoria->id ? 'border-left: 4px solid var(--primary-btn); background-color: rgba(0,0,0,0.05);' : '' }}">
+                   style="color: var(--text-primary); {{ $selectedCategory == $categoria->id ? 'border-left: 4px solid var(--primary-btn); background-color: rgba(0,0,0,0.05);' : '' }}">
                     {{ $categoria->name }}
                 </a>
             </li>
@@ -115,16 +115,17 @@
                     <h2 class="text-3xl font-black tracking-tight" style="color: var(--text-primary);">{{__('messages.products')}}</h2>
                 </div>
                 <div class="flex  gap-3 justify-end w-full">
-                    <a href="{{ route('catalogo.cart', $catalogo->name) }}" class="inline-flex items-center gap-2 rounded-full border border-white bg-white px-4 py-2 text-sm font-semibold text-black shadow hover:bg-gray-100" style="border-color: var(--primary-btn);">
+                    <a href="{{ route('catalogo.cart', 
+                    $catalogo->name) }}" class="inline-flex items-center gap-2 rounded-full border border-white bg-white px-4 py-2 text-sm font-semibold text-black shadow hover:bg-gray-100" style="border-color: var(--primary-btn);">
                         {{ __('messages.cart') }}
                         <span class="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-indigo-600 text-white text-xs">{{ $cartItemCount }}</span>
                     </a>
                     <div class="relative w-full md:w-96">
                     <input type="text" wire:model.live="search" 
                            class="w-full p-4 pl-12 rounded-2xl border-none shadow-sm focus:ring-2 outline-none" 
-                           style="background-color: var(--bg-card-aside); color: var(--text-secondary); --tw-ring-color: var(--primary-btn);" 
+                           style="background-color: var(--bg-card-aside); color: var(--text-primary); --tw-ring-color: var(--primary-btn);" 
                            placeholder="{{__('messages.search_products')}}..." />
-                    <svg class="absolute left-4 top-4 w-5 h-5 opacity-40" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <svg class="absolute left-4 top-4 w-5 h-5 opacity-40" style="color: var(--text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
             </div>
 
@@ -141,7 +142,7 @@
      
         
     @empty
-        <div class="col-span-full py-20 text-center opacity-40 font-bold" style="color: var(--text-secondary);">{{__('messages.no_products')}}</div>
+        <div class="col-span-full py-20 text-center opacity-40 font-bold" style="color: var(--text-primary);">{{__('messages.no_products')}}</div>
     @endforelse
 </div>
 </div>

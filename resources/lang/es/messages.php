@@ -80,6 +80,7 @@ return [
     'expiration_date' => 'Fecha de Expiración',
     'save_discount' => 'Guardar Descuento',
     'configure_catalog' => 'Configura tu Catálogo',
+    'complete_config_before_catalog' => 'Debes completar nombre, descripción, logo, banner, plantilla y tema antes de acceder a tu catálogo.',
     'catalog_information' => 'Información del Catálogo',
     'no_banner' => 'Sin banner',
     'no_logo' => 'Sin logo',
@@ -149,6 +150,7 @@ return [
     "custom_colors" => "Colores Personalizados",
     "account" => "Cuenta",
     "no_plan" => "Sin plan",
+    "color_preview" => "Vista previa de colores",
     //VALIDACIONES
     //Productos
     'product_name_required' => 'El nombre del producto es obligatorio.',

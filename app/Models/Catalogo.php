@@ -22,8 +22,17 @@ class Catalogo extends Model
         'horario',
         'theme_id',
         'sucursal',
-        
     ];
+
+    public function isConfigurationComplete(): bool
+    {
+        return filled($this->name)
+            && filled($this->description)
+            && filled($this->logo_url)
+            && filled($this->banner_url)
+            && filled($this->plantilla_id)
+            && filled($this->theme_id);
+    }
 
     public function categories()
     {

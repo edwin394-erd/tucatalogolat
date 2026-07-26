@@ -108,6 +108,7 @@
     @foreach ($plantillas as $template)
         <div 
             wire:key="template-{{ $template->id }}"
+            wire:click="selectTemplate({{ $template->id }})"
             @click="selected = {{ $template->id }}" 
             :class="selected == {{ $template->id }} ? 'border-indigo-500 shadow-lg bg-indigo-50' : 'border-gray-300'"
             class=" mr-4 p-2 border rounded-lg cursor-pointer hover:shadow-lg transition flex flex-col mb-4 md:mb-0 md:w-1/4">
@@ -127,7 +128,7 @@
     <p>{{ __('messages.select_theme') }}</p><br>
     <div class="flex flex-wrap gap-4">
         @foreach ($themes as $theme)
-            <div wire:key="theme-{{ $theme->id }}" @click="selectedTheme = {{ $theme->id }}" 
+            <div wire:key="theme-{{ $theme->id }}" wire:click="selectTheme({{ $theme->id }})" @click="selectedTheme = {{ $theme->id }}" 
                 :class="selectedTheme == {{ $theme->id }} ? ' bg-indigo-50 border-indigo-500' : 'bg-white'"
                 class="w-50 h-20 rounded-lg cursor-pointer transition flex flex-col items-center justify-center p-2 shadow-sm border border-gray-300">
                 <p class="text-xs font-bold mb-2 text-center">{{ $theme->name }}</p>
@@ -142,7 +143,7 @@
             </div>
         @endforeach
 
-        <div @click="selectedTheme = 'custom';" 
+        <div wire:click="selectCustomTheme()" @click="selectedTheme = 'custom';" 
             :class="selectedTheme == 'custom' ? 'ring-1 ring-indigo-500 bg-indigo-50 border-indigo-500' : 'bg-white'"
             class="w-auto h-20 rounded-lg cursor-pointer transition flex flex-col items-center justify-center p-2 shadow-sm border group relative">
             <p class="text-xs font-bold mb-2 text-center">{{ __('messages.custom') }}</p>
@@ -161,6 +162,52 @@
                     <div class="w-6 h-6 rounded-full shadow-md" style="background-color: {{ $secondary_font_custom ?? '#000000' }};"></div>
                 </div>
            
+        </div>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Vista previa en vivo</h3>
+        <div class="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+            <div class="rounded-3xl overflow-hidden border border-gray-200 shadow-sm">
+                <div class="p-6" style="background-color: {{ $selectedTheme->secondary_color ?? '#ffffff' }}; color: {{ $selectedTheme->primary_font_color ?? '#111827' }};">
+                    <h4 class="text-2xl font-bold mb-2" style="color: {{ $selectedTheme->primary_font_color ?? '#1f2937' }};">{{ __('messages.color_preview') }}</h4>
+                    <div class="space-y-3">
+                        <div class="rounded-xl p-4" style="background-color: {{ $selectedTheme->bg_color ?? '#f8fafc' }}; color: {{ $selectedTheme->primary_font_color ?? '#111827' }};">
+                            <p class="font-medium">Ejemplo de texto</p>
+                            <p class="text-sm">Aquí se ve cómo quedaría tu catálogo con los colores actuales.</p>
+                        </div>
+                        <div class="flex gap-3 flex-wrap">
+                            <span class="inline-flex items-center justify-center h-9 px-4 rounded-full" style="background-color: {{ $selectedTheme->primary_color ?? '#4338ca' }}; color: {{ $selectedTheme->secondary_font_color ?? '#ffffff' }};">Botón principal</span>
+                            <span class="inline-flex items-center justify-center h-9 px-4 rounded-full border" style="border-color: {{ $selectedTheme->primary_color ?? '#4338ca' }}; color: {{ $selectedTheme->primary_font_color ?? '#4338ca' }};">Botón secundario</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h4 class="text-lg font-semibold mb-4">Colores seleccionados</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="rounded-2xl p-4" style="background-color: {{ $selectedTheme->primary_color ?? '#4338ca' }}; color: {{ $selectedTheme->secondary_font_color ?? '#ffffff' }};">
+                        <p class="text-sm font-semibold">Primario</p>
+                        <p class="text-xs">{{ $selectedTheme->primary_color ?? '#4338ca' }}</p>
+                    </div>
+                    <div class="rounded-2xl p-4" style="background-color: {{ $selectedTheme->secondary_color ?? '#f3f4f6' }}; color: {{ $selectedTheme->primary_font_color ?? '#111827' }};">
+                        <p class="text-sm font-semibold">Secundario</p>
+                        <p class="text-xs">{{ $selectedTheme->secondary_color ?? '#f3f4f6' }}</p>
+                    </div>
+                    <div class="rounded-2xl p-4" style="background-color: {{ $selectedTheme->bg_color ?? '#ffffff' }}; color: {{ $selectedTheme->primary_font_color ?? '#111827' }};">
+                        <p class="text-sm font-semibold">Fondo</p>
+                        <p class="text-xs">{{ $selectedTheme->bg_color ?? '#ffffff' }}</p>
+                    </div>
+                    <div class="rounded-2xl p-4" style="background-color: {{ $selectedTheme->primary_font_color ?? '#111827' }}; color: {{ $selectedTheme->bg_color ?? '#ffffff' }};">
+                        <p class="text-sm font-semibold">Texto primario</p>
+                        <p class="text-xs">{{ $selectedTheme->primary_font_color ?? '#111827' }}</p>
+                    </div>
+                    <div class="rounded-2xl p-4" style="background-color: {{ $selectedTheme->secondary_font_color ?? '#6b7280' }}; color: {{ $selectedTheme->bg_color ?? '#ffffff' }};">
+                        <p class="text-sm font-semibold">Texto secundario</p>
+                        <p class="text-xs">{{ $selectedTheme->secondary_font_color ?? '#6b7280' }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -95,10 +95,24 @@ class Configuracion extends Component
         $plantillas = \App\Models\Plantilla::all();
         $themes = \App\Models\Theme::whereNull('catalogo_id')->get();
 
+        $selectedPlantilla = $plantillas->find($this->plantilla_id) ?? $plantillas->first();
+
+        if ($this->tema_id === 'custom') {
+            $selectedTheme = (object) [
+                'primary_color' => $this->primary_custom,
+                'secondary_color' => $this->secondary_custom,
+                'bg_color' => $this->bg_custom,
+                'primary_font_color' => $this->primary_font_custom,
+                'secondary_font_color' => $this->secondary_font_custom,
+                'name' => __('messages.custom'),
+            ];
+        } else {
+            $selectedTheme = $themes->find($this->tema_id) ?? $themes->first();
+        }
     
-        return view('livewire.configuracion', compact('catalogo', 'plantillas', 'themes'))
-        ->extends('layouts.auth2')
-        ->section('content');
+        return view('livewire.configuracion', compact('catalogo', 'plantillas', 'themes', 'selectedPlantilla', 'selectedTheme'))
+            ->extends('layouts.auth2')
+            ->section('content');
     }
 
     public function saveChanges()
@@ -147,13 +161,21 @@ $this->validate([
 
 public function selectTemplate($templateId)
 {
-    // Esto es lo que le falta a tu código:
-    $this->plantilla_id = $templateId; 
-    
-    // (Opcional) Esto también ayuda a que la UI se mantenga sincronizada
-    $this->catalogo->plantilla_id = $templateId; 
+    $this->plantilla_id = $templateId;
+    $this->catalogo->plantilla_id = $templateId;
 }
-  public function updatedBanner()
+
+public function selectTheme($themeId)
+{
+    $this->tema_id = $themeId;
+}
+
+public function selectCustomTheme()
+{
+    $this->tema_id = 'custom';
+}
+
+public function updatedBanner()
 {
     $this->validate(['banner' => 'image|max:2048']);
     

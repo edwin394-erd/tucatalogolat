@@ -50,6 +50,11 @@ class Catalogo extends Component
         $catalogo = \App\Models\Catalogo::where('name', $this->name)->firstOrFail();
         $catalogo->load(['categories', 'products.fotos', 'plantilla']);
 
+        if (auth()->check() && auth()->id() === $catalogo->user_id && ! $catalogo->isConfigurationComplete()) {
+            session()->flash('message', __('messages.complete_config_before_catalog'));
+            $this->redirectRoute('configuracion');
+        }
+
             $this->subscripcionActiva = $catalogo->user->subscriptions->last() && $catalogo->user->subscriptions->last()->expires_at > now();
 
             if (!$this->subscripcionActiva) {

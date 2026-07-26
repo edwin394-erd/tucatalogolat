@@ -9,30 +9,30 @@
 
             {{-- Contenido: Padding reducido en móvil --}}
             <div class="p-3 md:p-6 flex flex-col flex-1">
-                <h5 class="text-sm md:text-lg font-bold mb-1 md:mb-2 line-clamp-1" style="color: var(--text-secondary);">
+                <h5 class="text-sm md:text-lg font-bold mb-1 md:mb-2 line-clamp-1" style="color: var(--text-primary);">
                     {{ $item->name }}
                 </h5>
                 
                 {{-- Descripción: Oculta o muy breve en móvil para ahorrar espacio --}}
-                <p class="hidden md:block text-sm mb-6 flex-1 line-clamp-3 leading-relaxed" style="color: var(--text-secondary);">
+                <p class="hidden md:block text-sm mb-6 flex-1 line-clamp-3 leading-relaxed" style="color: var(--text-primary);">
                     {{ $item->description }}
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-auto gap-2">
                     @if($item->precio_descuento)
                     <div class="flex flex-col">
-                        <span class="text-sm md:text-md font-black opacity-50 line-through" style="color: var(--text-secondary);">
+                        <span class="text-sm md:text-md font-black opacity-50 line-through" style="color: var(--text-primary);">
                            ${{ number_format($item->price, 2) }} 
                         </span>
                         
 
-                        <span class="text-lg md:text-2xl font-black" style="color: var(--text-secondary);">
+                        <span class="text-lg md:text-2xl font-black" style="color: var(--text-primary);">
                            ${{ number_format($item->precio_descuento, 2) }} 
                          </span>
                         
                     </div>
                     @else
-                        <span class="text-lg md:text-2xl font-black" style="color: var(--text-secondary);">
+                        <span class="text-lg md:text-2xl font-black" style="color: var(--text-primary);">
                         ${{ number_format($item->price, 2) }} 
                     </span>
                     @endif
