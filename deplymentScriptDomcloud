@@ -1,0 +1,26 @@
+source: https://github.com/edwin394-erd/tucatalogolat
+root: public_html/public
+features:
+  - php 8.3
+  - mysql
+  - node 20
+nginx:
+  fastcgi: "on"
+  locations:
+    - match: /
+      try_files: $uri $uri/ /index.php$is_args$args
+    - match: ~ \.[^\/]+(?<!\.php)$
+      try_files: $uri =404
+commands:
+  - composer install --no-dev --optimize-autoloader
+  - cp .env.example .env || true
+  - sed -ri "s/DB_DATABASE=.*/DB_DATABASE=${DATABASE}/g" .env
+  - sed -ri "s/DB_USERNAME=.*/DB_USERNAME=${USERNAME}/g" .env
+  - sed -ri "s/DB_PASSWORD=.*/DB_PASSWORD=${MYPASSWD}/g" .env
+  - sed -ri "s/APP_URL=.*/APP_URL=https:\/\/${DOMAIN}/g" .env
+  - php artisan key:generate --force
+  - php artisan migrate --force
+  - php artisan storage:link
+  - npm install && npm run build
+  - php artisan optimize
+  - chmod 0750 -R storage bootstrap/cache || true
