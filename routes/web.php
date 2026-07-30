@@ -40,6 +40,9 @@ Route::get('/Editar/{model}/{id}', EditItem::class)->middleware(['auth'])->name(
 
 Route::get('/lang/{locale}', [LanguageController::class, 'setLocale'])->name('lang.switch');
 
+Route::get('/debug-upload', [\App\Http\Controllers\DebugUploadController::class, 'show'])->middleware(['auth'])->name('debug.upload');
+Route::post('/debug-upload', [\App\Http\Controllers\DebugUploadController::class, 'upload'])->middleware(['auth'])->name('debug.upload.post');
+
 // Las rutas comodín como /{name} siempre deben ir al final
 Route::get('/{name}/product/{id}', ShowProduct::class)->name('product-show');
 Route::get('/{name}/cart', Cart::class)->name('catalogo.cart');

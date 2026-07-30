@@ -9,12 +9,11 @@
        <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
     <title>TuCatalogo.Lat</title>
  @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+    @livewireStyles
 </head>
 
 
 <body class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm h-screen ">
-    @vite('resources/js/app.js')
 
   <x-alert alert_type="success" />
 
@@ -252,5 +251,6 @@ if(langSelect){
 
 </script>
 
+@livewireScripts
 
 </html>

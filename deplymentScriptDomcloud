@@ -14,13 +14,24 @@ nginx:
 commands:
   - composer install --no-dev --optimize-autoloader
   - cp .env.example .env || true
-  - sed -ri "s/DB_HOST=.*/DB_HOST=localhost/g" .env
-  - sed -ri "s/DB_DATABASE=.*/DB_DATABASE=${DATABASE}/g" .env
-  - sed -ri "s/DB_USERNAME=.*/DB_USERNAME=${USERNAME}/g" .env
-  - sed -ri "s/DB_PASSWORD=.*/DB_PASSWORD=${MYPASSWD}/g" .env
-  - sed -ri "s/APP_URL=.*/APP_URL=https:\/\/${DOMAIN}/g" .env
+  # Cambiar la conexión de sqlite a mysql
+  - sed -ri "s/DB_CONNECTION=.*/DB_CONNECTION=mysql/g" .env
+  # Descomentar y asignar los valores de MySQL (delimitador | para contraseñas complejas)
+  - sed -ri "s/#? ?DB_HOST=.*/DB_HOST=localhost/g" .env
+  - sed -ri "s/#? ?DB_PORT=.*/DB_PORT=3306/g" .env
+  - sed -ri "s/#? ?DB_DATABASE=.*/DB_DATABASE=${DATABASE}/g" .env
+  - sed -ri "s/#? ?DB_USERNAME=.*/DB_USERNAME=${USERNAME}/g" .env
+  - sed -ri "s|#? ?DB_PASSWORD=.*|DB_PASSWORD=${MYPASSWD}|g" .env
+  - sed -ri "s|APP_URL=.*|APP_URL=https://${DOMAIN}|g" .env
+  # Configuración crítica para subida de archivos y entorno de producción
+  - sed -ri "s/FILESYSTEM_DISK=.*/FILESYSTEM_DISK=public/g" .env
+  - sed -ri "s/APP_ENV=.*/APP_ENV=production/g" .env
+  - sed -ri "s/APP_DEBUG=.*/APP_DEBUG=false/g" .env
   - php artisan key:generate --force
   - php artisan migrate --force
+  # Recreación limpia del symlink para evitar errores de 'link exists'
+  - rm -f public/storage || true
   - php artisan storage:link
+  # Permisos correctos para carpetas de escritura
+  - chmod -R 775 storage bootstrap/cache || true
   - php artisan optimize
-  - chmod 0750 -R storage bootstrap/cache || true
