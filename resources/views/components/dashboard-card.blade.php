@@ -7,7 +7,7 @@
     <div class="px-6 flex flex-col flex-grow">
         <h2 class="text-gray-600 text-xl pt-6 mb-4 flex-grow">{{ $content }}</h2>
         <div class="flex justify-end mt-auto">
-            <a href="#" class="text-gray-200 text-sm rounded-lg bg-indigo-600 mb-6 p-2 hover:bg-indigo-700 transition">{{ __('messages.show_more') }}</a>
+            <a href="#" class="text-gray-200 text-sm rounded-lg bg-indigo-600 mb-6 p-2 hover:bg-indigo-700 transition">{{ __('messages.show_more') }} prueba borrar</a>
         </div>
     </div>
 </div>
