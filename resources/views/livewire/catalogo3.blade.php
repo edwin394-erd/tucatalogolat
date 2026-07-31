@@ -88,7 +88,7 @@
                                             </div>
                                         </div>
                                         <div class="flex flex-col gap-2 items-start md:items-end">
-                                            <button wire:click="addToCart({{ $item->id }})" class="rounded-full px-5 py-2 text-sm font-semibold shadow" style="background-color: {{ $pColor }}; color: {{ $iconColor }};">Añadir al carrito</button>
+                                            <button type="button" x-data="{ added: false }" @click="added = true; setTimeout(() => added = false, 400)" wire:click="addToCart({{ $item->id }})" :class="added ? 'scale-125 shadow-2xl ring-4 ring-white/80 animate-pulse' : ''" class="rounded-full px-5 py-2 text-sm font-semibold shadow transition-all duration-200 ease-out" style="background-color: {{ $pColor }}; color: {{ $iconColor }};">Añadir al carrito</button>
                                             @if($item->stock !== null)
                                                 <span class="text-xs uppercase tracking-wider" style="color: {{ $sFont }};">{{ __('messages.stock') }}: {{ $item->stock }}</span>
                                             @endif
