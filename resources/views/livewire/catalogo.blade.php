@@ -80,7 +80,7 @@
                 wire:click="filterByCategory(null)"
                 class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-colors duration-150"
                 style="background-color: {{  $selectedCategory === null ? 'var(--primary-btn)' : 'var(--bg-card-aside)' }}; 
-                       color: {{ $selectedCategory === null ? $iconColor : 'var(--text-secondary)' }}; 
+                       color: {{ $selectedCategory === null ? $iconColor : 'var(--text-primary)' }}; 
                        border-color: {{ $selectedCategory === null ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
                 {{ __('messages.all') }}
             </button>

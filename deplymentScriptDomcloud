@@ -30,7 +30,7 @@ commands:
   - php artisan key:generate --force
   - php artisan migrate --force
   # Recreación limpia del symlink para evitar errores de 'link exists'
-  - rm -f public/storage || true
+  - rm -rf public/storage || true
   - php artisan storage:link
   # Permisos correctos para carpetas de escritura
   - chmod -R 775 storage bootstrap/cache || true
