@@ -52,6 +52,9 @@
             <p><strong>storage/app/public escribible:</strong> {{ is_writable(storage_path('app/public')) ? 'sí' : 'no' }}</p>
             <p><strong>public/storage existe:</strong> {{ file_exists(public_path('storage')) ? 'sí' : 'no' }}</p>
             <p><strong>public/storage escribible:</strong> {{ is_writable(public_path('storage')) ? 'sí' : 'no' }}</p>
+            <p><strong>debug dir expected:</strong> {{ storage_path('app/public/debug') }}</p>
+            <p><strong>debug dir exists:</strong> {{ is_dir(storage_path('app/public/debug')) ? 'sí' : 'no' }}</p>
+            <p><strong>debug file exists (if uploaded_path):</strong> {{ session('uploaded_path') ? (file_exists(storage_path('app/public/' . session('uploaded_path'))) ? 'sí' : 'no') : 'n/a' }}</p>
         </div>
 
         @if(session('uploaded_path'))

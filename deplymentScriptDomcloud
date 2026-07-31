@@ -16,15 +16,15 @@ commands:
   - cp .env.example .env || true
   # Cambiar la conexión de sqlite a mysql
   - sed -ri "s/DB_CONNECTION=.*/DB_CONNECTION=mysql/g" .env
-  # Descomentar y asignar los valores de MySQL (delimitador | para contraseñas complejas)
+  # Descomentar y asignar los valores de MySQL
   - sed -ri "s/#? ?DB_HOST=.*/DB_HOST=localhost/g" .env
   - sed -ri "s/#? ?DB_PORT=.*/DB_PORT=3306/g" .env
   - sed -ri "s/#? ?DB_DATABASE=.*/DB_DATABASE=${DATABASE}/g" .env
   - sed -ri "s/#? ?DB_USERNAME=.*/DB_USERNAME=${USERNAME}/g" .env
   - sed -ri "s|#? ?DB_PASSWORD=.*|DB_PASSWORD=${MYPASSWD}|g" .env
   - sed -ri "s|APP_URL=.*|APP_URL=https://${DOMAIN}|g" .env
-  # Configuración crítica para subida de archivos y entorno de producción
-  - sed -ri "s/FILESYSTEM_DISK=.*/FILESYSTEM_DISK=public/g" .env
+  # Configuración corregida para el sistema de archivos y entorno de producción
+  - sed -ri "s/FILESYSTEM_DISK=.*/FILESYSTEM_DISK=local/g" .env
   - sed -ri "s/APP_ENV=.*/APP_ENV=production/g" .env
   - sed -ri "s/APP_DEBUG=.*/APP_DEBUG=false/g" .env
   - php artisan key:generate --force
@@ -34,4 +34,6 @@ commands:
   - php artisan storage:link
   # Permisos correctos para carpetas de escritura
   - chmod -R 775 storage bootstrap/cache || true
+  # Limpieza previa y optimización limpia
+  - php artisan config:clear
   - php artisan optimize
