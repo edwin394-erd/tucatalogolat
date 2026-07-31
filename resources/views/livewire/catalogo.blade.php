@@ -90,9 +90,9 @@
                     type="button"
                     wire:click="filterByCategory({{ $category->id }})"
                     class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border transition-colors duration-150"
-                    style="background-color: {{ (isset($selectedCategory) && $selectedCategory == $category->id) ? 'var(--primary-btn)' : 'var(--bg-card-aside)' }}; 
-                           color: {{ (isset($selectedCategory) && $selectedCategory == $category->id) ? $iconColor : 'var(--text-secondary)' }}; 
-                           border-color: {{ (isset($selectedCategory) && $selectedCategory == $category->id) ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
+                    style="background-color: {{  $selectedCategory === null ? 'var(--primary-btn)' : 'var(--bg-card-aside)' }}; 
+                       color: {{ $selectedCategory === null ? $iconColor : 'var(--text-primary)' }}; 
+                       border-color: {{ $selectedCategory === null ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
                     <span class="truncate max-w-[10rem] text-sm">{{ $category->name }}</span>
                 </button>
             @endforeach
