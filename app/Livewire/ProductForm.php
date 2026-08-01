@@ -174,20 +174,59 @@ public function messages(): array
     }
 
     // Optimización y guardado de nuevas imágenes
-    $manager = new ImageManager(new Driver());
-    foreach ($this->images as $image) {
-        $name = 'products/' . uniqid() . '.webp';
-        // Redimensiona proporcionalmente y comprime
-        $img = $manager->read($image->getRealPath())
-                       ->scale(width: 800) 
-                       ->toWebp(80);
-
-        Storage::disk('public')->put($name, $img);
-
-        $product->fotos()->create([
-            'url' => $name,
-            'imageable_type' => Product::class,
+    try {
+        $manager = ImageManager::gd();
+    } catch (\Throwable $exception) {
+        \Log::error('ProductForm image manager initialization failed', [
+            'message' => $exception->getMessage(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => $exception->getTraceAsString(),
         ]);
+
+        $this->addError('images', __('messages.image_processing_error'));
+        return;
+    }
+
+    foreach ($this->images as $image) {
+        try {
+            $path = $image->getRealPath() ?: $image->getPathname();
+            if (! $path) {
+                throw new \RuntimeException('Uploaded image has no accessible temporary path.');
+            }
+
+            $img = $manager->read($path)
+                           ->scale(800);
+
+            $extension = function_exists('imagewebp') ? 'webp' : 'jpg';
+            $quality = $extension === 'webp' ? 80 : 90;
+            $encoded = $img->encodeByExtension($extension, $quality);
+
+            $name = 'products/' . uniqid() . '.' . $extension;
+            $saved = Storage::disk('public')->put($name, (string) $encoded);
+
+            if (! $saved) {
+                throw new \RuntimeException('Failed to write image to public disk: ' . $name);
+            }
+
+            $product->fotos()->create([
+                'url' => $name,
+                'imageable_type' => Product::class,
+            ]);
+        } catch (\Throwable $exception) {
+            \Log::error('ProductForm image save failed', [
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+                'image_name' => $name ?? null,
+                'image_path' => $path ?? null,
+                'image_extension' => $extension ?? null,
+            ]);
+
+            $this->addError('images', __('messages.image_processing_error'));
+            return;
+        }
     }
 
     // Manejar variantes
