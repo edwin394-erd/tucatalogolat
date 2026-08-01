@@ -39,7 +39,7 @@
                                                     $price += $item->variant->price_adjustment;
                                                 }
                                             @endphp
-                                            {{ number_format($price, 2) }} €
+                                            ${{ number_format($price, 2) }}
                                         </p>
                                     </div>
                                 </div>
@@ -59,7 +59,7 @@
                         <p class="text-sm text-gray-500">{{ __('messages.cart_summary') }}</p>
                         <div class="flex items-center justify-between text-lg font-semibold">
                             <span>{{ __('messages.subtotal') }}</span>
-                            <span>{{ number_format($cart->total, 2) }} €</span>
+                            <span>${{ number_format($cart->total, 2) }}</span>
                         </div>
                     </div>
                     <button wire:click="checkout" class="w-full rounded-3xl bg-indigo-600 px-4 py-3 text-white font-semibold hover:bg-indigo-700">{{ __('messages.checkout') }}</button>

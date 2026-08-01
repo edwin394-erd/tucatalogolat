@@ -82,13 +82,13 @@
                                             <div class="mt-4 md:mt-0">
                                                 <div class="flex items-center gap-3">
                                                     <h3 class="text-xl font-semibold" style="color: {{ $pColor }};">{{ $item->name }}</h3>
-                                                    <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">{{ number_format($item->price, 2) }} €</span>
+                                                    <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">${{ number_format($item->price, 2) }}</span>
                                                 </div>
                                                 <p class="mt-2 text-sm leading-relaxed" style="color: {{ $sFont }};">{{ $item->description }}</p>
                                             </div>
                                         </div>
                                         <div class="flex flex-col gap-2 items-start md:items-end">
-                                            <button type="button" x-data="{ added: false }" @click="added = true; setTimeout(() => added = false, 400)" wire:click="addToCart({{ $item->id }})" :class="added ? 'scale-125 shadow-2xl ring-4 ring-white/80 animate-pulse' : ''" class="rounded-full px-5 py-2 text-sm font-semibold shadow transition-all duration-200 ease-out" style="background-color: {{ $pColor }}; color: {{ $iconColor }};">Añadir al carrito</button>
+                                            <button type="button" x-data="{ added: false }" @click="added = true; setTimeout(() => added = false, 400); window.dispatchEvent(new CustomEvent('cart-added'))" wire:click="addToCart({{ $item->id }})" :class="added ? 'scale-125 shadow-2xl ring-4 ring-white/80 animate-pulse' : ''" class="rounded-full px-5 py-2 text-sm font-semibold shadow transition-all duration-200 ease-out" style="background-color: {{ $pColor }}; color: {{ $iconColor }};">Añadir al carrito</button>
                                             @if($item->stock !== null)
                                                 <span class="text-xs uppercase tracking-wider" style="color: {{ $sFont }};">{{ __('messages.stock') }}: {{ $item->stock }}</span>
                                             @endif

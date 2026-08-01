@@ -35,10 +35,10 @@
                                 }
                                 $totalPrice = $basePrice + $adjustment;
                             @endphp
-                            {{ number_format($totalPrice, 2) }} €
+                            ${{ number_format($totalPrice, 2) }}
                         </span>
                         <div class="space-x-2">
-                            <button type="button" x-data="{ added: false }" @click="added = true; setTimeout(() => added = false, 400)" wire:click="addToCart({{ $product->id }})" :class="added ? 'scale-125 shadow-2xl ring-4 ring-white/80 animate-pulse' : ''" class="px-3 py-1 bg-blue-600 text-white rounded transition-all duration-200 ease-out">Añadir al carrito</button>
+                            <button type="button" x-data="{ added: false }" @click="added = true; setTimeout(() => added = false, 400); window.dispatchEvent(new CustomEvent('cart-added'))" wire:click="addToCart({{ $product->id }})" :class="added ? 'scale-125 shadow-2xl ring-4 ring-white/80 animate-pulse' : ''" class="px-3 py-1 bg-blue-600 text-white rounded transition-all duration-200 ease-out">Añadir al carrito</button>
                             <button wire:click="$emit('showEditForm', {{ $product->id }})" class="px-3 py-1 bg-gray-200 rounded">Editar</button>
                         </div>
                     </div>
