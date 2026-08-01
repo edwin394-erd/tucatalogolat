@@ -44,10 +44,10 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <button wire:click="decreaseQuantity({{ $item->id }})" class="px-3 py-2 rounded-xl border border-gray-300">-</button>
+                                    <button @click="window.dispatchEvent(new CustomEvent('cart-updated', { detail: { delta: -1 } }))" wire:click="decreaseQuantity({{ $item->id }})" class="px-3 py-2 rounded-xl border border-gray-300">-</button>
                                     <span class="w-10 text-center">{{ $item->quantity }}</span>
-                                    <button wire:click="increaseQuantity({{ $item->id }})" class="px-3 py-2 rounded-xl border border-gray-300">+</button>
-                                    <button wire:click="removeItem({{ $item->id }})" class="px-3 py-2 rounded-xl bg-red-600 text-white">{{ __('messages.remove') }}</button>
+                                    <button @click="window.dispatchEvent(new CustomEvent('cart-updated', { detail: { delta: 1 } }))" wire:click="increaseQuantity({{ $item->id }})" class="px-3 py-2 rounded-xl border border-gray-300">+</button>
+                                    <button @click="window.dispatchEvent(new CustomEvent('cart-updated', { detail: { delta: -{{ $item->quantity }} } }))" wire:click="removeItem({{ $item->id }})" class="px-3 py-2 rounded-xl bg-red-600 text-white">{{ __('messages.remove') }}</button>
                                 </div>
                             </div>
                         @endforeach
@@ -63,7 +63,7 @@
                         </div>
                     </div>
                     <button wire:click="checkout" class="w-full rounded-3xl bg-indigo-600 px-4 py-3 text-white font-semibold hover:bg-indigo-700">{{ __('messages.checkout') }}</button>
-                    <button wire:click="clearCart" class="w-full rounded-3xl border border-gray-300 px-4 py-3 text-gray-700">{{ __('messages.clear_cart') }}</button>
+                    <button @click="window.dispatchEvent(new CustomEvent('cart-reset'))" wire:click="clearCart" class="w-full rounded-3xl border border-gray-300 px-4 py-3 text-gray-700">{{ __('messages.clear_cart') }}</button>
                 </div>
             </div>
         @endif

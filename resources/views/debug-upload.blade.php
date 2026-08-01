@@ -45,16 +45,26 @@
     <div class="mt-8 space-y-4">
         <div class="bg-gray-50 p-4 rounded">
             <h2 class="font-semibold mb-2">Rutas de almacenamiento</h2>
+            <p><strong>APP_URL:</strong> {{ config('app.url') }}</p>
+            <p><strong>FILESYSTEM_DISK:</strong> {{ config('filesystems.default') }}</p>
+            <p><strong>public disk URL:</strong> {{ config('filesystems.disks.public.url') }}</p>
             <p><strong>storage/app/public:</strong> {{ storage_path('app/public') }}</p>
             <p><strong>public/storage:</strong> {{ public_path('storage') }}</p>
             <p><strong>public/storage es symlink:</strong> {{ is_link(public_path('storage')) ? 'sí' : 'no' }}</p>
-            <p><strong>storage/app/public existe:</strong> {{ is_dir(storage_path('app/public')) ? 'sí' : 'no' }}</p>
-            <p><strong>storage/app/public escribible:</strong> {{ is_writable(storage_path('app/public')) ? 'sí' : 'no' }}</p>
             <p><strong>public/storage existe:</strong> {{ file_exists(public_path('storage')) ? 'sí' : 'no' }}</p>
-            <p><strong>public/storage escribible:</strong> {{ is_writable(public_path('storage')) ? 'sí' : 'no' }}</p>
+            <p><strong>public/storage escribible:</strong> {{ file_exists(public_path('storage')) ? (is_writable(public_path('storage')) ? 'sí' : 'no') : 'n/a' }}</p>
+            <p><strong>storage/app/public existe:</strong> {{ is_dir(storage_path('app/public')) ? 'sí' : 'no' }}</p>
+            <p><strong>storage/app/public escribible:</strong> {{ is_dir(storage_path('app/public')) ? (is_writable(storage_path('app/public')) ? 'sí' : 'no') : 'n/a' }}</p>
             <p><strong>debug dir expected:</strong> {{ storage_path('app/public/debug') }}</p>
             <p><strong>debug dir exists:</strong> {{ is_dir(storage_path('app/public/debug')) ? 'sí' : 'no' }}</p>
+            <p><strong>debug dir escribible:</strong> {{ is_dir(storage_path('app/public/debug')) ? (is_writable(storage_path('app/public/debug')) ? 'sí' : 'no') : 'n/a' }}</p>
             <p><strong>debug file exists (if uploaded_path):</strong> {{ session('uploaded_path') ? (file_exists(storage_path('app/public/' . session('uploaded_path'))) ? 'sí' : 'no') : 'n/a' }}</p>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded">
+            <h2 class="font-semibold mb-2">Debug Livewire temp upload</h2>
+            <p class="text-sm text-gray-600 mb-4">Esta sección prueba la previsualización temporal de Livewire usando <code>temporaryUrl()</code>.</p>
+            @livewire('debug-temp-upload')
         </div>
 
         @if(session('uploaded_path'))

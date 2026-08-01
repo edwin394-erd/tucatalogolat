@@ -197,7 +197,7 @@ return [
     'cart_empty_description' => 'Agrega productos desde el catálogo para comenzar.',
     'cart_summary' => 'Resumen del carrito',
     'subtotal' => 'Subtotal',
-    'checkout' => 'Pagar',
+    'checkout' => 'Enviar Pedido',
     'clear_cart' => 'Vaciar carrito',
     'remove' => 'Eliminar',
     'item_removed' => 'Producto eliminado del carrito.',
