@@ -176,18 +176,35 @@ public function messages(): array
     // Optimización y guardado de nuevas imágenes
     $manager = new ImageManager(new Driver());
     foreach ($this->images as $image) {
-        $name = 'products/' . uniqid() . '.webp';
-        // Redimensiona proporcionalmente y comprime
-        $img = $manager->read($image->getRealPath())
-                       ->scale(width: 800) 
-                       ->toWebp(80);
+        try {
+            $img = $manager->make($image->getRealPath())
+                           ->resize(800, null, function ($constraint) {
+                               $constraint->aspectRatio();
+                               $constraint->upsize();
+                           });
 
-        Storage::disk('public')->put($name, $img);
+            $extension = function_exists('imagewebp') ? 'webp' : 'jpg';
+            $quality = $extension === 'webp' ? 80 : 90;
+            $encoded = $img->encode($extension, $quality);
 
-        $product->fotos()->create([
-            'url' => $name,
-            'imageable_type' => Product::class,
-        ]);
+            $name = 'products/' . uniqid() . '.' . $extension;
+            Storage::disk('public')->put($name, (string) $encoded);
+
+            $product->fotos()->create([
+                'url' => $name,
+                'imageable_type' => Product::class,
+            ]);
+        } catch (\Throwable $exception) {
+            \Log::error('ProductForm image save failed', [
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
+            $this->addError('images', __('messages.image_processing_error'));
+            return;
+        }
     }
 
     // Manejar variantes

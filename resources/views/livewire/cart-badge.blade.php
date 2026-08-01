@@ -1,3 +1,4 @@
+<div>
 @php
     $routeName = request()->route('name');
 @endphp
@@ -54,3 +55,4 @@
         })();
     </script>
 @endif
+</div>
