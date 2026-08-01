@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>tucatalogo.lat</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @livewireStyles
     <style>
       body {
         font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -47,6 +48,11 @@
 </head>
 <body class="bg-gradient-to-br from-gray-200 to-white min-h-screen">
     @vite('resources/js/app.js')
+
+  <!-- Fixed cart button (global) Livewire component -->
+  <div class="fixed top-4 right-4 z-50">
+    @livewire('cart-badge')
+  </div>
 
 <nav class="backdrop-blur-sm bg-white/70 dark:bg-gray-900/60 border-b border-gray-100 dark:border-gray-800 rounded-b-xl shadow-lg">
   <div class="max-w-screen-xl mx-auto px-4 md:px-6">
@@ -155,5 +161,6 @@
         });
     });
 </script>
+  @livewireScripts
 </body>
 </html>

@@ -115,11 +115,7 @@
                     <h2 class="text-3xl font-black tracking-tight" style="color: var(--text-primary);">{{__('messages.products')}}</h2>
                 </div>
                 <div class="flex  gap-3 justify-end w-full">
-                    <a href="{{ route('catalogo.cart', 
-                    $catalogo->name) }}" class="inline-flex items-center gap-2 rounded-full border border-white bg-white px-4 py-2 text-sm font-semibold text-black shadow hover:bg-gray-100" style="border-color: var(--primary-btn);">
-                        {{ __('messages.cart') }}
-                        <span class="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-indigo-600 text-white text-xs">{{ $cartItemCount }}</span>
-                    </a>
+                    <!-- Cart button moved to layout (fixed top-right) -->
                     <div class="relative w-full md:w-96">
                     <input type="text" wire:model.live="search" 
                            class="w-full p-4 pl-12 rounded-2xl border-none shadow-sm focus:ring-2 outline-none" 

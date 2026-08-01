@@ -112,7 +112,7 @@
         <br>
 
         <!-- Variantes -->
-        <div class="col-span-2">
+        {{-- <div class="col-span-2">
             <label class="block mb-2 text-sm font-medium text-gray-900">Variantes (opcional)</label>
             <button type="button" wire:click="addVariant" class="mb-2 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1">
                 Agregar Variante
@@ -132,7 +132,7 @@
                     </div>
                 @endforeach
             </div>
-        </div>
+        </div> --}}
         <br>
       
          

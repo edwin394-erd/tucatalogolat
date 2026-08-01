@@ -32,12 +32,7 @@
 
     {{-- Configuración Button --}}
     <x-setting-c :catalogo="$catalogo"/>
-    <div class="absolute right-35 top-4 z-50">
-        <a href="{{ route('catalogo.cart', $catalogo->name) }}" class="fixed  rounded-full border border-white bg-white px-4 py-2 text-sm font-semibold text-black shadow-lg hover:bg-gray-100" style="border-color: var(--primary-btn);">
-            {{ __('messages.cart') }}
-            <span class="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-indigo-600 text-white text-xs">{{ $cartItemCount }}</span>
-        </a>
-    </div>
+    <!-- Old cart button removed (global fixed cart in layout will be used) -->
     {{-- Banner & Logo --}}
     <div class="relative">
         @if ($catalogo->banner_url && $catalogo->logo_url)
@@ -121,6 +116,7 @@
     <div class="mt-8">
         {{ $catalogo->products->links() }}
     </div>
+    
 </div>
 
 </div>

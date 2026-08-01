@@ -46,4 +46,10 @@ Route::post('/debug-upload', [\App\Http\Controllers\DebugUploadController::class
 // Las rutas comodín como /{name} siempre deben ir al final
 Route::get('/{name}/product/{id}', ShowProduct::class)->name('product-show');
 Route::get('/{name}/cart', Cart::class)->name('catalogo.cart');
+// JSON endpoint to return current cart item count for a catalog
+Route::get('/{name}/cart-count', function($name){
+	$catalogo = \App\Models\Catalogo::where('name', $name)->firstOrFail();
+	$count = \App\Models\Cart::findCurrent($catalogo->id)?->count ?? 0;
+	return response()->json(['count' => $count]);
+})->name('catalogo.cartCount');
 Route::get('/{name}', Catalogo::class)->name('catalogo');
