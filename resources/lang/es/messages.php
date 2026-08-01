@@ -214,6 +214,7 @@ return [
     'product_created' => 'Producto creado con éxito.',
     'category_updated' => 'Categoría actualizada con éxito.',
     'category_created' => 'Categoría creada con éxito.',
+    'image_processing_error' => 'No se pudo procesar la imagen. Intenta con otro archivo o comunícate con el administrador.',
 
      'settings_updated' => 'Información actualizada con éxito.',
     'banner_updated' => 'Banner actualizado con éxito.',

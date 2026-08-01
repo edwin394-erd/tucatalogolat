@@ -226,6 +226,7 @@ return [
     'product_created' => 'Product created successfully.',
     'category_updated' => 'Category updated successfully.',
     'category_created' => 'Category created successfully.',
+    'image_processing_error' => 'Unable to process the image. Try a different file or contact the administrator.',
 
     'settings_updated' => 'Info updated successfully.',
     'banner_updated' => 'Banner updated successfully.',
