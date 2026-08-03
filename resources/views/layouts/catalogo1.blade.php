@@ -15,9 +15,9 @@
     {{-- Banner and profile pic --}}
     
     <!-- Fixed cart button (global) Livewire component -->
-    {{-- <div class="fixed top-4 right-4 z-50">
+    <div class="fixed top-4 right-4 z-50">
         @livewire('cart-badge')
-    </div> --}}
+    </div>
 
 
 @yield('content')
