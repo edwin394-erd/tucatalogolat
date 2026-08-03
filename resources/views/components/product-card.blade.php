@@ -1,7 +1,7 @@
    <div class="rounded-2xl md:rounded-3xl shadow-sm hover:shadow-xl overflow-hidden flex flex-col group border border-black/5" style="background-color: var(--bg-card-aside);">
             
             {{-- Imagen: Altura adaptable (más pequeña en móvil) --}}
-            <div class="relative h-40 s:h-48 md:h-56 overflow-hidden">
+            <div class="relative h-40 sm:h-48 md:h-56 overflow-hidden">
                 <img src="{{ asset('storage/' . $item->fotos[0]->url) }}" 
                      class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                      loading="lazy">
@@ -13,8 +13,8 @@
                     {{ $item->name }}
                 </h5>
                 
-                {{-- Descripción: Oculta o muy breve en móvil para ahorrar espacio --}}
-                <p class="hidden md:block text-sm mb-6 flex-1 line-clamp-3 leading-relaxed" style="color: var(--text-primary);">
+                {{-- Descripción: siempre visible para móviles y escritorio --}}
+                <p class="text-sm mb-6 flex-1 line-clamp-3 leading-relaxed" style="color: var(--text-primary);">
                     {{ $item->description }}
                 </p>
 

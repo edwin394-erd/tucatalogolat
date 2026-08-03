@@ -36,6 +36,7 @@ return [
     'remember_me' => 'Recuérdame',
     'forgot_password' => '¿Olvidaste tu contraseña?',
     'login' => 'Iniciar sesión',
+    'home' => 'Inicio',
     'no_account' => '¿No tienes una cuenta todavía?',
     'register' => 'Regístrate',
     'create_account' => 'Crear una cuenta',

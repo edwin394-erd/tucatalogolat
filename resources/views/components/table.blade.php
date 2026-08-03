@@ -29,12 +29,12 @@
 
     <!-- Table Wrapper (scrollable on mobile) -->
     <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-gray-500 min-w-max">
+        <table class="w-full table-auto min-w-full text-sm text-left text-gray-500">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
                     @foreach ($column_names as $index => $column)
                         <th wire:click="sortBy('{{ $column }}')"
-                            class="px-6 py-3 cursor-pointer whitespace-nowrap {{ $index === 0 ? 'rounded-tl-xl' : '' }}">
+                            class="px-4 py-3 cursor-pointer whitespace-normal break-words {{ $index === 0 ? 'rounded-tl-xl' : '' }}">
                             {{ Str::title(Str::replace('_', ' ', $column)) }}
                             @if ($sortBy === $column)
                                 <span>{!! $sortDirection === 'asc' ? '&#9650;' : '&#9660;' !!}</span>
@@ -42,7 +42,7 @@
                         </th>
                     @endforeach
 
-                    <th class="px-6 py-3 rounded-tr-xl text-right whitespace-nowrap">Acciones</th>
+                    <th class="px-4 py-3 rounded-tr-xl text-right whitespace-normal">Acciones</th>
                 </tr>
             </thead>
 
@@ -51,7 +51,7 @@
                     <tr class="bg-white border-b hover:bg-gray-50">
 
                         @foreach ($columns as $column)
-                            <td class="px-6 py-4 whitespace-nowrap">
+                            <td class="px-4 py-4 align-top whitespace-normal break-words max-w-[12rem]">
                                 @if ($column === 'category_id')
                                     {{ $item->category->name ?? '' }}
 
@@ -61,7 +61,7 @@
                                 @elseif ($column === 'foto')
                                     @if ($item->fotos->count() > 0)
                                         <img src="{{ asset('storage/' . $item->fotos->first()->url) }}"
-                                            class="w-16 h-16 object-cover rounded">
+                                            class="w-16 h-16 min-w-[4rem] min-h-[4rem] object-cover rounded">
                                     @else
                                         <span class="text-gray-500">No image</span>
                                     @endif
@@ -73,19 +73,19 @@
                         @endforeach
 
                         <!-- Actions -->
-                        <td class="px-6 py-4 flex gap-2 justify-end whitespace-nowrap">
+                        <td class="px-4 py-4 flex flex-col sm:flex-row gap-2 justify-end whitespace-normal">
 
                             <!-- Edit -->
                             <a href="{{ route('edit', ['model' => $model, 'id' => $item->id]) }}"
                                 wire:navigate.hover
-                                class="bg-yellow-600 hover:bg-yellow-800 text-white rounded-lg px-3 py-2">
+                                class="bg-yellow-600 hover:bg-yellow-800 text-white rounded-lg px-3 py-2 w-full sm:w-auto text-center">
                                 ✏️
                             </a>
 
                             <!-- Delete -->
                             <button wire:confirm="¿Estás seguro de que deseas eliminar este registro?"
                                 wire:click="delete({{ $item->id }})"
-                                class="bg-red-600 hover:bg-red-800 text-white rounded-lg px-3 py-2">
+                                class="bg-red-600 hover:bg-red-800 text-white rounded-lg px-3 py-2 w-full sm:w-auto">
 
                                 <span wire:loading.remove wire:target="delete({{ $item->id }})">🗑️</span>
 
