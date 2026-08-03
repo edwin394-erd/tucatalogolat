@@ -132,7 +132,7 @@
             
             {{-- Grid --}}
           {{-- Grid Optimizado --}}
-<div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 flex-wrap">
+<div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 flex-wrap">
     @forelse ($catalogo->products as $item)
         <x-product-card  :catalogo="$catalogo" :item="$item" :iconColor="$iconColor" />
      

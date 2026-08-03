@@ -97,7 +97,7 @@
 {{-- Productos --}}
 <div class="max-w-7xl mx-auto px-4">
     <h2 class="text-2xl font-bold mb-6" style="color: var(--text-primary);">{{ __('messages.products') }}</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
         @forelse ($catalogo->products as $item) {{-- CAMBIO: Usa $products, no $catalogo->products --}}
             <x-product-card 
                 :catalogo="$catalogo" 

@@ -14,10 +14,7 @@
     @vite('resources/js/app.js')
     {{-- Banner and profile pic --}}
     
-    <!-- Fixed cart button (global) Livewire component -->
-    <div class="fixed top-4 right-4 z-50">
-        @livewire('cart-badge')
-    </div>
+    <!-- Cart badge moved into the redes component so it sits above social icons in the bottom-right spot -->
 
 
 @yield('content')
