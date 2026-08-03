@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\Foto;
+use App\Models\foto;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -167,7 +167,7 @@ public function messages(): array
         $product->update($data);
 
         foreach ($this->imagesToDelete as $imageId) {
-            $image = Foto::find($imageId);
+            $image = foto::find($imageId);
             if ($image) {
                 Storage::disk('public')->delete($image->url);
                 $image->delete();
