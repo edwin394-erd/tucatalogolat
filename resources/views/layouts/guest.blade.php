@@ -49,10 +49,7 @@
 <body class="bg-gradient-to-br from-gray-200 to-white min-h-screen">
     @vite('resources/js/app.js')
 
-  <!-- Fixed cart button (global) Livewire component -->
-  <div class="fixed top-4 right-4 z-50">
-    @livewire('cart-badge')
-  </div>
+  <!-- Cart badge removed from guest layout: shown only in catalog layouts -->
 
 <nav class="backdrop-blur-sm bg-white/70 dark:bg-gray-900/60 border-b border-gray-100 dark:border-gray-800 rounded-b-xl shadow-lg">
   <div class="max-w-screen-xl mx-auto px-4 md:px-6">

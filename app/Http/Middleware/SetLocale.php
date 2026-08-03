@@ -18,9 +18,13 @@ class SetLocale
     public function handle(Request $request, Closure $next): Response
     {
         $locale = Cookie::get('locale');
+
         if ($locale && in_array($locale, ['en', 'es'])) {
             App::setLocale($locale);
+        } else {
+            App::setLocale('es');
         }
+
         return $next($request);
     }
 }

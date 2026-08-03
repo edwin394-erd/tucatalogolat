@@ -5,10 +5,12 @@
 
         <x-dashboard-card 
             title="{{ __('messages.users') }}" 
-            content="Total de usuarios: {{ $n_usuarios }}" />
+            content="Total de usuarios: {{ $n_usuarios }}"
+            :link="route('usuarios')" />
         <x-dashboard-card
           title="{{ __('messages.subscriptions') }}" 
-          content="Total de suscripciones activas: {{ $n_suscripciones_activas }}" />
+          content="Total de suscripciones activas: {{ $n_suscripciones_activas }}"
+          :link="route('subscripciones')" />
         
         {{-- <x-dashboard-card
           title="{{ __('messages.expired_subscriptions') }}"
@@ -20,7 +22,8 @@
         
         <x-dashboard-card
           title="{{ __('messages.plans') }}"
-          content="Total de planes: {{ $n_planes }}" />
+          content="Total de planes: {{ $n_planes }}"
+          :link="route('planes')" />
 {{--         
         <x-dashboard-card
           title="Suscripciones activas en los últimos 7 días" 
@@ -31,13 +34,15 @@
           content="Total de suscripciones expiradas en los últimos 7 días: {{ $n_suscripciones_expiradas_ultimos_7_dias }}" /> --}}
       
       @elseif(auth()->user()->role == 'user')
-      <x-dashboard-card 
+        <x-dashboard-card 
           title="{{ __('messages.products') }}" 
-          content="{{ __('messages.total_products') }}: {{ $n_productos }}" />
+          content="{{ __('messages.total_products') }}: {{ $n_productos }}"
+          :link="route('products')" />
 
-      <x-dashboard-card 
+        <x-dashboard-card 
           title="{{ __('messages.categories') }}"
-          content="{{ __('messages.total_categories') }}: {{ $n_categorias }}" />
+          content="{{ __('messages.total_categories') }}: {{ $n_categorias }}"
+          :link="route('categories')" />
       @endif
 
        
