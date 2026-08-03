@@ -134,6 +134,7 @@ return [
     'total_categories' => 'Total de Categorías',
     'total_users' => 'Total de Usuarios',
     'search' => 'Buscar',
+    'search_results_for' => 'Mostrando resultados para:',
     'save' => 'Guardar',
     'saving' => 'Guardando...',
     'product_description_placeholder' => 'Escribe una descripción del producto aquí',

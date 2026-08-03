@@ -60,12 +60,17 @@
     <x-store-info :catalogo="$catalogo" :icon-color="$iconColor" />
 
     {{-- Search --}}
-    <div class="max-w-7xl mx-auto px-4 mb-8 md:w-1/2">
+    <div class="max-w-7xl mx-auto px-4 mb-4 md:w-1/2">
        <input type="text" wire:model.live="search" 
                            class="w-full p-4 pl-12 rounded-2xl border-none shadow-sm focus:ring-2 outline-none" 
                            style="background-color: var(--bg-card-aside); color: var(--text-secondary); --tw-ring-color: var(--primary-btn);" 
                            placeholder="{{__('messages.search_products')}}..." />
     </div>
+    @if ($search)
+        <div class="max-w-7xl mx-auto px-4 mb-8 md:w-1/2">
+            <p class="text-sm text-gray-700 dark:text-gray-300">{{ __('messages.search_results_for') }} <span class="font-semibold">"{{ $search }}"</span></p>
+        </div>
+    @endif
 
     {{-- Categorías --}}
     <div class="max-w-7xl mx-auto px-4">

@@ -123,6 +123,7 @@ return [
     'total_categories' => 'Total Categories',
     'total_users' => 'Total Users',
     'search' => 'Search',
+    'search_results_for' => 'Showing results for:',
     'save' => 'Save',
     'saving' => 'Saving...',
     'product_description_placeholder' => 'Enter a product description here',

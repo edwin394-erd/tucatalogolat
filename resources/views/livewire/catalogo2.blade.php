@@ -113,6 +113,9 @@
             <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
                 <div class="space-y-2">
                     <h2 class="text-3xl font-black tracking-tight" style="color: var(--text-primary);">{{__('messages.products')}}</h2>
+                    @if ($search)
+                        <p class="text-sm text-gray-700 dark:text-gray-300">{{ __('messages.search_results_for') }} <span class="font-semibold">"{{ $search }}"</span></p>
+                    @endif
                 </div>
                 <div class="flex  gap-3 justify-end w-full">
                     <!-- Cart button moved to layout (fixed top-right) -->
