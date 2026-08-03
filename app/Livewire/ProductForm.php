@@ -112,17 +112,22 @@ public function messages(): array
     // Marca una imagen existente para ser eliminada cuando se guarde el formulario.
     public function markImageForDeletion($imageId)
     {
-        $this->imagesToDelete[] = $imageId;
+        if (! in_array($imageId, $this->imagesToDelete, true)) {
+            $this->imagesToDelete[] = $imageId;
+        }
+
         $this->existingImages = collect($this->existingImages)->filter(function ($item) use ($imageId) {
-            return $item['id'] != $imageId;
+            return isset($item['id']) && $item['id'] != $imageId;
         })->values()->toArray();
     }
     
     // Elimina una imagen nueva (temporal) antes de que se guarde.
     public function removeNewImage($index)
     {
-        unset($this->images[$index]);
-        $this->images = array_values($this->images);
+        if (isset($this->images[$index])) {
+            unset($this->images[$index]);
+            $this->images = array_values($this->images);
+        }
     }
 
     public function addVariant()
@@ -195,12 +200,16 @@ public function messages(): array
                 throw new \RuntimeException('Uploaded image has no accessible temporary path.');
             }
 
-            $img = $manager->read($path)
-                           ->scale(800);
+            $img = $manager->read($path)->scale(800);
 
             $extension = function_exists('imagewebp') ? 'webp' : 'jpg';
             $quality = $extension === 'webp' ? 80 : 90;
-            $encoded = $img->encodeByExtension($extension, $quality);
+
+            if ($extension === 'webp') {
+                $encoded = $img->toWebp($quality);
+            } else {
+                $encoded = $img->toJpeg($quality);
+            }
 
             $name = 'products/' . uniqid() . '.' . $extension;
             $saved = Storage::disk('public')->put($name, (string) $encoded);
