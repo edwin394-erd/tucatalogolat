@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Foto;
 
 class Category extends Model
 {
@@ -28,6 +29,6 @@ class Category extends Model
 
     public function fotos()
     {
-        return $this->morphMany(foto::class, 'imageable');
+        return $this->morphMany(Foto::class, 'imageable');
     }
 }
