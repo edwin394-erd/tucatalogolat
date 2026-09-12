@@ -130,9 +130,12 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@26.5.1/build/js/intlTelInput.min.js"></script>
 <script>
-  const input = document.querySelector("#phone");
-  window.intlTelInput(input, {
-    loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@26.5.1/build/js/utils.js"),
+  const telInputs = document.querySelectorAll('#telephone, #phone, input[type="tel"]');
+  telInputs.forEach((input) => {
+    if (!input || typeof window.intlTelInput !== 'function') return;
+    window.intlTelInput(input, {
+      loadUtils: () => import('https://cdn.jsdelivr.net/npm/intl-tel-input@26.5.1/build/js/utils.js'),
+    });
   });
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
