@@ -102,13 +102,13 @@
 {{-- Productos --}}
 <div class="max-w-7xl mx-auto px-4">
     <h2 class="text-2xl font-bold mb-6" style="color: var(--text-primary);">{{ __('messages.products') }}</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-        @forelse ($catalogo->products as $item) {{-- CAMBIO: Usa $products, no $catalogo->products --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        @forelse ($catalogo->products as $item)
             <x-product-card 
                 :catalogo="$catalogo" 
                 :item="$item" 
                 :iconColor="$iconColor" 
-                wire:key="prod-{{ $item->id }}" {{-- CAMBIO: Key única obligatoria --}}
+                wire:key="prod-{{ $item->id }}" 
             />
         @empty
             <div class="col-span-full py-20 text-center opacity-40 font-bold" style="color: var(--text-secondary);">

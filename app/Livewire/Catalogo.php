@@ -29,10 +29,15 @@ class Catalogo extends Component
 
     public function mount($name)
     {
-        $this->name = $name;
+        $handle = \App\Models\Catalogo::generateHandle($name);
+
+        if ($handle !== $name) {
+            $this->redirectRoute('catalogo', $handle);
+            return;
+        }
+
+        $this->name = $handle;
         $this->selectedCategory = $this->categoryId;
-        
-        
     }
 
     public function updatingSearch()
@@ -47,7 +52,7 @@ class Catalogo extends Component
 
     public function render()
     {
-        $catalogo = \App\Models\Catalogo::where('name', $this->name)->firstOrFail();
+        $catalogo = \App\Models\Catalogo::where('name_handle', $this->name)->firstOrFail();
         $catalogo->load(['categories', 'products.fotos', 'plantilla']);
 
         if (auth()->check() && auth()->id() === $catalogo->user_id && ! $catalogo->isConfigurationComplete()) {
@@ -67,10 +72,14 @@ class Catalogo extends Component
         $products = $catalogo->products;
 
         if ($this->search) {
-            $products = $products->filter(fn($product) => 
-                stripos($product->name ?? '', $this->search) !== false || 
-                (isset($product->description) && stripos($product->description, $this->search) !== false)
-            );
+            $search = trim(preg_replace('/\s+/', ' ', $this->search));
+            $searchWords = collect(explode(' ', strtolower($search)))->filter();
+
+            $products = $products->filter(function ($product) use ($searchWords) {
+                $haystack = strtolower(($product->name ?? '') . ' ' . ($product->description ?? ''));
+
+                return $searchWords->every(fn($word) => str_contains($haystack, $word));
+            });
         }
 
         if ($this->categoryId) {
@@ -124,7 +133,7 @@ class Catalogo extends Component
 
     public function addToCart($productId)
     {
-        $catalogo = \App\Models\Catalogo::where('name', $this->name)->firstOrFail();
+        $catalogo = \App\Models\Catalogo::where('name_handle', \App\Models\Catalogo::generateHandle($this->name))->firstOrFail();
         $product = Product::where('catalogo_id', $catalogo->id)->findOrFail($productId);
 
         $cart = Cart::current($catalogo->id);

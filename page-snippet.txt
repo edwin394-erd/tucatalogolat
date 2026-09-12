@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>tucatalogo.lat</title>
+  <script type="module" src="http://[::1]:5173/@vite/client" data-navigate-track="reload"></script><link rel="stylesheet" href="http://[::1]:5173/resources/css/app.css" data-navigate-track="reload" /><script type="module" src="http://[::1]:5173/resources/js/app.js" data-navigate-track="reload"></script>  <!-- Livewire Styles --><style >[wire\:loading][wire\:loading], [wire\:loading\.delay][wire\:loading\.delay], [wire\:loading\.list-item][wire\:loading\.list-item], [wire\:loading\.inline-block][wire\:loading\.inline-block], [wire\:loading\.inline][wire\:loading\.inline], [wire\:loading\.block][wire\:loading\.block], [wire\:loading\.flex][wire\:loading\.flex], [wire\:loading\.table][wire\:loading\.table], [wire\:loading\.grid][wire\:loading\.grid], [wire\:loading\.inline-flex][wire\:loading\.inline-flex] {display: none;}[wire\:loading\.delay\.none][wire\:loading\.delay\.none], [wire\:loading\.delay\.shortest][wire\:loading\.delay\.shortest], [wire\:loading\.delay\.shorter][wire\:loading\.delay\.shorter], [wire\:loading\.delay\.short][wire\:loading\.delay\.short], [wire\:loading\.delay\.default][wire\:loading\.delay\.default], [wire\:loading\.delay\.long][wire\:loading\.delay\.long], [wire\:loading\.delay\.longer][wire\:loading\.delay\.longer], [wire\:loading\.delay\.longest][wire\:loading\.delay\.longest] {display: none;}[wire\:offline][wire\:offline] {display: none;}[wire\:dirty]:not(textarea):not(input):not(select) {display: none;}:root {--livewire-progress-bar-color: #2299dd;}[x-cloak] {display: none !important;}[wire\:cloak] {display: none !important;}dialog#livewire-error::backdrop {background-color: rgba(0, 0, 0, .6);}</style>
+    <style>
+      body {
+        font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      }
+      nav {
+        box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04);
+      }
+      .select2-container--default .select2-selection--single {
+    background-color: rgb(243 244 246) !important; /* bg-gray-100 */
+    border: 1px solid rgb(209 213 219) !important; /* border-gray-300 */
+    border-radius: 0.5rem !important; /* rounded-lg */
+    height: 42px !important; /* Ajuste para p-2.5 */
+    display: flex;
+    align-items: center;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: rgb(17 24 39) !important; /* text-gray-900 */
+    font-size: 0.875rem !important; /* text-sm */
+    padding-left: 0.625rem !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+}
+
+/* Ajuste de la bandera dentro del select */
+.fi {
+    margin-right: 8px;
+    border-radius: 2px;
+}
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@26.5.1/build/css/intlTelInput.css">
+
+
+</head>
+<body class="bg-gradient-to-br from-gray-200 to-white min-h-screen">
+    <script type="module" src="http://[::1]:5173/@vite/client" data-navigate-track="reload"></script><script type="module" src="http://[::1]:5173/resources/js/app.js" data-navigate-track="reload"></script>
+  <!-- Cart badge removed from guest layout: shown only in catalog layouts -->
+
+<nav class="backdrop-blur-sm bg-white/70 dark:bg-gray-900/60 border-b border-gray-100 dark:border-gray-800 rounded-b-xl shadow-lg">
+  <div class="max-w-screen-xl mx-auto px-4 md:px-6">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-4">
+        <a href="http://localhost:8000" class="flex items-center gap-3">
+          <a href="http://localhost:8000" class="flex items-center gap-2">
+    
+          <span class="font-extrabold text-2xl text-gray-800 dark:text-white tracking-tight">tucatalogo.lat</span>
+</a>        </a>
+      </div>
+
+     
+
+      <div class="flex items-center gap-3">
+        <!-- Search (decorative, no JS) -->
+        
+
+        <!-- Theme toggle (visual only) -->
+        
+
+        <!-- Language switch -->
+        <div class="relative">
+          <select id="language-select" class="hidden sm:block bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 transition">
+            <option value="es" selected>???? Español</option>
+            <option value="en" >???? English</option>
+          </select>
+        </div>
+
+        <!-- CTA visible on md+ (keeps auth links for guests) -->
+        <div class="hidden md:flex items-center gap-2">
+          <a href="http://localhost:8000/Login" wire:navigate class="px-3 py-1.5 text-sm rounded-md text-gray-700 hover:bg-gray-100 transition">Iniciar sesión</a>
+          <a href="http://localhost:8000/Register" wire:navigate class="px-3 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">Regístrate</a>
+        </div>
+
+        <!-- Mobile menu button -->
+        <button data-collapse-toggle="navbar-default" type="button" aria-controls="navbar-default" aria-expanded="false"
+                class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-600 rounded-lg md:hidden hover:bg-gray-200 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 transition">
+          <span class="sr-only">Open main menu</span>
+          <svg class="w-6 h-6" aria-hidden="true" fill="none" viewBox="0 0 17 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile collapsible -->
+    <div class="hidden w-full md:hidden mt-3" id="navbar-default">
+      <div class="bg-white dark:bg-gray-900/70 border border-gray-100 dark:border-gray-800 rounded-xl p-3 shadow-sm">
+        <ul class="flex flex-col gap-2">
+          <li><a href="http://localhost:8000" wire:navigate class="block px-3 py-2 rounded-md text-blue-700 bg-blue-50">Inicio</a></li>
+          <li><a href="http://localhost:8000/Login" wire:navigate class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Iniciar sesión</a></li>
+          <li><a href="http://localhost:8000/Register" wire:navigate class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Regístrate</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+            <section wire:snapshot="{&quot;data&quot;:{&quot;email&quot;:null,&quot;password&quot;:null,&quot;showPassword&quot;:false},&quot;memo&quot;:{&quot;id&quot;:&quot;VdAuHPwtgadRGq694hSG&quot;,&quot;name&quot;:&quot;login&quot;,&quot;path&quot;:&quot;Login&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;release&quot;:&quot;a-a-a&quot;,&quot;children&quot;:[],&quot;scripts&quot;:[],&quot;assets&quot;:[],&quot;errors&quot;:[],&quot;locale&quot;:&quot;es&quot;,&quot;islands&quot;:[]},&quot;checksum&quot;:&quot;f4723e135a021d7db95190450d1dc210fca7bbb348b5af2a557eb9d00b743f4b&quot;}" wire:effects="[]" wire:id="VdAuHPwtgadRGq694hSG" wire:name="login" class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm md:px-10 h-screen  ">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+                <a href="http://localhost:8000" class="flex items-center gap-2">
+    
+          <span class="font-extrabold text-2xl text-gray-800 dark:text-white tracking-tight">tucatalogo.lat</span>
+</a><br>
+            <div class="w-full bg-white rounded-lg shadow border border-gray-300 md:mt-0 sm:max-w-md xl:p-0">
+                    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                            <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
+                                    Iniciar sesión
+                            </h1>
+                            <form class="space-y-4 md:space-y-6" wire:submit.prevent="login" novalidate>
+                                    <div>
+                                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Tu email</label>
+                                            <input type="email" wire:model.blur="email" name="email" id="email" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5" placeholder="name@company.com" required="">
+                                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                                        </div>
+                                    <div x-data="{ showPassword: false }">
+                                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Contraseña</label>
+                                        <div class="relative">
+                                                <input x-bind:type="showPassword ? 'text' : 'password'" wire:model.blur="password" name="password" id="password" placeholder="••••••••" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5 pr-10" required="">
+                                                <button type="button" x-on:click="showPassword = !showPassword" tabindex="-1" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                                        <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        <svg x-show="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m3.249-2.383A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.965 9.965 0 01-4.043 5.197M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+                                                        </svg>
+                                                </button>
+                                        </div>
+                                            <!--[if BLOCK]><![endif]--><!--[if ENDBLOCK]><![endif]-->
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                            <div class="flex items-start">
+                                                    <div class="flex items-center h-5">
+                                                        <input id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-100 inset-shadow-sm focus:ring-3 focus:ring-gray-300" required="">
+                                                    </div>
+                                                    <div class="ml-3 text-sm">
+                                                        <label for="remember" class="text-gray-500">Recuérdame</label>
+                                                    </div>
+                                            </div>
+                                            <a href="#" class="text-sm font-medium text-gray-600 hover:underline">¿Olvidaste tu contraseña?</a>
+                                    </div>
+                                    <button type="submit" class="w-full text-white bg-indigo-600  focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Iniciar sesión</button>
+                                    <p class="text-sm font-light text-gray-500">
+                                            ¿No tienes una cuenta todavía? <a href="http://localhost:8000/Register" wire:navigate class="font-medium text-gray-600 hover:underline">Regístrate</a>
+                                    </p>
+                            </form>
+                    </div>
+            </div>
+    </div>
+</section>
+        <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+ <script>
+    // Elimina el listener anterior si existe
+    window.removeEventListener('livewire:navigated', window._myNavigatedListener);
+
+    // Define el listener y guárdalo en window para referencia
+    window._myNavigatedListener = function() {
+        console.log('Livewire navigated hOLA');
+        if (typeof initFlowbite === 'function') {
+            initFlowbite();
+        }
+    };
+
+    window.addEventListener('livewire:navigated', window._myNavigatedListener);
+</script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@26.5.1/build/js/intlTelInput.min.js"></script>
+<script>
+  const input = document.querySelector("#phone");
+  window.intlTelInput(input, {
+    loadUtils: () => import("https://cdn.jsdelivr.net/npm/intl-tel-input@26.5.1/build/js/utils.js"),
+  });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2-flags').select2({
+            templateResult: formatFlag,
+            templateSelection: formatFlag,
+            escapeMarkup: function(m) { return m; }
+        });
+
+        function formatFlag(state) {
+            if (!state.id) return state.text;
+            var flag = $(state.element).data('flag');
+            return `<span class="fi fi-${flag}"></span> ${state.text}`;
+        }
+
+        // Language switch
+        $('#language-select').on('change', function() {
+            var locale = $(this).val();
+            window.location.href = "http://localhost:8000/lang/" + locale;
+        });
+    });
+</script>
+  <!-- Livewire Scripts -->
+<script src="http://localhost:8000/livewire-f55c228d/livewire.js?id=f4724cc4"   data-csrf="S9CyugYZ9VLr0FXOIMl6Gph0M95Kuks9wkI9dAmT" data-module-url="http://localhost:8000/livewire-f55c228d" data-update-uri="http://localhost:8000/livewire-f55c228d/update" data-navigate-once="true"></script>
+</body>
+</html>

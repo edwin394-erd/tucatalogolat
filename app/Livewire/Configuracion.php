@@ -124,11 +124,17 @@ class Configuracion extends Component
         $this->tema_id = $this->custom_theme_catalogo->id;
     }
 
- 
-    
-$this->validate([
-    'name' => 'required|string|max:255|unique:catalogos,name,' . $this->catalogo->id,
-    'description' => 'nullable|string|max:1000',
+    $nameHandle = \App\Models\Catalogo::generateHandle($this->name);
+
+    $this->validate([
+        'name' => ['required','string','max:255', function ($attribute, $value, $fail) use ($nameHandle) {
+            if (\App\Models\Catalogo::where('name_handle', $nameHandle)
+                ->where('id', '!=', $this->catalogo->id)
+                ->exists()) {
+                $fail('El nombre del catálogo sin espacios ya existe en otro catálogo.');
+            }
+        }],
+        'description' => 'nullable|string|max:1000',
     'plantilla_id' => 'required|exists:plantillas,id',
     'telefono_contacto' => 'nullable|string|max:20',
     'tema_id' => 'nullable|exists:themes,id',
@@ -141,6 +147,7 @@ $this->validate([
     // Asignar valores al modelo antes de guardar
     $this->catalogo->update([
         'name' => $this->name,
+        'name_handle' => $nameHandle,
         'description' => $this->description,
         'horario' => $this->horario,
         'ubicacion' => $this->ubicacion,

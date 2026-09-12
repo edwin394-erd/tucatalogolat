@@ -6,12 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Catalogo</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @livewireStyles
 </head>
 
 
 <body class="bg-gray-100 ">
-    @vite('resources/js/app.js')
+    {{-- scripts already included via @vite above --}}
     {{-- Banner and profile pic --}}
     
     <!-- Cart badge moved into the redes component so it sits above social icons in the bottom-right spot -->

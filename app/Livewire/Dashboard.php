@@ -6,11 +6,13 @@ use Livewire\Component;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Catalogo;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class Dashboard extends Component
 {
     public $n_productos;
     public $n_categorias;
+    public $catalogLink;
 
     public $n_usuarios;
     public $n_planes;
@@ -30,11 +32,12 @@ class Dashboard extends Component
     public function render()
     {
         if (auth()->user()->catalogo) {
-          
-            $this->n_productos = Catalogo::find(auth()->user()->catalogo->id)->products()->count();
-            $this->n_categorias = Catalogo::find(auth()->user()->catalogo->id)->categories()->count();
-            $this->n_productos_ultimos_7_dias = Catalogo::find(auth()->user()->catalogo->id)->products()->where('created_at', '>=', now()->subDays(7))->count();
-            $this->n_categorias_ultimos_7_dias = Catalogo::find(auth()->user()->catalogo->id)->categories()->where('created_at', '>=', now()->subDays(7))->count();
+            $catalogo = Catalogo::find(auth()->user()->catalogo->id);
+            $this->n_productos = $catalogo->products()->count();
+            $this->n_categorias = $catalogo->categories()->count();
+            $this->n_productos_ultimos_7_dias = $catalogo->products()->where('created_at', '>=', now()->subDays(7))->count();
+            $this->n_categorias_ultimos_7_dias = $catalogo->categories()->where('created_at', '>=', now()->subDays(7))->count();
+            $this->catalogLink = route('catalogo', $catalogo->name_handle);
         }
 
         $this->n_usuarios = \App\Models\User::count();

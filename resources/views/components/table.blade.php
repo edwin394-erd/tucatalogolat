@@ -1,4 +1,4 @@
-<div class="bg-white p-4 shadow-md sm:rounded-lg">
+{{-- <div class="bg-white p-4 shadow-md sm:rounded-lg">
 
     <x-alert alert_type="success" />
 
@@ -117,4 +117,4 @@
     <div class="mt-4">
         {{ $items->links() }}
     </div>
-</div>
+</div> --}}

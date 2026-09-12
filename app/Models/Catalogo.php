@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Catalogo extends Model
 {
@@ -58,5 +59,10 @@ class Catalogo extends Model
         return $this->belongsTo(Theme::class);
     }
 
-    
+    public static function generateHandle(string $name): string
+    {
+        $handle = Str::slug($name, '');
+
+        return $handle !== '' ? $handle : Str::random(8);
+    }
 }

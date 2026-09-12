@@ -82,9 +82,14 @@ class Register extends Component
         ]);
 
         if (true) {
+            $handle = \App\Models\Catalogo::generateHandle($this->name);
+            if (\App\Models\Catalogo::where('name_handle', $handle)->exists()) {
+                $handle .= '-' . $user->id;
+            }
+
             Catalogo::create([
                 'name' => $this->name,
-                'name_handle' => \Str::slug($this->name) . '-' . $user->id,
+                'name_handle' => $handle,
                 'user_id' => $user->id,
                 'telefono_contacto' => $this->area_code . $this->telephone,
             ]);

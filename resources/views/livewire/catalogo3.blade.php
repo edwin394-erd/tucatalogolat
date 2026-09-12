@@ -88,7 +88,18 @@
                                             </div>
                                         </div>
                                         <div class="flex flex-col gap-2 items-start md:items-end">
-                                            <button type="button" x-data="{ added: false }" @click="added = true; setTimeout(() => added = false, 400); window.dispatchEvent(new CustomEvent('cart-added'))" wire:click="addToCart({{ $item->id }})" :class="added ? 'scale-125 shadow-2xl ring-4 ring-white/80 animate-pulse' : ''" class="rounded-full px-5 py-2 text-sm font-semibold shadow transition-all duration-200 ease-out" style="background-color: {{ $pColor }}; color: {{ $iconColor }};">Añadir al carrito</button>
+                                            <div>
+                                                <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) == 0">
+                                                    <button type="button" @click="window.cartAdd({{ $item->id }})" class="rounded-full px-5 py-2 text-sm font-semibold shadow transition-all duration-200 ease-out" style="background-color: var(--primary-btn); color: var(--text-on-primary, #fff);">Añadir al carrito</button>
+                                                </template>
+                                                <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) > 0">
+                                                    <div class="inline-flex items-center gap-2">
+                                                        <button type="button" @click="window.cartDecrease({{ $item->id }})" class="px-2 py-1 rounded bg-gray-100">-</button>
+                                                        <div class="px-3 py-1 text-sm font-medium" x-text="Alpine.store('cart') ? (Alpine.store('cart').items['{{ $item->id }}'] || 0) : 0"></div>
+                                                        <button type="button" @click="window.cartIncrease({{ $item->id }})" class="px-2 py-1 rounded bg-[var(--primary-btn)] text-white">+</button>
+                                                    </div>
+                                                </template>
+                                            </div>
                                             @if($item->stock !== null)
                                                 <span class="text-xs uppercase tracking-wider" style="color: {{ $sFont }};">{{ __('messages.stock') }}: {{ $item->stock }}</span>
                                             @endif
@@ -118,7 +129,7 @@
                 </div>
                 <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
                     <h3 class="text-xl font-bold mb-3" style="color: {{ $pColor }};">Acciones rápidas</h3>
-                    <a href="{{ route('catalogo.cart', $catalogo->name) }}" class="block rounded-full px-4 py-3 text-center font-semibold" style="background-color: {{ $pColor }}; color: {{ $iconColor }};">Ver carrito</a>
+                    <a href="{{ route('catalogo.cart', $catalogo->name) }}" class="block rounded-full px-4 py-3 text-center font-semibold" style="background-color: var(--primary-btn); color: var(--text-on-primary, #fff);">Ver carrito</a>
                 </div>
             </aside>
         </div>

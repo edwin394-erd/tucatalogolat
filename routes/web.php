@@ -19,6 +19,11 @@ use App\Livewire\Subscripciones;
 use App\Livewire\EditItem;
 use App\Livewire\CreateItem;
 use App\Http\Controllers\LanguageController;
+use Illuminate\Http\Request;
+use App\Models\Catalogo as CatalogoModel;
+use App\Models\Cart as CartModel;
+use App\Models\CartItem as CartItemModel;
+use App\Models\Product as ProductModel;
 
 Route::get('/', Home::class)->middleware(['guest'])->name('home');
 Route::get('/Login', Login::class)->middleware(['guest'])->name('login');
@@ -48,8 +53,52 @@ Route::get('/{name}/product/{id}', ShowProduct::class)->name('product-show');
 Route::get('/{name}/cart', Cart::class)->name('catalogo.cart');
 // JSON endpoint to return current cart item count for a catalog
 Route::get('/{name}/cart-count', function($name){
-	$catalogo = \App\Models\Catalogo::where('name', $name)->firstOrFail();
-	$count = \App\Models\Cart::findCurrent($catalogo->id)?->count ?? 0;
+	$handle = CatalogoModel::generateHandle($name);
+	$catalogo = CatalogoModel::where('name_handle', $handle)->firstOrFail();
+	$count = CartModel::findCurrent($catalogo->id)?->count ?? 0;
 	return response()->json(['count' => $count]);
 })->name('catalogo.cartCount');
+
+// Endpoint to sync client-side cart with server (optimistic client sync)
+Route::post('/{name}/cart-sync', function(Request $request, $name){
+	$handle = CatalogoModel::generateHandle($name);
+	$catalogo = CatalogoModel::where('name_handle', $handle)->firstOrFail();
+	$cart = CartModel::current($catalogo->id);
+
+	$payload = $request->json()->all();
+	$raw = $payload['items'] ?? [];
+	// Normalize to int keys => int qty
+	$items = [];
+	foreach ($raw as $k => $v) {
+		$items[(int)$k] = (int)$v;
+	}
+
+	// Remove items not present in payload
+	foreach ($cart->items()->get() as $ci) {
+		$pid = $ci->product_id;
+		if (! array_key_exists($pid, $items) || ($items[$pid] <= 0)) {
+			$ci->delete();
+		}
+	}
+
+	// Add/update incoming items
+	foreach ($items as $pid => $qty) {
+		$qty = (int) $qty;
+		if ($qty <= 0) continue;
+		$product = ProductModel::find($pid);
+		if (! $product) continue;
+
+		$existing = $cart->items()->where('product_id', $product->id)->first();
+		if ($existing) {
+			$existing->quantity = $qty;
+			$existing->save();
+		} else {
+			// use Cart::addProduct to keep pricing logic
+			$cart->addProduct($product, $qty);
+		}
+	}
+
+	$cart->load('items.product');
+	return response()->json(['count' => $cart->count, 'items' => $cart->items->map(function($i){ return ['product_id'=>$i->product_id,'quantity'=>$i->quantity]; })]);
+})->name('catalogo.cartSync');
 Route::get('/{name}', Catalogo::class)->name('catalogo');

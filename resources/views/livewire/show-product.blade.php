@@ -38,7 +38,18 @@
                             ${{ number_format($totalPrice, 2) }}
                         </span>
                         <div class="space-x-2">
-                            <button type="button" x-data="{ added: false }" @click="added = true; setTimeout(() => added = false, 400); window.dispatchEvent(new CustomEvent('cart-added'))" wire:click="addToCart({{ $product->id }})" :class="added ? 'scale-125 shadow-2xl ring-4 ring-white/80 animate-pulse' : ''" class="px-3 py-1 bg-blue-600 text-white rounded transition-all duration-200 ease-out">Añadir al carrito</button>
+                            <div style="display:inline-block">
+                                <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $product->id }}'] || 0)) == 0">
+                                    <button type="button" @click="window.cartAdd({{ $product->id }})" class="px-3 py-1 text-white rounded transition-all duration-200 ease-out" style="background-color: var(--primary-btn);">Añadir al carrito</button>
+                                </template>
+                                <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $product->id }}'] || 0)) > 0">
+                                    <div class="inline-flex items-center gap-2">
+                                        <button type="button" @click="window.cartDecrease({{ $product->id }})" class="px-2 py-1 rounded bg-gray-100">-</button>
+                                        <div class="px-3 py-1 text-sm font-medium" x-text="Alpine.store('cart') ? (Alpine.store('cart').items['{{ $product->id }}'] || 0) : 0"></div>
+                                        <button type="button" @click="window.cartIncrease({{ $product->id }})" class="px-2 py-1 rounded bg-[var(--primary-btn)] text-white">+</button>
+                                    </div>
+                                </template>
+                            </div>
                             <button wire:click="$emit('showEditForm', {{ $product->id }})" class="px-3 py-1 bg-gray-200 rounded">Editar</button>
                         </div>
                     </div>

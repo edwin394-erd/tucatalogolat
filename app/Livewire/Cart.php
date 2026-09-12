@@ -15,7 +15,8 @@ class Cart extends Component
     public function mount($name)
     {
         $this->name = $name;
-        $this->catalogo = Catalogo::where('name', $name)->firstOrFail();
+        $handle = Catalogo::generateHandle($name);
+        $this->catalogo = Catalogo::where('name_handle', $handle)->firstOrFail();
         $this->refreshCart();
     }
 

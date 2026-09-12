@@ -45,24 +45,36 @@
             <tr class="bg-white border-b border-gray-200 hover:bg-gray-100">
                 
                 @foreach ($columns as $column)
-                    <td class="px-4 py-4 align-top whitespace-normal break-words max-w-[12rem]">
+                    <td class="px-4 py-4 align-top whitespace-normal break-words max-w-[12rem] h-24 overflow-hidden">
                         @if ($column === 'category_id')
-                            {{ $item->category ? $item->category->name : '' }}
+                            <div class="h-full overflow-hidden text-sm" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                {{ $item->category ? $item->category->name : '' }}
+                            </div>
                         @elseif ($column === 'descuento_id')
-                            {{ $item->descuento ? $item->descuento->name . ' (' . $item->descuento->amount . '%)' : 'Sin descuento' }}
+                            <div class="h-full overflow-hidden text-sm" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                {{ $item->descuento ? $item->descuento->name . ' (' . $item->descuento->amount . '%)' : 'Sin descuento' }}
+                            </div>
 
                         @elseif ($column === 'foto')
                             @if($item->fotos->count() > 0)
-                                <img src="{{ asset('storage/' . $item->fotos->first()->url) }}" alt="Foto" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded">
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 overflow-hidden rounded">
+                                    <img src="{{ asset('storage/' . $item->fotos->first()->url) }}" alt="Foto" class="w-full h-full object-cover rounded">
+                                </div>
                             @else
                                 <span class="text-gray-500">No image</span>
                             @endif
                         @elseif ($column === 'subscription')
-                           {{ $item->subscriptions->isNotEmpty() ? $item->subscriptions->last()->plan->name : 'Sin suscripción' }}
+                           <div class="h-full overflow-hidden text-sm" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                               {{ $item->subscriptions->isNotEmpty() ? $item->subscriptions->last()->plan->name : 'Sin suscripción' }}
+                           </div>
                         @elseif ($column === 'user_id')
-                            {{ $item->user ? $item->user->name : 'N/A' }}
+                            <div class="h-full overflow-hidden text-sm" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                {{ $item->user ? $item->user->name : 'N/A' }}
+                            </div>
                         @elseif ($column === 'plan_id')
-                            {{ $item->plan ? $item->plan->name : 'N/A' }}
+                            <div class="h-full overflow-hidden text-sm" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                {{ $item->plan ? $item->plan->name : 'N/A' }}
+                            </div>
                          
                         @elseif ($column === 'fecha_de_corte')
                         <div class="rounded-lg p-1 text-center @if($item->subscriptions->isNotEmpty() && $item->subscriptions->last()->expires_at < now()) bg-red-100 text-red-700 @else bg-green-100 text-green-700 @endif">
@@ -75,12 +87,14 @@
                             </div>
                         @elseif ($column === 'catalogo_name')
             
-                        <a href="{{ $item->catalogo ? route('catalogo', ['name' => $item->catalogo->name]) : '#' }}" class="text-blue-600 hover:underline" target="_blanck">
+                        <a href="{{ $item->catalogo ? route('catalogo', ['name' => $item->catalogo->name_handle]) : '#' }}" class="text-blue-600 hover:underline" target="_blanck">
 
                             {{ $item->catalogo ? $item->catalogo->name : 'N/A' }}
                         </a>
                         @else
-                            {{ $item->$column }}
+                            <div class="h-full overflow-hidden text-sm" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+                                {{ $item->$column }}
+                            </div>
                         @endif
                     </td>
                 @endforeach
