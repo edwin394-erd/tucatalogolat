@@ -18,8 +18,7 @@ class CartBadge extends Component
     {
         $name = request()->route('name');
         if ($name) {
-            $handle = \App\Models\Catalogo::generateHandle($name);
-            $catalogo = \App\Models\Catalogo::where('name_handle', $handle)->first();
+            $catalogo = \App\Models\Catalogo::resolveByName($name);
             $this->count = $catalogo ? (Cart::findCurrent($catalogo->id)?->count ?? 0) : 0;
         }
     }
@@ -33,8 +32,7 @@ class CartBadge extends Component
     {
         $name = request()->route('name');
         if ($name) {
-            $handle = \App\Models\Catalogo::generateHandle($name);
-            $catalogo = \App\Models\Catalogo::where('name_handle', $handle)->first();
+            $catalogo = \App\Models\Catalogo::resolveByName($name);
             $this->count = $catalogo ? (Cart::findCurrent($catalogo->id)?->count ?? 0) : 0;
         }
     }

@@ -65,4 +65,29 @@ class Catalogo extends Model
 
         return $handle !== '' ? $handle : Str::random(8);
     }
+
+    public static function normalizeHandle(string $value): string
+    {
+        return strtolower(preg_replace('/\s+/', '', (string) $value));
+    }
+
+    public static function resolveByName(string $name): ?self
+    {
+        $raw = trim((string) $name);
+
+        if ($raw === '') {
+            return null;
+        }
+
+        $normalizedName = self::normalizeHandle($raw);
+        $generatedHandle = self::generateHandle($raw);
+
+        return self::query()
+            ->where(function ($query) use ($generatedHandle, $normalizedName) {
+                $query->where('name_handle', $generatedHandle)
+                    ->orWhereRaw('LOWER(REPLACE(name_handle, " ", "")) = ?', [$normalizedName])
+                    ->orWhereRaw('LOWER(REPLACE(name, " ", "")) = ?', [$normalizedName]);
+            })
+            ->first();
+    }
 }

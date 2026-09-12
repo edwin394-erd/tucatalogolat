@@ -14,8 +14,9 @@ class ShowProduct extends Component
     public function mount($name,$id)
     {
         // Buscamos el producto por ID. Si no existe, lanza un error 404.
-         $handle = \App\Models\Catalogo::generateHandle($name);
-         $id_catalogo = \App\Models\Catalogo::where('name_handle', $handle)->firstOrFail()->id;
+         $catalogo = \App\Models\Catalogo::resolveByName($name);
+         abort_unless($catalogo, 404, 'Catalogo no encontrado');
+         $id_catalogo = $catalogo->id;
 
         // debug rápido: ver valores
 
@@ -32,7 +33,7 @@ class ShowProduct extends Component
 
     public function addToCart($productId)
     {
-        $catalogo = \App\Models\Catalogo::where('name_handle', \App\Models\Catalogo::generateHandle($this->name))->firstOrFail();
+        $catalogo = \App\Models\Catalogo::resolveByName($this->name) ?? \App\Models\Catalogo::where('name_handle', \App\Models\Catalogo::generateHandle($this->name))->firstOrFail();
         $product = Product::where('catalogo_id', $catalogo->id)->findOrFail($productId);
 
         $cart = \App\Models\Cart::current($catalogo->id);

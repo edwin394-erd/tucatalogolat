@@ -53,16 +53,16 @@ Route::get('/{name}/product/{id}', ShowProduct::class)->name('product-show');
 Route::get('/{name}/cart', Cart::class)->name('catalogo.cart');
 // JSON endpoint to return current cart item count for a catalog
 Route::get('/{name}/cart-count', function($name){
-	$handle = CatalogoModel::generateHandle($name);
-	$catalogo = CatalogoModel::where('name_handle', $handle)->firstOrFail();
+	$catalogo = CatalogoModel::resolveByName($name);
+	abort_unless($catalogo, 404, 'Catalogo no encontrado');
 	$count = CartModel::findCurrent($catalogo->id)?->count ?? 0;
 	return response()->json(['count' => $count]);
 })->name('catalogo.cartCount');
 
 // Endpoint to sync client-side cart with server (optimistic client sync)
 Route::post('/{name}/cart-sync', function(Request $request, $name){
-	$handle = CatalogoModel::generateHandle($name);
-	$catalogo = CatalogoModel::where('name_handle', $handle)->firstOrFail();
+	$catalogo = CatalogoModel::resolveByName($name);
+	abort_unless($catalogo, 404, 'Catalogo no encontrado');
 	$cart = CartModel::current($catalogo->id);
 
 	$payload = $request->json()->all();

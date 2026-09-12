@@ -29,14 +29,21 @@ class Catalogo extends Component
 
     public function mount($name)
     {
-        $handle = \App\Models\Catalogo::generateHandle($name);
+        $catalogo = \App\Models\Catalogo::resolveByName($name);
 
-        if ($handle !== $name) {
-            $this->redirectRoute('catalogo', $handle);
+        if ($catalogo) {
+            $resolvedHandle = $catalogo->name_handle;
+            if ($resolvedHandle !== $name) {
+                $this->redirectRoute('catalogo', $resolvedHandle);
+                return;
+            }
+
+            $this->name = $resolvedHandle;
+            $this->selectedCategory = $this->categoryId;
             return;
         }
 
-        $this->name = $handle;
+        $this->name = \App\Models\Catalogo::generateHandle($name);
         $this->selectedCategory = $this->categoryId;
     }
 
@@ -52,7 +59,7 @@ class Catalogo extends Component
 
     public function render()
     {
-        $catalogo = \App\Models\Catalogo::where('name_handle', $this->name)->firstOrFail();
+        $catalogo = \App\Models\Catalogo::resolveByName($this->name) ?? \App\Models\Catalogo::where('name_handle', $this->name)->firstOrFail();
         $catalogo->load(['categories', 'products.fotos', 'plantilla']);
 
         if (auth()->check() && auth()->id() === $catalogo->user_id && ! $catalogo->isConfigurationComplete()) {
