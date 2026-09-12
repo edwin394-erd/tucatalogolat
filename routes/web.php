@@ -45,6 +45,14 @@ Route::get('/Editar/{model}/{id}', EditItem::class)->middleware(['auth'])->name(
 
 Route::get('/lang/{locale}', [LanguageController::class, 'setLocale'])->name('lang.switch');
 
+Route::post('/logout', function () {
+    auth()->logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+
+    return redirect()->route('login');
+})->middleware('auth')->name('logout');
+
 Route::get('/debug-upload', [\App\Http\Controllers\DebugUploadController::class, 'show'])->middleware(['auth'])->name('debug.upload');
 Route::post('/debug-upload', [\App\Http\Controllers\DebugUploadController::class, 'upload'])->middleware(['auth'])->name('debug.upload.post');
 
