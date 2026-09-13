@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+     <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
+       <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
+       <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
     <title>tucatalogo.lat</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   @livewireStyles
@@ -84,8 +87,8 @@
 
         <!-- CTA visible on md+ (keeps auth links for guests) -->
         <div class="hidden md:flex items-center gap-2">
-          <a href="{{ route('login') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md text-gray-700 hover:bg-gray-100 transition">{{ __('messages.login') }}</a>
-          <a href="{{ route('register') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">{{ __('messages.register') }}</a>
+          <a href="{{ route('login') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">{{ __('messages.login') }}</a>
+          {{-- <a href="{{ route('register') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">{{ __('messages.register') }}</a> --}}
         </div>
 
         <!-- Mobile menu button -->

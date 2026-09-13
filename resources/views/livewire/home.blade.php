@@ -9,7 +9,7 @@
 					<h2 class="text-4xl font-extrabold leading-tight">{{ __('messages.home_hero_title') }}</h2>
 					<p class="mt-4 text-lg text-gray-600">{{ __('messages.home_hero_subtitle') }}</p>
 					<div class="mt-6 flex flex-wrap gap-3">
-						<a href="{{ route('register') }}" class="inline-flex items-center px-5 py-3 bg-indigo-600 text-white rounded-md shadow">{{ __('messages.home_start_now') }}</a>
+						<a href="{{ route('login') }}" class="inline-flex items-center px-5 py-3 bg-indigo-600 text-white rounded-md shadow">{{ __('messages.home_start_now') }}</a>
 						<a href="#pricing" class="inline-flex items-center px-5 py-3 border border-gray-200 rounded-md text-gray-700">{{ __('messages.home_view_plans') }}</a>
 					</div>
 					<ul class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
@@ -141,7 +141,7 @@
 							</ul>
 							
 							
-							<a href="{{ route('register') }}" class="mt-6 inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded">{{ __('messages.home_start_now') }}</a>
+							<a href="{{ route('login') }}" class="mt-6 inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded">{{ __('messages.home_start_now') }}</a>
 						</div>
 						
 					@endforeach
@@ -153,7 +153,7 @@
 				<div class="max-w-4xl mx-auto text-center">
 					<h3 class="text-2xl font-bold">{{ __('messages.home_cta_title') }}</h3>
 					<p class="mt-2 text-gray-600">{{ __('messages.home_cta_subtitle') }}</p>
-					<a href="{{ route('register') }}" class="mt-6 inline-block px-6 py-3 bg-indigo-600 text-white rounded-md">{{ __('messages.home_start_now_cta') }}</a>
+					<a href="{{ route('login') }}" class="mt-6 inline-block px-6 py-3 bg-indigo-600 text-white rounded-md">{{ __('messages.home_start_now_cta') }}</a>
 				</div>
 			</section>
 
