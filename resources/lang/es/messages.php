@@ -249,10 +249,10 @@ return [
     'home_brand' => 'CatálogosPYME',
     'home_brand_desc' => 'Haz crecer tu negocio con catálogos digitales profesionales.',
     'home_contact' => 'Contacto',
-    'home_email' => 'email@tuejemplo.com',
-    'home_phone' => '+34 600 000 000',
+    'home_email' => 'edwinerd.394@gmail.com',
+    'home_phone' => '+58 424-6054544',
     'home_follow_us' => 'Síguenos',
     'home_twitter' => 'Twitter',
     'home_facebook' => 'Facebook',
-    'home_copyright' => '© :year CatálogosPYME. Todos los derechos reservados.',
+    'home_copyright' => '© :year Tu Catalogo. Todos los derechos reservados.',
 ];
