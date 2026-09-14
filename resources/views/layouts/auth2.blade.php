@@ -1,12 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-       <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
-       <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
-       <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
+    <meta name="robots" content="index,follow">
+    <meta name="description" content="Administra tus catálogos, productos y configuración desde TuCatalogo.Lat.">
+    <meta name="keywords" content="dashboard, catalogo, productos, administración, tucatalogo">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TuCatalogo.Lat">
+    <meta property="og:title" content="TuCatalogo.Lat">
+    <meta property="og:description" content="Administra tus catálogos, productos y configuración desde TuCatalogo.Lat.">
+    <meta property="og:image" content="{{ asset('imgs/icono.ico') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TuCatalogo.Lat">
+    <meta name="twitter:description" content="Administra tus catálogos, productos y configuración desde TuCatalogo.Lat.">
+    <meta name="twitter:image" content="{{ asset('imgs/icono.ico') }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
+    <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
+    <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
     <title>TuCatalogo.Lat</title>
  @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles

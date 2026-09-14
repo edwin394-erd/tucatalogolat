@@ -1,15 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-     <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
-       <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
-       <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="robots" content="index,follow">
+    <meta name="description" content="@yield('description', 'Descubre productos, servicios y tiendas en TuCatalogo.Lat.')">
+    <meta name="keywords" content="@yield('keywords', 'catalogo, tienda, productos, ecommerce, negocios, tucatalogo')">
+    <meta name="author" content="TuCatalogo.Lat">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TuCatalogo.Lat">
+    <meta property="og:title" content="@yield('og_title', 'Catalogo')">
+    <meta property="og:description" content="@yield('description', 'Descubre productos, servicios y tiendas en TuCatalogo.Lat.')">
+    <meta property="og:image" content="@yield('og_image', asset('imgs/icono.ico'))">
+    <meta property="og:url" content="@yield('canonical', url()->current())">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('og_title', 'Catalogo')">
+    <meta name="twitter:description" content="@yield('description', 'Descubre productos, servicios y tiendas en TuCatalogo.Lat.')">
+    <meta name="twitter:image" content="@yield('og_image', asset('imgs/icono.ico'))">
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+    <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
+    <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
+    <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
     <title>@yield('title', 'Catalogo')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     @livewireStyles
 </head>
 

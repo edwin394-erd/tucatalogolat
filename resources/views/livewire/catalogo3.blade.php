@@ -1,4 +1,8 @@
 @section('title', $catalogo->name ?? 'Catalogo')
+@section('description', \Illuminate\Support\Str::limit(strip_tags($catalogo->description ?? 'Descubre productos y servicios en este catálogo.'), 160))
+@section('og_title', $catalogo->name ?? 'Catalogo')
+@section('og_image', $catalogo->logo_url ? asset('storage/' . $catalogo->logo_url) : asset('imgs/icono.ico'))
+@section('canonical', route('catalogo', $catalogo->name_handle))
 
 @php
     $pColor = $catalogo->theme->primary_color ?? '#000000';

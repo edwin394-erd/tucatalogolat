@@ -1,4 +1,8 @@
 @section('title', ($catalogo->name ?? 'Catalogo') . ' - Carrito')
+@section('description', 'Revisa tu carrito de compras en ' . ($catalogo->name ?? 'este catálogo') . '.')
+@section('og_title', ($catalogo->name ?? 'Catalogo') . ' - Carrito')
+@section('og_image', $catalogo->logo_url ? asset('storage/' . $catalogo->logo_url) : asset('imgs/icono.ico'))
+@section('canonical', route('catalogo.cart', $catalogo->name_handle))
 
 <div class="min-h-screen pb-10 px-4 sm:px-6 lg:px-8" style="background-color: var(--bg-main); color: var(--text-primary);">
     <x-alert alert_type="success" />
