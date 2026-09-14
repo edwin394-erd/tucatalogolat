@@ -178,6 +178,7 @@
                         </div>
                         <div class="flex gap-3 flex-wrap">
                             <span class="inline-flex items-center justify-center h-9 px-4 rounded-full" style="background-color: {{ $selectedTheme->primary_color ?? '#4338ca' }}; color: {{ $selectedTheme->primary_font_color ?? '#ffffff' }};">Botón principal</span>
+                            
                             <span class="inline-flex items-center justify-center h-9 px-4 rounded-full border" style="border-color: {{ $selectedTheme->primary_color ?? '#4338ca' }}; color: {{ $selectedTheme->primary_font_color ?? '#4338ca' }};">Botón secundario</span>
                         </div>
                     </div>
