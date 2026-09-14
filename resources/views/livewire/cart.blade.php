@@ -135,28 +135,32 @@
                     clear(){ if (window.cartReset) window.cartReset(); },
                     total(){ var t = 0; if (!(Alpine.store && Alpine.store('cart'))) return 0; var items = Alpine.store('cart').items; for (var pid in items){ var q = Number(items[pid]||0); var price = this.itemsData[pid] ? Number(this.itemsData[pid].price) : 0; t += q * price; } return t; },
                     checkout(){
-                        // ensure server has latest
-                        if (window.cartSyncNow) {
-                            window.cartSyncNow().then(function(){
-                                // after sync, call Livewire checkout via fetch to keep existing behavior
-                                // redirect to the Livewire checkout action by submitting a form
-                                var form = document.createElement('form');
-                                form.method = 'POST';
-                                form.action = window.location.pathname + '?_action=checkout';
-                                var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                                var input = document.createElement('input'); input.type='hidden'; input.name='_token'; input.value=token; form.appendChild(input);
-                                document.body.appendChild(form);
-                                form.submit();
+                        var routeName = '{{ $catalogo->name_handle ?? $catalogo->name }}';
+                        var token = (document.querySelector('meta[name="csrf-token"]') || {}).getAttribute('content') || '';
+
+                        function doCheckout(){
+                            fetch('/' + routeName + '/checkout', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': token
+                                }
+                            })
+                            .then(function(response){ return response.json(); })
+                            .then(function(data){
+                                if (data && data.url) {
+                                    window.location.href = data.url;
+                                }
+                            })
+                            .catch(function(){
+                                window.location.reload();
                             });
+                        }
+
+                        if (window.cartSyncNow) {
+                            window.cartSyncNow().then(doCheckout);
                         } else {
-                            // fallback: submit immediately
-                            var form = document.createElement('form');
-                            form.method = 'POST';
-                            form.action = window.location.pathname + '?_action=checkout';
-                            var token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                            var input = document.createElement('input'); input.type='hidden'; input.name='_token'; input.value=token; form.appendChild(input);
-                            document.body.appendChild(form);
-                            form.submit();
+                            doCheckout();
                         }
                     }
                 }

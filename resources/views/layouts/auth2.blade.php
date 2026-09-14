@@ -21,7 +21,7 @@
     <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
     <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
     <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
-    <title>TuCatalogo.Lat</title>
+    <title>tucatalogolat.lat</title>
  @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>

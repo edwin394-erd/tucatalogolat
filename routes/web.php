@@ -110,4 +110,39 @@ Route::post('/{name}/cart-sync', function(Request $request, $name){
 	$cart->load('items.product');
 	return response()->json(['count' => $cart->count, 'items' => $cart->items->map(function($i){ return ['product_id'=>$i->product_id,'quantity'=>$i->quantity]; })]);
 })->name('catalogo.cartSync');
+
+Route::post('/{name}/checkout', function (Request $request, $name) {
+    $catalogo = CatalogoModel::resolveByName($name);
+    abort_unless($catalogo, 404, 'Catalogo no encontrado');
+
+    $cart = CartModel::current($catalogo->id)->load('items.product', 'items.variant');
+
+    if ($cart->items->isEmpty()) {
+        return response()->json(['message' => 'El carrito está vacío.'], 400);
+    }
+
+    $message = "Pedido desde tucatalogo.lat\n\nHola me interesan estos productos:\n ";
+
+    foreach ($cart->items as $item) {
+        $variantText = '';
+        if ($item->variant) {
+            $variantText = " ({$item->variant->size} {$item->variant->color})";
+        }
+
+        $price = $item->product->precio_descuento ?? $item->product->price;
+        if ($item->variant) {
+            $price += $item->variant->price_adjustment;
+        }
+
+        $message .= "- {$item->product->name}{$variantText} x{$item->quantity} = $" . ($price * $item->quantity) . "\n";
+    }
+
+    $encodedMessage = urlencode($message);
+    $whatsappUrl = "https://wa.me/584246054544?text={$encodedMessage}";
+
+    $cart->items()->delete();
+
+    return response()->json(['url' => $whatsappUrl]);
+})->name('catalogo.checkout');
+
 Route::get('/{name}', Catalogo::class)->name('catalogo');

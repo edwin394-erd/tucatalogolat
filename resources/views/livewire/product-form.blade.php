@@ -68,44 +68,47 @@
         </div>
                 <label for="Imagen" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.product_image') }}</label>
 
-        <div class="flex flex-wrap items-center justify-center w-full mb-2">
-            <label for="dropzone-file" class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 inset-shadow-sm gg:hover:bg-gray-800 gg:bg-gray-700 hover:bg-gray-100 gg:border-gray-600 gg:hover:border-gray-500 gg:hover:bg-gray-600">
-                <div class="flex flex-col items-center justify-center p-6">
-                    @if(count($existingImages) > 0 || count($images) > 0)
-                        <div class="flex flex-wrap items-center justify-center gap-4 mb-2">
-                            {{-- Imágenes ya guardadas --}}
-                            @foreach($existingImages as $foto)
-                                <div class="relative w-24 h-24">
-                                    <img src="{{ asset('storage/' . $foto['url']) }}" alt="Foto guardada" class="w-full h-full object-cover rounded" />
-                                    <button type="button" wire:click="markImageForDeletion({{ $foto['id'] }})" class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-700">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            @endforeach
-                            
-                            {{-- Imágenes nuevas (no guardadas aún) --}}
-                            @foreach(array_keys($images) as $index)
-                                <div class="relative w-24 h-24">
-                                    <img src="{{ $images[$index]->temporaryUrl() }}" alt="Foto temporal" class="w-full h-full object-cover rounded" />
-                                    <button type="button" wire:click="removeNewImage({{ $index }})" class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-700">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            @endforeach
+       <div class="flex flex-wrap items-center justify-center w-full mb-2" x-data="{ previews: [] }">
+    <label for="dropzone-file" class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 inset-shadow-sm gg:hover:bg-gray-800 gg:bg-gray-700 hover:bg-gray-100 gg:border-gray-600 gg:hover:border-gray-500 gg:hover:bg-gray-600">
+        <div class="flex flex-col items-center justify-center p-6">
+            @if(count($existingImages) > 0 || count($images) > 0)
+                <div class="flex flex-wrap items-center justify-center gap-4 mb-2">
+                    {{-- Imágenes ya guardadas (sin cambios) --}}
+                    @foreach($existingImages as $foto)
+                        <div class="relative w-24 h-24">
+                            <img src="{{ asset('storage/' . $foto['url']) }}" alt="Foto guardada" class="w-full h-full object-cover rounded" />
+                            <button type="button" wire:click="markImageForDeletion({{ $foto['id'] }})" class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z"/>
+                                </svg>
+                            </button>
                         </div>
-                    @else
-                      <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"></path> </g></svg><br>
-                        <p class="mb-2 text-sm text-gray-500 gg:text-gray-400"><span class="font-semibold">{{ __('messages.click_to_upload') }}</span> or drag and drop</p>
-                        <p class="text-xs text-gray-500 gg:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                    @endif
+                    @endforeach
+
+                    {{-- Imágenes nuevas (preview generado en el navegador, sin pasar por Livewire) --}}
+                    <template x-for="(src, index) in previews" :key="index">
+                        <div class="relative w-24 h-24">
+                            <img :src="src" alt="Foto temporal" class="w-full h-full object-cover rounded" />
+                            <button type="button"
+                                    @click="URL.revokeObjectURL(previews[index]); previews.splice(index, 1); $wire.removeNewImage(index)"
+                                    class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </template>
                 </div>
-                <input id="dropzone-file" type="file" class="hidden" wire:model="images" multiple />
-            </label>
+            @else
+                <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 15L12 2M12 2L15 5.5M12 2L9 5.5" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8 22.0002H16C18.8284 22.0002 20.2426 22.0002 21.1213 21.1215C22 20.2429 22 18.8286 22 16.0002V15.0002C22 12.1718 22 10.7576 21.1213 9.8789C20.3529 9.11051 19.175 9.01406 17 9.00195M7 9.00195C4.82497 9.01406 3.64706 9.11051 2.87868 9.87889C2 10.7576 2 12.1718 2 15.0002L2 16.0002C2 18.8286 2 20.2429 2.87868 21.1215C3.17848 21.4213 3.54062 21.6188 4 21.749" stroke="#6b6b6b" stroke-width="1.5" stroke-linecap="round"></path> </g></svg><br>
+                <p class="mb-2 text-sm text-gray-500 gg:text-gray-400"><span class="font-semibold">{{ __('messages.click_to_upload') }}</span> or drag and drop</p>
+                <p class="text-xs text-gray-500 gg:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+            @endif
         </div>
+        <input id="dropzone-file" type="file" class="hidden" wire:model="images" multiple
+               @change="previews = Array.from($event.target.files).map(f => URL.createObjectURL(f))" />
+    </label>
+</div>
 
         <x-input-error for="images" class="mt-2" />
         <x-input-error for="images.*" class="mt-2" />
