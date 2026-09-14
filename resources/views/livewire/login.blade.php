@@ -48,6 +48,9 @@
                                     {{-- <p class="text-sm font-light text-gray-500">
                                             {{ __('messages.no_account') }} <a href="{{ route('register') }}" wire:navigate class="font-medium text-gray-600 hover:underline">{{ __('messages.register') }}</a>
                                     </p> --}}
+                                     <p class="text-sm font-light text-gray-500">
+                                            <a href="https://www.instagram.com/tucatalogolat.lat/" target="_blank" rel="noopener noreferrer" class="font-medium text-gray-600 underline hover:underline"> Solicita tu cuenta aqui</a>
+                                    </p>
                             </form>
                     </div>
             </div>
