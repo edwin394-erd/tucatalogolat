@@ -1,27 +1,13 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="robots" content="index,follow">
-    <meta name="description" content="TuCatalogo.Lat te ayuda a crear, personalizar y vender tu catálogo online con rapidez.">
-    <meta name="keywords" content="catalogo, tienda online, productos, negocios, ecommerce, tucatalogo">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="TuCatalogo.Lat">
-    <meta property="og:title" content="TuCatalogo.Lat">
-    <meta property="og:description" content="TuCatalogo.Lat te ayuda a crear, personalizar y vender tu catálogo online con rapidez.">
-    <meta property="og:image" content="{{ asset('imgs/icono.ico') }}">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="TuCatalogo.Lat">
-    <meta name="twitter:description" content="TuCatalogo.Lat te ayuda a crear, personalizar y vender tu catálogo online con rapidez.">
-    <meta name="twitter:image" content="{{ asset('imgs/icono.ico') }}">
-    <link rel="canonical" href="{{ url()->current() }}">
-    <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
-    <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
-    <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
-    <title>TuCatalogo.Lat</title>
+     <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
+       <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
+       <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
+    <title>tucatalogo.lat</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   @livewireStyles
     <style>

@@ -1,6 +1,6 @@
-<section class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm md:px-10 h-screen  ">
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                <x-logo /><br>
+<section class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm md:px-10 min-h-[calc(100vh-4rem)] flex items-center justify-center">
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto w-full lg:py-0">
+                {{-- <x-logo /><br> --}}
             <div class="w-full bg-white rounded-lg shadow border border-gray-300 md:mt-0 sm:max-w-md xl:p-0">
                     <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
