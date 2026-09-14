@@ -1,3 +1,5 @@
+@section('title', $catalogo->name ?? 'Catalogo')
+
 @php
     $pColor = $catalogo->theme->primary_color ?? '#000000';
     $bgColor = $catalogo->theme->bg_color ?? '#ffffff';

@@ -1,3 +1,5 @@
+@section('title', ($catalogo->name ?? 'Catalogo') . ' - Carrito')
+
 <div class="min-h-screen pb-10 px-4 sm:px-6 lg:px-8" style="background-color: var(--bg-main); color: var(--text-primary);">
     <x-alert alert_type="success" />
     <div class="max-w-6xl mx-auto py-8">

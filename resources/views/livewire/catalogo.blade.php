@@ -1,3 +1,5 @@
+@section('title', $catalogo->name ?? 'Catalogo')
+
 {{-- Definimos los colores desde la BD, con valores por defecto si son nulos --}}
 @php
     $pColor = $catalogo->theme->primary_color ?? '#4F46E5';
