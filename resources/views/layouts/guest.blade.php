@@ -88,6 +88,7 @@
         <!-- CTA visible on md+ (keeps auth links for guests) -->
         <div class="hidden md:flex items-center gap-2">
           <a href="{{ route('login') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">{{ __('messages.login') }}</a>
+          <a href="https://www.instagram.com/tucatalogolat.lat/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 text-sm rounded-md border border-gray-300 bg-white text-gray-700 shadow-sm hover:bg-gray-100 transition">Solicitar Cuenta</a>
           {{-- <a href="{{ route('register') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">{{ __('messages.register') }}</a> --}}
         </div>
 
@@ -108,7 +109,9 @@
         <ul class="flex flex-col gap-2">
           <li><a href="{{ route('home') }}" wire:navigate class="block px-3 py-2 rounded-md text-blue-700 bg-blue-50">{{ __('messages.home') }}</a></li>
           <li><a href="{{ route('login') }}" wire:navigate class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">{{ __('messages.login') }}</a></li>
-          <li><a href="{{ route('register') }}" wire:navigate class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">{{ __('messages.register') }}</a></li>
+          <li><a href="https://www.instagram.com/tucatalogolat.lat/" target="_blank" rel="noopener noreferrer" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Solicitar Cuenta</a></li>
+          {{-- <li><a href="{{ route('register') }}" wire:navigate class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">{{ __('messages.register') }}</a></li> --}}
+
         </ul>
       </div>
     </div>
