@@ -24,6 +24,7 @@ use App\Models\Catalogo as CatalogoModel;
 use App\Models\Cart as CartModel;
 use App\Models\CartItem as CartItemModel;
 use App\Models\Product as ProductModel;
+use Illuminate\Support\Facades\Response;
 
 Route::get('/', Home::class)->middleware(['guest'])->name('home');
 Route::get('/Login', Login::class)->middleware(['guest'])->name('login');
@@ -110,3 +111,25 @@ Route::post('/{name}/cart-sync', function(Request $request, $name){
 	return response()->json(['count' => $cart->count, 'items' => $cart->items->map(function($i){ return ['product_id'=>$i->product_id,'quantity'=>$i->quantity]; })]);
 })->name('catalogo.cartSync');
 Route::get('/{name}', Catalogo::class)->name('catalogo');
+Route::get('/sitemap.xml', function () {
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    
+    // URL principal
+    $xml .= '<url>';
+    $xml .= '<loc>' . config('app.url') . '</loc>';
+    $xml .= '<changefreq>daily</changefreq>';
+    $xml .= '<priority>1.0</priority>';
+    $xml .= '</url>';
+
+    // Agrega aquí otras rutas públicas de tu sitio si lo deseas
+    $xml .= '<url>';
+    $xml .= '<loc>' . config('app.url') . '/login</loc>';
+    $xml .= '<changefreq>monthly</changefreq>';
+    $xml .= '<priority>0.5</priority>';
+    $xml .= '</url>';
+
+    $xml .= '</urlset>';
+
+    return Response::make($xml, 200, ['Content-Type' => 'application/xml']);
+});
