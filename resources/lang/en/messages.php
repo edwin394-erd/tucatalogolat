@@ -242,6 +242,7 @@ return [
     'custom_colors_saved' => 'Custom colors saved successfully.',
 
     // Home page
+    'home_hero_badge' => 'Try free for 14 days',
     'home_hero_title' => 'Digital catalogs for SMEs by subscription',
     'home_hero_subtitle' => 'Create, publish and share professional catalogs in minutes. Increase sales and online presence without complications.',
     'home_start_now' => 'Start now',
@@ -262,6 +263,7 @@ return [
     'home_support_desc' => 'Onboarding and support so you start quickly.',
     'home_pricing_title' => 'Subscription plans',
     'home_pricing_subtitle' => 'Plans designed for SMEs. Change or cancel at any time.',
+    'home_most_popular' => 'Most popular',
     'home_cta_title' => 'Ready to transform your catalog?',
     'home_cta_subtitle' => 'Try free for 14 days. No credit card.',
     'home_start_now_cta' => 'Start now',

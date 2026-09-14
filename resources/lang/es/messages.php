@@ -224,6 +224,7 @@ return [
     'custom_colors_saved' => 'Colores personalizados guardados con éxito.',
 
     // Home page
+    'home_hero_badge' => 'Prueba gratis 14 días',
     'home_hero_title' => 'Catálogos digitales por suscripción para pymes',
     'home_hero_subtitle' => 'Crea, publica y comparte catálogos profesionales en minutos. Incrementa ventas y presencia en línea sin complicaciones.',
     'home_start_now' => 'Comenzar ahora',
@@ -243,6 +244,7 @@ return [
     'home_support_desc' => 'Capacitación y soporte para que comiences rápidamente.',
     'home_pricing_title' => 'Planes de suscripción',
     'home_pricing_subtitle' => 'Planes diseñados para pymes. Cambia o cancela en cualquier momento.',
+    'home_most_popular' => 'Más popular',
     'home_cta_title' => '¿Listo para transformar tu catálogo?',
     'home_cta_subtitle' => 'Prueba gratis por 14 días. Sin tarjeta de crédito.',
     'home_start_now_cta' => 'Comenzar ahora',
