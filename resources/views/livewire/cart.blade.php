@@ -4,15 +4,40 @@
 @section('og_image', $catalogo->logo_url ? asset('storage/' . $catalogo->logo_url) : asset('imgs/icono.ico'))
 @section('canonical', route('catalogo.cart', $catalogo->name_handle))
 
-<div class="min-h-screen pb-10 px-4 sm:px-6 lg:px-8" style="background-color: var(--bg-main); color: var(--text-primary);">
+@php
+    $pColor = $catalogo->theme->primary_color ?? '#4F46E5';
+    $bgColor = $catalogo->theme->bg_color ?? '#F2F2F2';
+    $sColor = $catalogo->theme->secondary_color ?? '#f0f0f0';
+    $pFont = $catalogo->theme->primary_font_color ?? '#333333';
+    $sFont = $catalogo->theme->secondary_font_color ?? '#666666';
+
+    function isDarkColorCart($hex) {
+        $hex = str_replace('#', '', $hex);
+        if (strlen($hex) == 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        $r = hexdec(substr($hex,0,2));
+        $g = hexdec(substr($hex,2,2));
+        $b = hexdec(substr($hex,4,2));
+        return (($r * 299 + $g * 587 + $b * 114) / 1000) < 128;
+    }
+
+    $iconColor = isDarkColorCart($pColor) ? '#ffffff' : '#000000';
+@endphp
+
+<div class="min-h-screen pb-10 px-4 sm:px-6 lg:px-8"
+     style="--primary-btn: {{ $pColor }};
+            --bg-main: {{ $bgColor }};
+            --bg-card-aside: {{ $sColor }};
+            --text-primary: {{ $pFont }};
+            --text-secondary: {{ $sFont }};
+            background-color: var(--bg-main); color: var(--text-primary);">
     <x-alert alert_type="success" />
-    <div class="max-w-6xl mx-auto py-8">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-3xl font-bold">{{ __('messages.cart') }}</h1>
-                <p class="text-sm text-gray-600">{{ __('messages.cart_description') }}</p>
+    <div class="max-w-6xl mx-auto py-6 sm:py-8">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div class="min-w-0">
+                <h1 class="text-2xl sm:text-3xl font-bold leading-tight" style="color: var(--text-primary);">{{ __('messages.cart') }}</h1>
+                <p class="text-sm mt-1" style="color: var(--text-secondary);">{{ __('messages.cart_description') }}</p>
             </div>
-            <a href="{{ route('catalogo', $catalogo->name_handle) }}" class="px-4 py-2 rounded-full bg-white text-black shadow hover:bg-gray-100">{{ __('messages.continue_shopping') }}</a>
+            <a href="{{ route('catalogo', $catalogo->name_handle) }}" class="w-full sm:w-auto text-center px-4 py-2.5 rounded-full shadow hover:opacity-90 transition text-sm sm:text-base" style="background-color: var(--primary-btn); color: {{ $iconColor }};">{{ __('messages.continue_shopping') }}</a>
         </div>
 
         @php
@@ -36,33 +61,36 @@
         @endphp
 
         <div x-data="cartPage()" x-init="init()" class="grid gap-6 lg:grid-cols-[2fr_1fr]">
-            <div class="rounded-3xl bg-white shadow p-6">
+            <div class="rounded-3xl shadow p-4 sm:p-6" style="background-color: var(--bg-card-aside); color: var(--text-secondary);">
                 <div class="space-y-4">
                     <template x-if="Object.keys(Alpine.store('cart') ? Alpine.store('cart').items : {}).length === 0">
-                        <div class="rounded-3xl bg-white p-10 text-center shadow">
-                            <h2 class="text-xl font-semibold mb-2">{{ __('messages.cart_empty') }}</h2>
-                            <p class="text-gray-500">{{ __('messages.cart_empty_description') }}</p>
+                        <div class="rounded-3xl p-6 sm:p-10 text-center shadow" style="background-color: var(--bg-main); color: var(--text-secondary);">
+                            <h2 class="text-lg sm:text-xl font-semibold mb-2" style="color: var(--text-primary);">{{ __('messages.cart_empty') }}</h2>
+                            <p class="text-sm sm:text-base" style="color: var(--text-secondary);">{{ __('messages.cart_empty_description') }}</p>
                         </div>
                     </template>
 
                     <template x-if="Object.keys(Alpine.store('cart') ? Alpine.store('cart').items : {}).length > 0">
                         <template x-for="(qty, pid) in Alpine.store('cart').items" :key="pid">
-                            <div class="flex flex-col gap-4 rounded-3xl border border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div class="flex items-center gap-4">
-                                    <div class="h-20 w-20 overflow-hidden rounded-3xl bg-gray-100">
+                            <div class="flex flex-col gap-4 rounded-3xl border p-3 sm:p-4" style="background-color: var(--bg-main); border-color: color-mix(in srgb, var(--primary-btn) 20%, transparent); color: var(--text-primary);">
+                                <div class="flex items-start gap-3 sm:gap-4">
+                                    <div class="h-16 w-16 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-2xl sm:rounded-3xl bg-gray-100">
                                         <img x-bind:src="itemsData[pid] ? itemsData[pid].image : ''" x-show="itemsData[pid] && itemsData[pid].image" class="h-full w-full object-cover" />
                                     </div>
-                                    <div>
-                                        <h3 class="font-semibold" x-text="itemsData[pid] ? itemsData[pid].name : 'Producto'">Producto</h3>
-                                        <p class="text-sm text-gray-500" x-text="itemsData[pid] ? itemsData[pid].short_description : ''"></p>
-                                        <p class="mt-2 text-sm font-semibold">${{ "" }}<span x-text="(itemsData[pid] ? Number(itemsData[pid].price).toFixed(2) : '0.00')"></span></p>
+                                    <div class="min-w-0 flex-1">
+                                        <h3 class="font-semibold text-sm sm:text-base line-clamp-2" style="color: var(--text-primary);" x-text="itemsData[pid] ? itemsData[pid].name : 'Producto'">Producto</h3>
+                                        <p class="text-xs sm:text-sm mt-1 line-clamp-2" style="color: var(--text-secondary);" x-text="itemsData[pid] ? itemsData[pid].short_description : ''"></p>
+                                        <p class="mt-2 text-sm sm:text-base font-semibold" style="color: var(--text-primary);">${{ "" }}<span x-text="(itemsData[pid] ? Number(itemsData[pid].price).toFixed(2) : '0.00')"></span></p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-3">
-                                    <button @click="decrease(pid)" class="px-3 py-2 rounded-xl border border-gray-300">-</button>
-                                    <span class="w-10 text-center" x-text="Alpine.store('cart').items[pid]">0</span>
-                                    <button @click="increase(pid)" class="px-3 py-2 rounded-xl border border-gray-300">+</button>
-                                    <button @click="remove(pid)" class="px-3 py-2 rounded-xl bg-red-600 text-white">{{ __('messages.remove') }}</button>
+
+                                <div class="flex items-center justify-between gap-2 sm:justify-end">
+                                    <div class="flex items-center gap-2 sm:gap-3">
+                                        <button @click="decrease(pid)" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border text-lg leading-none" style="border-color: var(--primary-btn); background-color: var(--bg-card-aside); color: var(--text-primary);">−</button>
+                                        <span class="min-w-[2rem] text-center text-sm sm:text-base font-semibold" style="color: var(--text-primary);" x-text="Alpine.store('cart').items[pid]">0</span>
+                                        <button @click="increase(pid)" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border text-lg leading-none" style="border-color: var(--primary-btn); background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
+                                    </div>
+                                    <button @click="remove(pid)" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-medium" style="background-color: color-mix(in srgb, var(--primary-btn) 18%, #ff0000 82%); color: white;">{{ __('messages.remove') }}</button>
                                 </div>
                             </div>
                         </template>
@@ -70,16 +98,16 @@
                 </div>
             </div>
 
-            <div class="rounded-3xl bg-white shadow p-6 space-y-6">
+            <div class="rounded-3xl shadow p-4 sm:p-6 space-y-5" style="background-color: var(--bg-card-aside); color: var(--text-primary);">
                 <div class="space-y-2">
-                    <p class="text-sm text-gray-500">{{ __('messages.cart_summary') }}</p>
-                    <div class="flex items-center justify-between text-lg font-semibold">
-                        <span>{{ __('messages.subtotal') }}</span>
-                        <span>$<span x-text="total().toFixed(2)">0.00</span></span>
+                    <p class="text-sm" style="color: var(--text-secondary);">{{ __('messages.cart_summary') }}</p>
+                    <div class="flex items-center justify-between text-base sm:text-lg font-semibold">
+                        <span style="color: var(--text-primary);">{{ __('messages.subtotal') }}</span>
+                        <span style="color: var(--text-primary);">$<span x-text="total().toFixed(2)">0.00</span></span>
                     </div>
                 </div>
-                <button @click="checkout()" class="w-full rounded-3xl bg-indigo-600 px-4 py-3 text-white font-semibold hover:bg-indigo-700">{{ __('messages.checkout') }}</button>
-                <button @click="clear()" class="w-full rounded-3xl border border-gray-300 px-4 py-3 text-gray-700">{{ __('messages.clear_cart') }}</button>
+                <button @click="checkout()" class="w-full rounded-3xl px-4 py-3 text-sm sm:text-base font-semibold hover:opacity-90 transition" style="background-color: var(--primary-btn); color: {{ $iconColor }};">{{ __('messages.checkout') }}</button>
+                <button @click="clear()" class="w-full rounded-3xl border px-4 py-3 text-sm sm:text-base" style="border-color: var(--primary-btn); background-color: transparent; color: var(--text-primary);">{{ __('messages.clear_cart') }}</button>
             </div>
         </div>
 

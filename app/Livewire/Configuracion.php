@@ -89,16 +89,30 @@ class Configuracion extends Component
     }
 
 
-    public function render()
+    private function normalizeTemaId($temaId)
     {
-        $catalogo = auth()->user()->catalogo;
-        $plantillas = \App\Models\Plantilla::all();
-        $themes = \App\Models\Theme::whereNull('catalogo_id')->get();
+        if ($temaId === 'custom' || (is_string($temaId) && strtolower(trim($temaId)) === 'custom')) {
+            return 'custom';
+        }
 
-        $selectedPlantilla = $plantillas->find($this->plantilla_id) ?? $plantillas->first();
+        if (is_object($temaId)) {
+            return 'custom';
+        }
 
-        if ($this->tema_id === 'custom') {
-            $selectedTheme = (object) [
+        if ($temaId === null || $temaId === '') {
+            return 'custom';
+        }
+
+        return is_numeric($temaId) ? (int) $temaId : $temaId;
+    }
+
+    private function resolveSelectedTheme($themes)
+    {
+        $normalizedTemaId = $this->normalizeTemaId($this->tema_id);
+
+        if ($normalizedTemaId === 'custom') {
+            return (object) [
+                'id' => 'custom',
                 'primary_color' => $this->primary_custom,
                 'secondary_color' => $this->secondary_custom,
                 'bg_color' => $this->bg_custom,
@@ -106,10 +120,35 @@ class Configuracion extends Component
                 'secondary_font_color' => $this->secondary_font_custom,
                 'name' => __('messages.custom'),
             ];
-        } else {
-            $selectedTheme = $themes->find($this->tema_id) ?? $themes->first();
         }
-    
+
+        $selectedTheme = $themes->firstWhere('id', $normalizedTemaId);
+
+        if ($selectedTheme) {
+            return $selectedTheme;
+        }
+
+        return $themes->first() ?? (object) [
+            'id' => 'custom',
+            'primary_color' => $this->primary_custom,
+            'secondary_color' => $this->secondary_custom,
+            'bg_color' => $this->bg_custom,
+            'primary_font_color' => $this->primary_font_custom,
+            'secondary_font_color' => $this->secondary_font_custom,
+            'name' => __('messages.custom'),
+        ];
+    }
+
+    public function render()
+    {
+        $catalogo = auth()->user()->catalogo;
+        $plantillas = \App\Models\Plantilla::all();
+        $themes = \App\Models\Theme::whereNull('catalogo_id')->get();
+
+        $this->tema_id = $this->normalizeTemaId($this->tema_id);
+        $selectedPlantilla = $plantillas->find($this->plantilla_id) ?? $plantillas->first();
+        $selectedTheme = $this->resolveSelectedTheme($themes);
+
         return view('livewire.configuracion', compact('catalogo', 'plantillas', 'themes', 'selectedPlantilla', 'selectedTheme'))
             ->extends('layouts.auth2')
             ->section('content');
@@ -117,11 +156,13 @@ class Configuracion extends Component
 
     public function saveChanges()
 {
+    $themeIdToSave = $this->tema_id;
 
     if($this->tema_id === 'custom') {
         $this->saveCustomColors();
         $this->custom_theme_catalogo = \App\Models\Theme::where('catalogo_id', $this->catalogo->id)->first();
-        $this->tema_id = $this->custom_theme_catalogo->id;
+        $this->tema_id = 'custom';
+        $themeIdToSave = $this->custom_theme_catalogo->id;
     }
 
     $nameHandle = \App\Models\Catalogo::generateHandle($this->name);
@@ -135,14 +176,14 @@ class Configuracion extends Component
             }
         }],
         'description' => 'nullable|string|max:1000',
-    'plantilla_id' => 'required|exists:plantillas,id',
-    'telefono_contacto' => 'nullable|string|max:20',
-    'tema_id' => 'nullable|exists:themes,id',
-    'facebook' => ['nullable', 'url'],          
-    'instagram' => ['nullable', 'url'],
-    'twitter' => ['nullable', 'url'],
-    'tiktok' => ['nullable', 'url'],
-]);
+        'plantilla_id' => 'required|exists:plantillas,id',
+        'telefono_contacto' => 'nullable|string|max:20',
+        'tema_id' => ['nullable'],
+        'facebook' => ['nullable', 'url'],
+        'instagram' => ['nullable', 'url'],
+        'twitter' => ['nullable', 'url'],
+        'tiktok' => ['nullable', 'url'],
+    ]);
 
     // Asignar valores al modelo antes de guardar
     $this->catalogo->update([
@@ -153,7 +194,7 @@ class Configuracion extends Component
         'ubicacion' => $this->ubicacion,
         'plantilla_id' => $this->plantilla_id,
         'telefono_contacto' => $this->telefono_contacto,
-        'theme_id' => $this->tema_id,
+        'theme_id' => $themeIdToSave,
         'ubicacion_mapa' => $this->ubicacion_mapa,
         'instagram' => $this->instagram,
         'facebook' => $this->facebook,
@@ -163,31 +204,56 @@ class Configuracion extends Component
 
    
     session()->flash('message', __('messages.settings_updated'));
-    return redirect()->route('configuracion');
 }
 
-public function selectTemplate($templateId)
-{
-    $this->plantilla_id = $templateId;
-    $this->catalogo->plantilla_id = $templateId;
-}
+    public function selectTemplate($templateId)
+    {
+        $this->plantilla_id = $templateId;
+        $this->catalogo->plantilla_id = $templateId;
+    }
 
-public function selectTheme($themeId)
-{
-    $this->tema_id = $themeId;
-}
+    public function selectTheme($themeId)
+    {
+        $this->tema_id = $this->normalizeTemaId($themeId);
+    }
 
-public function selectCustomTheme()
-{
-    $this->tema_id = 'custom';
-}
+    public function selectCustomTheme()
+    {
+        $this->tema_id = 'custom';
+    }
 
-public function getSelectedTemplateProperty()
-{
-    return $this->plantillas->firstWhere('id', $this->plantilla_id);
-}
-public function updatedBanner()
-{
+    public function updatedBgCustom($value)
+    {
+        $this->bg_custom = $value;
+    }
+
+    public function updatedPrimaryCustom($value)
+    {
+        $this->primary_custom = $value;
+    }
+
+    public function updatedSecondaryCustom($value)
+    {
+        $this->secondary_custom = $value;
+    }
+
+    public function updatedPrimaryFontCustom($value)
+    {
+        $this->primary_font_custom = $value;
+    }
+
+    public function updatedSecondaryFontCustom($value)
+    {
+        $this->secondary_font_custom = $value;
+    }
+
+    public function getSelectedTemplateProperty()
+    {
+        return $this->plantillas->firstWhere('id', $this->plantilla_id);
+    }
+
+    public function updatedBanner()
+    {
     $this->validate(['banner' => 'image|max:2048']);
     
     $manager = new ImageManager(new Driver());
@@ -253,7 +319,6 @@ public function saveCustomColors()
         ]
     );
     session()->flash('message', __('messages.custom_colors_saved'));
-    return redirect()->route('configuracion');
 }
 
 }

@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-indigo-100 text-gray-800 overflow-x-hidden">
 
-	<main class="pt-10 relative">
+	<main class="pt-2 sm:pt-4 lg:pt-6 relative">
 
 		<!-- Decorative animated blobs (background only, no interaction) -->
 		<div class="pointer-events-none absolute -top-24 -left-24 w-96 h-96 bg-indigo-300/30 rounded-full blur-3xl blob-anim"></div>
@@ -9,12 +9,12 @@
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
 
 			<!-- Hero content -->
-			<section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center py-16">
+			<section class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center py-8 sm:py-10 lg:py-14">
 				<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out">
 					{{-- <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold tracking-wide">
 						 {{ __('messages.home_hero_badge') ?? 'Prueba gratis 14 días' }}
 					</span> --}}
-					<h2 class="mt-4 text-4xl sm:text-5xl font-extrabold leading-tight bg-gradient-to-r from-indigo-700 via-purple-600 to-indigo-500 bg-clip-text text-transparent">
+					<h2 class="mt-2 text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight bg-gradient-to-r from-indigo-700 via-purple-600 to-indigo-500 bg-clip-text text-transparent">
 						{{ __('messages.home_hero_title') }}
 					</h2>
 					<p class="mt-4 text-lg text-gray-600 max-w-xl">{{ __('messages.home_hero_subtitle') }}</p>
@@ -43,6 +43,41 @@
 						<img src="{{ asset('imgs/plantilla1.png') }}" alt="Mockup"
 						     class="relative rounded-2xl shadow-2xl w-full float-anim"/>
 					</div>
+				</div>
+			</section>
+
+			<!-- Demos -->
+			<section id="demos" class="py-10 sm:py-16">
+				<div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-5 sm:mb-8">
+					<div>
+						<p class="text-[10px] sm:text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Demos</p>
+						<h3 data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+							Explora ejemplos reales
+						</h3>
+					</div>
+					<a href="#pricing" class="text-xs sm:text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+						Ver planes →
+					</a>
+				</div>
+
+				<div class="grid grid-cols-2 gap-3 sm:grid-cols-2 xl:grid-cols-4 sm:gap-5 xl:gap-6">
+					@foreach ($demos as $demo)
+						<a href="{{ $demo['url'] }}"
+						   target="_blank"
+						   rel="noopener noreferrer"
+						   class="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+							<div class="relative aspect-square overflow-hidden">
+								<img src="{{ $demo['image'] }}"
+									 alt="{{ $demo['name'] }} demo"
+									 class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+								<div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent"></div>
+								<div class="absolute inset-x-0 bottom-0 p-2 sm:p-3 xl:p-4">
+									<p class="text-[7px] sm:text-[9px] xl:text-xs font-medium uppercase tracking-[0.2em] text-white/80">Demo</p>
+									<h4 class="mt-0.5 text-[11px] font-bold text-white sm:text-base xl:text-xl">{{ $demo['name'] }}</h4>
+								</div>
+							</div>
+						</a>
+					@endforeach
 				</div>
 			</section>
 
@@ -155,6 +190,51 @@
 				</div>
 			</section>
 
+			<!-- FAQ -->
+			<section id="faq" class="py-16">
+				<div class="max-w-4xl mx-auto">
+					<div class="text-center">
+						<p class="text-[10px] sm:text-sm font-semibold uppercase tracking-[0.2em] text-indigo-600">Preguntas frecuentes</p>
+						<h3 class="mt-2 text-2xl sm:text-3xl font-bold text-gray-900">Todo lo que necesitas saber</h3>
+					</div>
+
+					<div class="mt-8 space-y-4">
+						@php
+							$faqs = [
+								[
+									'question' => '¿Cuánto tarda en configurarse mi catálogo?',
+									'answer' => 'En la mayoría de los casos, puedes tener tu catálogo funcionando en menos de 30 minutos. Si quieres personalizar colores, productos o contenido adicional, el proceso se acelera aún más con nuestras plantillas listas para usar.'
+								],
+								[
+									'question' => '¿Puedo cambiar de plan después?',
+									'answer' => 'Sí. Puedes actualizar tu plan en cualquier momento según tus necesidades. Los cambios se reflejan en tu cuenta y solo pagas la diferencia proporcional del periodo activo.'
+								],
+								[
+									'question' => '¿Es compatible con móviles?',
+									'answer' => 'Sí. Todos los catálogos están diseñados para verse correctamente en celular, tablet y escritorio, con una experiencia optimizada para vender desde cualquier dispositivo.'
+								],
+								[
+									'question' => '¿Necesito conocimientos técnicos?',
+									'answer' => 'No. La plataforma está pensada para que puedas administrar productos, precios, categorías y textos sin depender de programación ni de un equipo técnico.'
+								],
+							];
+						@endphp
+
+						@foreach ($faqs as $faq)
+							<details class="group rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md open:border-indigo-200 open:bg-indigo-50/40">
+								<summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left font-semibold text-gray-800">
+									<span>{{ $faq['question'] }}</span>
+									<span class="faq-icon flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 transition-transform duration-300">+</span>
+								</summary>
+								<div class="px-5 pb-5 text-sm leading-6 text-gray-600">
+									{{ $faq['answer'] }}
+								</div>
+							</details>
+						@endforeach
+					</div>
+				</div>
+			</section>
+
 			<!-- CTA -->
 			<section data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out py-14 relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl my-12">
 				<div class="pointer-events-none absolute -bottom-16 -left-16 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
@@ -208,6 +288,10 @@
 		50% { transform: translateY(-10px); }
 	}
 	.float-anim { animation: floatY 5s ease-in-out infinite; }
+
+	details[open] .faq-icon {
+		transform: rotate(45deg);
+	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.blob-anim, .float-anim { animation: none; }

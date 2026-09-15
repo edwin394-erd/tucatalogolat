@@ -1,4 +1,4 @@
-<div x-data="{ showProductModal: false }" class="relative rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col h-full group border border-black/5 bg-[var(--bg-card-aside)] shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.14)] transition-shadow duration-500">
+<div x-data="{ showProductModal: false }" @click="showProductModal = true" @keydown.enter.prevent="showProductModal = true" @keydown.space.prevent="showProductModal = true" tabindex="0" role="button" class="relative rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col h-full group border border-black/5 bg-[var(--bg-card-aside)] shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.14)] transition-shadow duration-500 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10">
 
     {{-- Imagen --}}
     <div class="relative w-full aspect-square overflow-hidden shrink-0">
@@ -19,14 +19,6 @@
             </div>
         @endif
 
-        <button type="button" @click="showProductModal = true" title="Ver detalles"
-                class="absolute top-2 right-2 sm:top-3 sm:right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full inline-flex items-center justify-center backdrop-blur-md bg-white/30 border border-white/40 text-white shadow-sm transition hover:bg-white/50 hover:scale-105 active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 sm:w-4.5 sm:h-4.5">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12.01" y2="8" />
-                <line x1="12" y1="12" x2="12" y2="16" />
-            </svg>
-        </button>
     </div>
 
     {{-- Contenido: todo el espaciado vertical se controla desde un solo lugar --}}
@@ -36,7 +28,7 @@
             <h5 class="text-xs sm:text-sm md:text-base font-bold truncate leading-tight tracking-tight" style="color: var(--text-secondary);">
                 {{ $item->name }}
             </h5>
-            <p class="hidden sm:block text-xs md:text-sm mt-0.5 line-clamp-2 leading-snug" style="color: var(--text-secondary); opacity: 0.65;">
+            <p class="hidden sm:block text-xs md:text-sm mt-0.5 leading-snug break-words overflow-hidden" style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--text-secondary); opacity: 0.65;">
                 {{ $item->description }}
             </p>
         </div>
@@ -60,7 +52,7 @@
         {{-- Acción principal --}}
         <div x-data class="mt-auto pt-0.5">
             <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) == 0">
-                <button type="button" x-on:click="window.cartAdd({{ $item->id }})" title="Agregar al carrito"
+                <button type="button" x-on:click.stop="window.cartAdd({{ $item->id }})" title="Agregar al carrito"
                         class="w-full h-8 sm:h-10 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold shadow-md transition-all duration-200 hover:shadow-lg hover:brightness-105 active:scale-[0.98]"
                         style="background-color: var(--primary-btn); color: {{ $iconColor }};">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 sm:w-4.5 sm:h-4.5">
@@ -73,9 +65,9 @@
             </template>
             <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) > 0">
                 <div class="flex items-center justify-between w-full h-8 sm:h-10 rounded-xl sm:rounded-2xl border border-black/10 bg-white/50 backdrop-blur-sm px-1 sm:px-1.5 shadow-inner">
-                    <button type="button" @click="window.cartDecrease({{ $item->id }})" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white/70 text-sm sm:text-base font-semibold transition hover:bg-white active:scale-95 text-[var(--text-secondary)]">−</button>
+                    <button type="button" @click.stop="window.cartDecrease({{ $item->id }})" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white/70 text-sm sm:text-base font-semibold transition hover:bg-white active:scale-95 text-[var(--text-secondary)]">−</button>
                     <div class="flex-1 text-center text-xs sm:text-sm font-bold text-[var(--text-secondary)]" x-text="Alpine.store('cart') ? (Alpine.store('cart').items['{{ $item->id }}'] || 0) : 0"></div>
-                    <button type="button" @click="window.cartIncrease({{ $item->id }})" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
+                    <button type="button" @click.stop="window.cartIncrease({{ $item->id }})" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
                 </div>
             </template>
         </div>
@@ -100,7 +92,7 @@
                     <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-secondary)] opacity-50">Producto</span>
                     <h3 class="text-lg sm:text-xl font-bold text-[var(--text-secondary)] truncate">{{ $item->name }}</h3>
                 </div>
-                <button type="button" @click="showProductModal = false" class="shrink-0 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full text-xl font-bold transition hover:bg-black/5 active:scale-90" aria-label="Cerrar">&times;</button>
+                <button type="button" @click.stop="showProductModal = false" class="shrink-0 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full text-xl font-bold transition hover:bg-black/5 active:scale-90" aria-label="Cerrar">&times;</button>
             </header>
 
             <main class="grid grid-cols-1 flex-1 gap-5 sm:gap-6 overflow-y-auto p-5 sm:p-6 sm:grid-cols-[160px_1fr] md:grid-cols-[180px_1fr]">
@@ -127,7 +119,7 @@
 
                     <div>
                         <span class="text-xs font-semibold text-[var(--text-secondary)] opacity-80">Descripción</span>
-                        <p class="text-sm leading-relaxed text-[var(--text-secondary)] opacity-70 mt-0.5">{{ $item->description }}</p>
+                        <p class="mt-0.5 max-h-32 overflow-y-auto text-sm leading-relaxed break-words text-[var(--text-secondary)] opacity-70" style="display: block; word-break: break-word;">{{ $item->description }}</p>
                     </div>
 
                     @if(!empty($item->category_id) || !empty($item->categoria) || !empty($item->stock))
@@ -150,12 +142,22 @@
             </main>
 
             <footer class="flex items-center justify-end gap-3 border-t border-black/5 px-5 sm:px-6 py-3 sm:py-4 shrink-0" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
-                <button type="button" x-data="{ anim:false }" @click="anim = true; window.cartAdd({{ $item->id }}); setTimeout(() => anim = false, 350)" wire:click="addToCart({{ $item->id }})"
-                        :class="anim ? 'scale-105 shadow-2xl ring-4 ring-black/5' : ''"
-                        class="w-full sm:w-auto rounded-2xl px-6 py-2.5 text-sm font-semibold transition transform duration-200 ease-out hover:scale-105 active:scale-95 shadow-md"
-                        style="background-color: var(--primary-btn); color: {{ $iconColor }};">
-                    Agregar al carrito
-                </button>
+                <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) == 0">
+                    <button type="button" x-data="{ anim:false }" @click.stop="anim = true; window.cartAdd({{ $item->id }}); setTimeout(() => anim = false, 350)" wire:click="addToCart({{ $item->id }})"
+                            :class="anim ? 'scale-105 shadow-2xl ring-4 ring-black/5' : ''"
+                            class="w-full sm:w-auto rounded-2xl px-6 py-2.5 text-sm font-semibold transition transform duration-200 ease-out hover:scale-105 active:scale-95 shadow-md"
+                            style="background-color: var(--primary-btn); color: {{ $iconColor }};">
+                        Agregar al carrito
+                    </button>
+                </template>
+
+                <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) > 0">
+                    <div class="flex items-center justify-between w-full sm:w-auto min-w-[140px] h-11 rounded-2xl border border-black/10 bg-white/50 backdrop-blur-sm px-1.5 shadow-inner">
+                        <button type="button" @click.stop="window.cartDecrease({{ $item->id }})" class="w-8 h-8 rounded-xl bg-white/70 text-lg font-semibold transition hover:bg-white active:scale-95 text-[var(--text-secondary)]">−</button>
+                        <div class="flex-1 text-center text-sm font-bold text-[var(--text-secondary)]" x-text="Alpine.store('cart') ? (Alpine.store('cart').items['{{ $item->id }}'] || 0) : 0"></div>
+                        <button type="button" @click.stop="window.cartIncrease({{ $item->id }})" class="w-8 h-8 rounded-xl text-lg font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
+                    </div>
+                </template>
             </footer>
         </div>
     </div>

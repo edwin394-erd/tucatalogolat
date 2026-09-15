@@ -6,13 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="robots" content="index,follow">
-    <meta name="description" content="@yield('description', 'Descubre productos, servicios y tiendas en TuCatalogo.Lat.')">
+    <meta name="description" content="@yield('description', 'Descubre productos, servicios y tiendas en TuCatalogolat.Lat.')">
     <meta name="keywords" content="@yield('keywords', 'catalogo, tienda, productos, ecommerce, negocios, tucatalogo')">
     <meta name="author" content="TuCatalogo.Lat">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="TuCatalogo.Lat">
     <meta property="og:title" content="@yield('og_title', 'Catalogo')">
-    <meta property="og:description" content="@yield('description', 'Descubre productos, servicios y tiendas en TuCatalogo.Lat.')">
+    <meta property="og:description" content="@yield('description', 'Descubre productos, servicios y tiendas en TuCatalogolat.Lat.')">
     <meta property="og:image" content="@yield('og_image', asset('imgs/icono.ico'))">
     <meta property="og:url" content="@yield('canonical', url()->current())">
     <meta name="twitter:card" content="summary_large_image">

@@ -1,6 +1,11 @@
+@php
+    $alertKey = session()->has('message') ? 'alert-' . md5((string) session('message') . microtime(true)) : 'alert-empty';
+@endphp
+
 <div
-    x-data="{ show: true }"
-    x-init="setTimeout(() => show = false, 5000)"
+    wire:key="{{ $alertKey }}"
+    x-data="{ show: {{ session()->has('message') ? 'true' : 'false' }} }"
+    x-init="show = true; setTimeout(() => show = false, 5000)"
     x-show="show"
     x-transition:enter="transition ease-out duration-300 transform"
     x-transition:enter-start="opacity-0 translate-x-full"
