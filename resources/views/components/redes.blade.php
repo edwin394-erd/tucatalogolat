@@ -25,7 +25,7 @@
             </div>
         @endif
 
-        <div class="mt-1">
-            @livewire('cart-badge')
-        </div>
+       <div class="mt-1">
+        @livewire('cart-badge', ['catalogo' => $catalogo])
+    </div>
     </div>
