@@ -24,6 +24,29 @@
         return (($r * 299 + $g * 587 + $b * 114) / 1000) < 128;
     }
     $iconColor = isDarkColor($pColor) ? '#ffffff' : '#000000';
+
+    function contrastRatio($hex1, $hex2) {
+    $lum = function($hex) {
+        $hex = str_replace('#', '', $hex);
+        if (strlen($hex) == 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        $r = hexdec(substr($hex,0,2)) / 255;
+        $g = hexdec(substr($hex,2,2)) / 255;
+        $b = hexdec(substr($hex,4,2)) / 255;
+        $chan = function($c) {
+            return $c <= 0.03928 ? $c / 12.92 : pow(($c + 0.055) / 1.055, 2.4);
+        };
+        return 0.2126 * $chan($r) + 0.7152 * $chan($g) + 0.0722 * $chan($b);
+    };
+    $l1 = $lum($hex1); $l2 = $lum($hex2);
+    $lighter = max($l1, $l2); $darker = min($l1, $l2);
+    return round(($lighter + 0.05) / ($darker + 0.05), 2);
+}
+
+function contrastBadge($ratio) {
+    if ($ratio >= 4.5) return ['label' => '✓ Buen contraste', 'class' => 'bg-green-100 text-green-700'];
+    if ($ratio >= 3)   return ['label' => '⚠ Contraste bajo', 'class' => 'bg-yellow-100 text-yellow-700'];
+    return ['label' => '✗ Texto ilegible', 'class' => 'bg-red-100 text-red-700'];
+}
 @endphp
 
 

@@ -56,8 +56,8 @@
 					<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
 						<div class="flex items-start gap-3">
 							<div class="flex-shrink-0 bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"></path>
+								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<path d="M13 2L4 13h6l-1 9 9-11h-6l1-9z"></path>
 								</svg>
 							</div>
 							<div>
@@ -70,9 +70,9 @@
 					<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-100 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
 						<div class="flex items-start gap-3">
 							<div class="flex-shrink-0 bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M2 20l8-8 4 4 8-8"></path>
-									<path d="M14 6l4-4"></path>
+								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<path d="M4 16l6-6 4 4 7-8"></path>
+									<path d="M17 6h3v3"></path>
 								</svg>
 							</div>
 							<div>
@@ -85,12 +85,10 @@
 					<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-200 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
 						<div class="flex items-start gap-3">
 							<div class="flex-shrink-0 bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M10 2v4"></path>
-									<path d="M14 2v4"></path>
-									<path d="M4 11v5a3 3 0 003 3h0a3 3 0 003-3v-1"></path>
-									<path d="M20 11v5a3 3 0 01-3 3h0a3 3 0 01-3-3v-1"></path>
-									<path d="M12 11v6"></path>
+								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<path d="M10 13a5 5 0 0 1 0-7l1.5-1.5a5 5 0 0 1 7 7L17 13"></path>
+									<path d="M14 11a5 5 0 0 1 0 7l-1.5 1.5a5 5 0 0 1-7-7L7 11"></path>
+									<path d="M8 16l8-8"></path>
 								</svg>
 							</div>
 							<div>
@@ -103,10 +101,11 @@
 					<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-300 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
 						<div class="flex items-start gap-3">
 							<div class="flex-shrink-0 bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M4 15v-1a8 8 0 0116 0v1"></path>
-									<path d="M12 19v.01"></path>
-									<path d="M8 15v3a1 1 0 001 1h6a1 1 0 001-1v-3"></path>
+								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+									<path d="M4 13a8 8 0 0 1 16 0"></path>
+									<path d="M6 13v4a2 2 0 0 0 2 2h1v-6H8a2 2 0 0 0-2 2z"></path>
+									<path d="M18 13v4a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z"></path>
+									<path d="M8 17h8"></path>
 								</svg>
 							</div>
 							<div>
