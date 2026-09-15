@@ -182,6 +182,10 @@ public function selectCustomTheme()
     $this->tema_id = 'custom';
 }
 
+public function getSelectedTemplateProperty()
+{
+    return $this->plantillas->firstWhere('id', $this->plantilla_id);
+}
 public function updatedBanner()
 {
     $this->validate(['banner' => 'image|max:2048']);

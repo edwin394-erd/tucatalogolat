@@ -257,4 +257,6 @@ return [
     'home_twitter' => 'Twitter',
     'home_facebook' => 'Facebook',
     'home_copyright' => '© :year Tu Catalogo. Todos los derechos reservados.',
+
+    'live_preview' => 'Vista previa de colores en vivo',
 ];

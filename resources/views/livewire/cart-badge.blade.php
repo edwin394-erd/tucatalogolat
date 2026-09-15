@@ -4,10 +4,10 @@
 @endphp
 
 <div x-data="{ count: {{ (int) $count }} }" x-init="window.addEventListener('cart-added', () => { count++ }); window.addEventListener('cart-updated', event => { if (event.detail && typeof event.detail.count === 'number') { count = event.detail.count } }); window.addEventListener('cart-reset', () => { count = 0 }); if (window.Alpine && Alpine.store && Alpine.store('cart')) { count = Alpine.store('cart').count() }">
-    <a href="{{ $routeName ? route('catalogo.cart', $routeName) : route('home') }}" aria-label="Carrito" class="relative inline-flex items-center gap-2 p-3 rounded-full shadow-lg hover:scale-105 transition-transform" style="background-color: var(--primary-btn); color: var(--text-on-primary, #fff);" wire:navigate x-on:click.prevent="(window.cartSyncNow ? window.cartSyncNow() : Promise.resolve()).then(()=> Alpine.navigate($event.currentTarget.href))">
+    <a href="{{ $routeName ? route('catalogo.cart', $routeName) : route('home') }}" aria-label="Carrito" class="relative inline-flex items-center gap-2 p-3 rounded-full shadow-lg hover:scale-105 transition-transform"style="background-color: var(--primary-btn); color: {{ $iconColor }};" wire:navigate x-on:click.prevent="(window.cartSyncNow ? window.cartSyncNow() : Promise.resolve()).then(()=> Alpine.navigate($event.currentTarget.href))">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 7h13"></path></svg>
         Ver Carrito
-        <span id="global-cart-count" x-text="count" x-show="count > 0" class="ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background-color: var(--bg-card-aside); color: var(--text-primary);"></span>
+        <span id="global-cart-count" x-text="count" x-show="count > 0" class="ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold" style="background-color: var(--bg-card-aside); color: var(--text-secondary);"></span>
     </a>
 </div>
 

@@ -113,15 +113,15 @@
                         {{ __('messages.all') }}
                     </button>
 
-                    @foreach ($catalogo->categories as $category)
-                        <button type="button" wire:click="filterByCategory({{ $category->id }})"
-                                class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-colors duration-150"
-                                style="background-color: {{ $selectedCategory == $category->id ? 'var(--primary-btn)' : 'var(--bg-card-aside)' }};
-                                       color: {{ $selectedCategory == $category->id ? $iconColor : 'var(--text-primary)' }};
-                                       border-color: {{ $selectedCategory == $category->id ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
-                            <span class="truncate max-w-[10rem]">{{ $category->name }}</span>
-                        </button>
-                    @endforeach
+                @foreach ($catalogo->categories as $category)
+                    <button type="button" wire:click="filterByCategory({{ $category->id }})"
+                            class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-colors duration-150"
+                            style="background-color: {{ $selectedCategory == $category->id ? 'var(--primary-btn)' : 'var(--bg-card-aside)' }};
+                                color: {{ $selectedCategory == $category->id ? $iconColor : 'var(--text-secondary)' }};
+                                border-color: {{ $selectedCategory == $category->id ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
+                        <span class="truncate max-w-[10rem]">{{ $category->name }}</span>
+                    </button>
+                @endforeach
                 </div>
             </div>
 
