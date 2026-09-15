@@ -1,6 +1,6 @@
 <div>
 @php
-    $routeName = request()->route('name');
+    $routeName = $catalogo?->name_handle ?? request()->route('name');
 @endphp
 
 <div x-data="{ count: {{ (int) $count }} }" x-init="window.addEventListener('cart-added', () => { count++ }); window.addEventListener('cart-updated', event => { if (event.detail && typeof event.detail.count === 'number') { count = event.detail.count } }); window.addEventListener('cart-reset', () => { count = 0 }); if (window.Alpine && Alpine.store && Alpine.store('cart')) { count = Alpine.store('cart').count() }">

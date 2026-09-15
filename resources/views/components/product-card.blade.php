@@ -143,7 +143,7 @@
 
             <footer class="flex items-center justify-end gap-3 border-t border-black/5 px-5 sm:px-6 py-3 sm:py-4 shrink-0" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
                 <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) == 0">
-                    <button type="button" x-data="{ anim:false }" @click.stop="anim = true; window.cartAdd({{ $item->id }}); setTimeout(() => anim = false, 350)" wire:click="addToCart({{ $item->id }})"
+                    <button type="button" x-data="{ anim:false }" @click.stop="anim = true; window.cartAdd({{ $item->id }}); setTimeout(() => anim = false, 350)"
                             :class="anim ? 'scale-105 shadow-2xl ring-4 ring-black/5' : ''"
                             class="w-full sm:w-auto rounded-2xl px-6 py-2.5 text-sm font-semibold transition transform duration-200 ease-out hover:scale-105 active:scale-95 shadow-md"
                             style="background-color: var(--primary-btn); color: {{ $iconColor }};">

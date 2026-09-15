@@ -16,25 +16,25 @@ class Home extends Component
                 'name' => 'Urban Style',
                 'slug' => 'urbanstyle',
                 'url' => 'https://tucatalogolat.lat/urbanstyle',
-                'image' => 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80',
+                'image' => asset('imgs/URBANSTYLE.png'),
             ],
             [
                 'name' => 'Electronics Store',
-                'slug' => 'electorinicsstore',
-                'url' => 'https://tucatalogolat.lat/electorinicsstore',
-                'image' => 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=80',
+                'slug' => 'electronicsstore',
+                'url' => 'https://tucatalogolat.lat/electronicsstore',
+                'image' => asset('imgs/URBANSTYLE.png'),
             ],
             [
                 'name' => 'Auto Selling',
                 'slug' => 'autoselling',
                 'url' => 'https://tucatalogolat.lat/autoselling',
-                'image' => 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=80',
+                'image' => asset('imgs/URBANSTYLE.png'),
             ],
             [
                 'name' => 'Super Burger',
                 'slug' => 'superburguer',
                 'url' => 'https://tucatalogolat.lat/superburguer',
-                'image' => 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80',
+                'image' => asset('imgs/URBANSTYLE.png'),
             ],
         ];
 

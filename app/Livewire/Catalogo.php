@@ -21,6 +21,8 @@ class Catalogo extends Component
 
     public $subscripcionActiva = false;
 
+    protected $paginationTheme = 'tailwind';
+
     // Eliminamos 'page' de aquí para que no entre en conflicto con el trait
     protected $queryString = [
         'search' => ['except' => ''],
@@ -60,7 +62,7 @@ class Catalogo extends Component
     public function render()
     {
         $catalogo = \App\Models\Catalogo::resolveByName($this->name) ?? \App\Models\Catalogo::where('name_handle', $this->name)->firstOrFail();
-        $catalogo->load(['categories', 'products.fotos', 'plantilla']);
+        $catalogo->load(['categories', 'plantilla']);
 
         if (auth()->check() && auth()->id() === $catalogo->user_id && ! $catalogo->isConfigurationComplete()) {
             session()->flash('message', __('messages.complete_config_before_catalog'));
@@ -75,40 +77,25 @@ class Catalogo extends Component
             }
 
 
-        // Filtrado de la colección
-        $products = $catalogo->products;
+        $products = $catalogo->products()
+            ->with('fotos')
+            ->when($this->search, function ($query) {
+                $searchWords = collect(preg_split('/\s+/', trim($this->search)))
+                    ->filter()
+                    ->map(fn ($word) => strtolower($word));
 
-        if ($this->search) {
-            $search = trim(preg_replace('/\s+/', ' ', $this->search));
-            $searchWords = collect(explode(' ', strtolower($search)))->filter();
+                foreach ($searchWords as $word) {
+                    $query->where(function ($productQuery) use ($word) {
+                        $productQuery->whereRaw('LOWER(name) LIKE ?', ["%{$word}%"])
+                            ->orWhereRaw('LOWER(description) LIKE ?', ["%{$word}%"]);
+                    });
+                }
+            })
+            ->when($this->categoryId, fn ($query) => $query->where('category_id', $this->categoryId))
+            ->latest()
+            ->paginate(30);
 
-            $products = $products->filter(function ($product) use ($searchWords) {
-                $haystack = strtolower(($product->name ?? '') . ' ' . ($product->description ?? ''));
-
-                return $searchWords->every(fn($word) => str_contains($haystack, $word));
-            });
-        }
-
-        if ($this->categoryId) {
-            $products = $products->where('category_id', $this->categoryId);
-        }
-
-        $products = $products->sortByDesc('created_at')->values();
-
-        // Paginación manual compatible con Livewire
-        $perPage = 12;
-        $currentPage = $this->paginators['page'] ?? 1; // Recupera la página del estado de Livewire
-        $currentItems = $products->slice(($currentPage - 1) * $perPage, $perPage)->values();
-        
-        $paginatedProducts = new LengthAwarePaginator(
-            $currentItems,
-            $products->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url()]
-        );
-
-        $catalogo->setRelation('products', $paginatedProducts);
+        $catalogo->setRelation('products', $products);
         $this->cartItemCount = Cart::findCurrent($catalogo->id)?->count ?? 0;
 
         if ($catalogo->plantilla->id === 1) {

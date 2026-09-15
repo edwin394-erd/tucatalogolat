@@ -98,7 +98,7 @@
              style="background-color: color-mix(in srgb, var(--bg-main) 92%, transparent);">
             <div class="flex flex-col lg:flex-row lg:items-center gap-3">
                 <div class="w-full lg:w-80 flex-shrink-0">
-                    <input type="text" wire:model.live="search"
+                    <input type="text" wire:model.live.debounce.300ms="search"
                            class="w-full p-3 pl-4 rounded-2xl border-none shadow-sm focus:ring-2 outline-none"
                            style="background-color: var(--bg-card-aside); color: var(--text-secondary); --tw-ring-color: var(--primary-btn);"
                            placeholder="{{ __('messages.search_products') }}...">
@@ -108,8 +108,8 @@
                     <button type="button" wire:click="filterByCategory(null)"
                             class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-colors duration-150"
                             style="background-color: {{ $selectedCategory === null ? 'var(--primary-btn)' : 'var(--bg-card-aside)' }};
-                                   color: {{ $selectedCategory === null ? $iconColor : 'var(--text-primary)' }};
-                                   border-color: {{ $selectedCategory === null ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
+                                color: {{ $selectedCategory === null ? $iconColor : 'var(--text-secondary)' }};
+                                border-color: {{ $selectedCategory === null ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
                         {{ __('messages.all') }}
                     </button>
 

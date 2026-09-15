@@ -259,4 +259,5 @@ return [
     'home_copyright' => '© :year Tu Catalogo. Todos los derechos reservados.',
 
     'live_preview' => 'Vista previa de colores en vivo',
+    'cart_items' => 'Artículos en el carrito',
 ];

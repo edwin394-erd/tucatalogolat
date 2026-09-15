@@ -91,7 +91,7 @@ class Cart extends Component
         });
 
         $encodedMessage = urlencode($message);
-        $whatsappUrl = "https://wa.me/584246054544?text={$encodedMessage}";
+        $whatsappUrl = "https://wa.me/".$this->catalogo->telefono_contacto."?text={$encodedMessage}";
 
         // Clear cart after sending
         $this->cart->items()->delete();

@@ -42,10 +42,12 @@
                     <h1 class="text-4xl sm:text-5xl font-extrabold" style="color: {{ $pColor }};">{{ $catalogo->name }}</h1>
                     <p class="max-w-3xl text-lg leading-8" style="color: {{ $sFont }};">{{ $catalogo->description }}</p>
                     <div class="flex flex-wrap gap-3 mt-4">
+                        <button wire:click="filterByCategory(null)" class="rounded-full px-4 py-2 text-sm font-semibold border" style="border-color: {{ $pColor }}; color: {{ $pColor }}; background-color: rgba(0,0,0,0.03);">{{ __('messages.all') }}</button>
                         @foreach($catalogo->categories as $cat)
                             <button wire:click="filterByCategory({{ $cat->id }})" class="rounded-full px-4 py-2 text-sm font-semibold border" style="border-color: {{ $pColor }}; color: {{ $pColor }}; background-color: rgba(0,0,0,0.03);">{{ $cat->name }}</button>
                         @endforeach
                     </div>
+                    <input wire:model.live.debounce.300ms="search" type="search" class="mt-4 w-full rounded-2xl border px-4 py-3" style="border-color: {{ $pColor }};" placeholder="{{ __('messages.search_products') }}...">
                 </div>
                 <div class="rounded-3xl border shadow-xl overflow-hidden" style="border-color: {{ $pColor }}; background-color: {{ $sColor }};">
                     @if($catalogo->banner_url)
@@ -116,6 +118,10 @@
                         </div>
                     @endif
                 @endforeach
+
+                <div class="mt-6">
+                    {{ $catalogo->products->links() }}
+                </div>
             </section>
 
             <aside class="space-y-6">
@@ -141,3 +147,4 @@
         </div>
     </main>
 </div>
+
