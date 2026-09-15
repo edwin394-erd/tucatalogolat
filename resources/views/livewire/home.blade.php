@@ -11,9 +11,9 @@
 			<!-- Hero content -->
 			<section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center py-16">
 				<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out">
-					<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold tracking-wide">
-						🚀 {{ __('messages.home_hero_badge') ?? 'Prueba gratis 14 días' }}
-					</span>
+					{{-- <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold tracking-wide">
+						 {{ __('messages.home_hero_badge') ?? 'Prueba gratis 14 días' }}
+					</span> --}}
 					<h2 class="mt-4 text-4xl sm:text-5xl font-extrabold leading-tight bg-gradient-to-r from-indigo-700 via-purple-600 to-indigo-500 bg-clip-text text-transparent">
 						{{ __('messages.home_hero_title') }}
 					</h2>
