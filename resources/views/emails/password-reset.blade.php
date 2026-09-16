@@ -15,7 +15,7 @@
                     <tr>
                         <td style="background-color:#e7e7f0; padding:28px 32px;">
                             <img src="{{ asset('imgs/logo.png') }}" alt="TuCatálogo.lat" width="260" style="display:block; width:260px; max-width:100%; height:auto; border:0;">
-                            <div style="margin-top:9px; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:#c7d2fe;">Tu catálogo, siempre contigo</div>
+                            <div style="margin-top:9px; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:#4338ca;">Tu catálogo, siempre contigo</div>
                         </td>
                     </tr>
                     <tr>
