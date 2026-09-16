@@ -125,6 +125,11 @@
                 @endforeach
 
             <td class="px-4 py-4 flex flex-col sm:flex-row gap-2 justify-end {{ $index === count($items) - 1 ? 'rounded-br-xl' : '' }}">
+                    @if ($model === 'Order')
+                        <button wire:click="toggleOrderDetails({{ $item->id }})" class="bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 shadow-sm rounded-lg px-3 py-2 text-sm">
+                            {{ $expandedOrderId === $item->id ? 'Ocultar pedido' : 'Ver pedido' }}
+                        </button>
+                    @endif
                     @if ($model !== 'Order')
                     <a
                         href="{{ route('edit', ['model' => $model, 'id' => $item->id]) }}"
@@ -159,6 +164,33 @@
 
                 </td>
             </tr>
+
+            @if ($model === 'Order' && $expandedOrderId === $item->id)
+                <tr class="bg-indigo-50/40 border-b border-gray-200">
+                    <td colspan="{{ count($columns) + 1 }}" class="px-4 py-4">
+                        <div class="max-w-3xl">
+                            <p class="mb-2 text-sm font-semibold text-gray-800">Detalle del pedido</p>
+                            <ul class="grid gap-2 sm:grid-cols-2">
+                                @forelse ($item->items as $orderItem)
+                                    <li class="rounded-lg bg-white px-3 py-2 text-sm text-gray-700 ring-1 ring-indigo-100">
+                                        <span class="font-semibold">{{ $orderItem->quantity }}x</span>
+                                        {{ $orderItem->product_name }}
+                                        @if ($orderItem->variant_description)
+                                            <span class="text-xs text-gray-500">({{ $orderItem->variant_description }})</span>
+                                        @endif
+                                        <span class="block text-xs text-gray-500">${{ number_format($orderItem->unit_price, 2) }} c/u · Total: ${{ number_format($orderItem->total, 2) }}</span>
+                                    </li>
+                                @empty
+                                    <li class="text-sm text-gray-500">Sin productos registrados.</li>
+                                @endforelse
+                            </ul>
+                            @if ($item->customer_notes)
+                                <p class="mt-3 text-sm text-gray-600"><span class="font-semibold">Nota:</span> {{ $item->customer_notes }}</p>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+            @endif
 
             @empty
                 <tr>
@@ -204,6 +236,27 @@
                             </div>
                         @endforeach
                     </div>
+
+                    @if ($model === 'Order')
+                        <button wire:click="toggleOrderDetails({{ $item->id }})" class="mt-2 text-xs font-semibold text-indigo-700 hover:underline">
+                            {{ $expandedOrderId === $item->id ? 'Ocultar pedido' : 'Ver pedido' }}
+                        </button>
+                        @if ($expandedOrderId === $item->id)
+                            <div class="mt-2 space-y-1 rounded-lg bg-indigo-50 p-2 text-xs text-gray-700">
+                                @forelse ($item->items as $orderItem)
+                                    <div>
+                                        <span class="font-semibold">{{ $orderItem->quantity }}x</span>
+                                        {{ $orderItem->product_name }}
+                                        @if ($orderItem->variant_description)
+                                            <span class="text-gray-500">({{ $orderItem->variant_description }})</span>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <div class="text-gray-500">Sin productos registrados.</div>
+                                @endforelse
+                            </div>
+                        @endif
+                    @endif
                 </div>
 
                 <div class="flex shrink-0 items-center gap-1">

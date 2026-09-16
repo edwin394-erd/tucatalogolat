@@ -23,6 +23,7 @@ class Table extends Component
     public $searching_exceptions = ['foto'];
     public $titulo = '';
     public $statusFilter = '';
+    public $expandedOrderId;
 
 
 
@@ -93,6 +94,15 @@ class Table extends Component
         }
     }
 
+    public function toggleOrderDetails($id)
+    {
+        if ($this->model !== 'Order') {
+            return;
+        }
+
+        $this->expandedOrderId = $this->expandedOrderId === $id ? null : $id;
+    }
+
     /**
      * Elimina un registro de la tabla por su ID.
      */
@@ -121,6 +131,10 @@ class Table extends Component
 
         if ($this->model === 'User') {
             $query->with('catalogo.products.fotos');
+        }
+
+        if ($this->model === 'Order') {
+            $query->with('items');
         }
 
         // Aplica el filtro si está configurado
