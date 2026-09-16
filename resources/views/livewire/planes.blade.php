@@ -21,7 +21,7 @@
     
 @else
 <div class="px-5 my-5">
-    <h1 class="text-2xl font-bold text-gray-700 mb-5">{{ __('messages.plans') }}</h1>
+    <h1 class="text-2xl font-bold text-gray-700 mb-5">{{ __('messages.subscriptions') }}</h1>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach(\App\Models\Plan::where('is_active', 1)->get() as $plan)
@@ -39,9 +39,19 @@
                         Plan actual
                     </span>
                 @else
-                    <a href="https://wa.me/584246054544?text={{ rawurlencode($whatsappMessage) }}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex w-full justify-center bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">
-                        Solicitar Suscripción
-                    </a>
+                    <div x-data="{ open: false }" class="relative mt-4">
+                        <button type="button" @click="open = !open" @click.outside="open = false" :aria-expanded="open.toString()" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700">
+                            Solicitar Suscripción
+                        </button>
+                        <div x-show="open" x-transition class="absolute z-10 mt-2 w-full overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg" style="display: none;">
+                            <a href="https://wa.me/584246054544?text={{ rawurlencode($whatsappMessage) }}" target="_blank" rel="noopener noreferrer" @click="open = false" class="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700">
+                                Solicitar por WhatsApp
+                            </a>
+                            <a href="https://www.instagram.com/tucatalogolat.lat/" target="_blank" rel="noopener noreferrer" @click="open = false" class="block border-t border-gray-100 px-4 py-3 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-700">
+                                Solicitar por Instagram
+                            </a>
+                        </div>
+                    </div>
                 @endif
               
             </div>

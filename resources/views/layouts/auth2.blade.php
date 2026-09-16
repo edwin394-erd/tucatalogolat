@@ -166,7 +166,7 @@
                <li class="h-fit w-full">
                   <a data-tour="plans" href="{{ route('planes') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <x-svg-plans/>
-               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.plans') }}</span>
+               <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.subscriptions') }}</span>
             </a>
          </li>
 
