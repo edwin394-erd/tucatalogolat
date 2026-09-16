@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Home;
 use App\Livewire\Login;
 use App\Livewire\Register;
+use App\Livewire\ForgotPassword;
+use App\Livewire\ResetPassword;
 use App\Livewire\Dashboard;
 use App\Livewire\Products;
 use App\Livewire\Categories;
@@ -32,6 +34,8 @@ use Illuminate\Support\Facades\Response;
 Route::get('/', Home::class)->middleware(['guest'])->name('home');
 Route::get('/Login', Login::class)->middleware(['guest'])->name('login');
 Route::get('/Register', Register::class)->middleware(['guest'])->name('register');
+Route::get('/forgot-password', ForgotPassword::class)->middleware(['guest'])->name('password.request');
+Route::get('/reset-password/{token}', ResetPassword::class)->middleware(['guest'])->name('password.reset');
 Route::view('/terminos-y-condiciones', 'legal.terms')->name('terms');
 
 Route::get('/Dashboard', Dashboard::class)->middleware(['auth'])->name('dashboard');

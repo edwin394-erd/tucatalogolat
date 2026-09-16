@@ -82,75 +82,105 @@
 			</section>
 
 			<!-- Features -->
-			<section id="features" class="py-16">
-				<h3 data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out text-2xl sm:text-3xl font-bold text-center">
-					{{ __('messages.home_features_title') }}
-				</h3>
-				<div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+			<!-- Reseller Catalog Features -->
+<section id="reseller-features" class="py-16">
+    <div class="text-center max-w-3xl mx-auto">
+        <h3 data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out text-2xl sm:text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
+            <svg class="h-7 w-7 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 17l6-6 4 4 8-8"></path>
+                <path d="M17 7h4v4"></path>
+            </svg>
+            ¿En qué consiste el catálogo para revendedores?
+        </h3>
+        <p data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out mt-4 text-gray-600">
+            Es una réplica personalizada de tu catálogo principal, diseñada específicamente para revendedores.
+            Tú mantienes el control total desde tu catálogo matriz.
+        </p>
+    </div>
 
-					<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-						<div class="flex items-start gap-3">
-							<div class="flex-shrink-0 bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M13 2L4 13h6l-1 9 9-11h-6l1-9z"></path>
-								</svg>
-							</div>
-							<div>
-								<h4 class="font-semibold">{{ __('messages.home_easy_learning') }}</h4>
-								<p class="mt-2 text-sm text-gray-600">{{ __('messages.home_easy_desc') }}</p>
-							</div>
-						</div>
-					</div>
+    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-					<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-100 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-						<div class="flex items-start gap-3">
-							<div class="flex-shrink-0 bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M4 16l6-6 4 4 7-8"></path>
-									<path d="M17 6h3v3"></path>
-								</svg>
-							</div>
-							<div>
-								<h4 class="font-semibold">{{ __('messages.home_customized') }}</h4>
-								<p class="mt-2 text-sm text-gray-600">{{ __('messages.home_customized_desc') }}</p>
-							</div>
-						</div>
-					</div>
+        <!-- Precios personalizados -->
+        <div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out bg-gray-50 p-6 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all">
+            <div class="inline-flex items-center justify-center h-10 w-10 rounded-lg text-purple-600">
+                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1v22"></path>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+            </div>
+            <h4 class="mt-3 font-bold text-gray-900">Precios personalizados</h4>
+            <p class="mt-2 text-sm text-gray-500">Define precios específicos. Ofrece descuentos o márgenes de ganancia personalizados.</p>
+        </div>
 
-					<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-200 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-						<div class="flex items-start gap-3">
-							<div class="flex-shrink-0 bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M10 13a5 5 0 0 1 0-7l1.5-1.5a5 5 0 0 1 7 7L17 13"></path>
-									<path d="M14 11a5 5 0 0 1 0 7l-1.5 1.5a5 5 0 0 1-7-7L7 11"></path>
-									<path d="M8 16l8-8"></path>
-								</svg>
-							</div>
-							<div>
-								<h4 class="font-semibold">{{ __('messages.home_integrations') }}</h4>
-								<p class="mt-2 text-sm text-gray-600">{{ __('messages.home_integrations_desc') }}</p>
-							</div>
-						</div>
-					</div>
+        <!-- Identidad única -->
+        <div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-100 bg-gray-50 p-6 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all">
+            <div class="inline-flex items-center justify-center h-10 w-10 rounded-lg text-pink-500">
+                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="5" cy="7" r="2"></circle>
+                    <path d="M5 9v10"></path>
+                    <circle cx="19" cy="17" r="2"></circle>
+                    <path d="M19 15V5"></path>
+                </svg>
+            </div>
+            <h4 class="mt-3 font-bold text-gray-900">Identidad única</h4>
+            <p class="mt-2 text-sm text-gray-500">Cada catálogo puede incluir tu propio logo y configuraciones, otorgando exclusividad y profesionalismo.</p>
+        </div>
 
-					<div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-300 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
-						<div class="flex items-start gap-3">
-							<div class="flex-shrink-0 bg-indigo-50 p-2.5 rounded-xl text-indigo-600">
-								<svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-									<path d="M4 13a8 8 0 0 1 16 0"></path>
-									<path d="M6 13v4a2 2 0 0 0 2 2h1v-6H8a2 2 0 0 0-2 2z"></path>
-									<path d="M18 13v4a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2z"></path>
-									<path d="M8 17h8"></path>
-								</svg>
-							</div>
-							<div>
-								<h4 class="font-semibold">{{ __('messages.home_support') }}</h4>
-								<p class="mt-2 text-sm text-gray-600">{{ __('messages.home_support_desc') }}</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
+        <!-- Integración con WhatsApp -->
+        <div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-200 bg-gray-50 p-6 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all">
+            <div class="inline-flex items-center justify-center h-10 w-10 rounded-lg text-teal-500">
+                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="7" y="2" width="10" height="20" rx="2"></rect>
+                    <path d="M11 18h2"></path>
+                </svg>
+            </div>
+            <h4 class="mt-3 font-bold text-gray-900">Integración con WhatsApp</h4>
+            <p class="mt-2 text-sm text-gray-500">Los pedidos del catálogo van directamente a tu WhatsApp, sin intermediarios.</p>
+        </div>
+
+        <!-- Gestión centralizada -->
+        <div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out bg-gray-50 p-6 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all">
+            <div class="inline-flex items-center justify-center h-10 w-10 rounded-lg text-amber-500">
+                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="18" rx="2"></rect>
+                    <path d="M9 2h6v4H9z"></path>
+                    <path d="M8 12h8M8 16h8"></path>
+                </svg>
+            </div>
+            <h4 class="mt-3 font-bold text-gray-900">Gestión centralizada</h4>
+            <p class="mt-2 text-sm text-gray-500">Controla tu catálogo desde tu cuenta principal. Actualiza productos y precios en tiempo real.</p>
+        </div>
+
+        <!-- Escalabilidad sin límites -->
+        <div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-100 bg-gray-50 p-6 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all">
+            <div class="inline-flex items-center justify-center h-10 w-10 rounded-lg text-indigo-600">
+                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 17l6-6 4 4 8-8"></path>
+                    <path d="M17 7h4v4"></path>
+                </svg>
+            </div>
+            <h4 class="mt-3 font-bold text-gray-900">Escalabilidad sin límites</h4>
+            <p class="mt-2 text-sm text-gray-500">Escala tu red de ventas sin preocuparte.</p>
+        </div>
+
+        <!-- CTA card (highlighted) -->
+        <div data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out delay-200 relative overflow-hidden bg-gradient-to-br from-purple-600 to-fuchsia-700 p-6 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+            <div class="pointer-events-none absolute -bottom-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            <div class="inline-flex items-center justify-center h-10 w-10 rounded-lg text-white">
+                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+            </div>
+            <h4 class="mt-3 font-bold text-white">¿Listo para modernizarte?</h4>
+            <p class="mt-2 text-sm text-purple-100">Construye tu tienda online.</p>
+            <a href="{{ route('login') }}"
+               class="mt-4 inline-flex items-center justify-center w-full sm:w-auto px-5 py-2.5 bg-white text-purple-700 text-sm font-semibold rounded-xl shadow hover:-translate-y-0.5 transition-all duration-300">
+                Crear mi catálogo
+            </a>
+        </div>
+
+    </div>
+</section>
 
 			<!-- Pricing -->
 			<section id="pricing" class="py-16">
