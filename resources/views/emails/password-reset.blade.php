@@ -13,8 +13,8 @@
             <td align="center">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:600px; background-color:#ffffff; border:1px solid #dbe3f0; border-radius:16px; overflow:hidden; box-shadow:0 8px 24px rgba(30,41,59,0.10);">
                     <tr>
-                        <td style="background-color:#4338ca; padding:28px 32px;">
-                            <div style="font-size:24px; line-height:1; font-weight:700; color:#ffffff;">tu<span style="color:#facc15;">catalogo</span><span style="color:#c7d2fe;">lat</span></div>
+                        <td style="background-color:#e7e7f0; padding:28px 32px;">
+                            <img src="{{ asset('imgs/logo.png') }}" alt="TuCatálogo.lat" width="260" style="display:block; width:260px; max-width:100%; height:auto; border:0;">
                             <div style="margin-top:9px; font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:#c7d2fe;">Tu catálogo, siempre contigo</div>
                         </td>
                     </tr>
