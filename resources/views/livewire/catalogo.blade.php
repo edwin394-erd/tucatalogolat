@@ -44,16 +44,8 @@
         return ['label' => '✗ Texto ilegible', 'class' => 'bg-red-100 text-red-700'];
     }
 @endphp
-<style>
-    .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-    .no-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-</style>
 
+<div>
 <div class="min-h-screen pb-16"
      style="--primary-btn: {{ $pColor }};
             --bg-main: {{ $bgColor }};
@@ -109,15 +101,15 @@
              style="background-color: color-mix(in srgb, var(--bg-main) 92%, transparent);">
             <div class="flex flex-col lg:flex-row lg:items-center gap-3">
                 <div class="w-full lg:w-80 flex-shrink-0">
-                    <input type="text" wire:model.live.debounce.300ms="search"
-                           class="w-full p-3 pl-4 rounded-2xl border-none shadow-sm focus:ring-2 outline-none"
+                          <input type="text" wire:model.live.debounce.300ms="search"
+                              class="h-10 w-full px-4 py-2 rounded-full border-none shadow-sm focus:ring-2 outline-none"
                            style="background-color: var(--bg-card-aside); color: var(--text-secondary); --tw-ring-color: var(--primary-btn);"
                            placeholder="{{ __('messages.search_products') }}...">
                 </div>
 
                 <div class="flex items-center gap-3 overflow-x-auto no-scrollbar lg:flex-1">
                     <button type="button" wire:click="filterByCategory(null)"
-                            class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-colors duration-150"
+                            class="h-10 flex-shrink-0 inline-flex items-center gap-2 px-4 py-0 rounded-full border text-sm transition-colors duration-150"
                             style="background-color: {{ $selectedCategory === null ? 'var(--primary-btn)' : 'var(--bg-card-aside)' }};
                                 color: {{ $selectedCategory === null ? $iconColor : 'var(--text-secondary)' }};
                                 border-color: {{ $selectedCategory === null ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
@@ -126,7 +118,7 @@
 
                 @foreach ($catalogo->categories as $category)
                     <button type="button" wire:click="filterByCategory({{ $category->id }})"
-                            class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-colors duration-150"
+                            class="h-10 flex-shrink-0 inline-flex items-center gap-2 px-4 py-0 rounded-full border text-sm transition-colors duration-150"
                             style="background-color: {{ $selectedCategory == $category->id ? 'var(--primary-btn)' : 'var(--bg-card-aside)' }};
                                 color: {{ $selectedCategory == $category->id ? $iconColor : 'var(--text-secondary)' }};
                                 border-color: {{ $selectedCategory == $category->id ? 'var(--bg-card-aside)' : 'var(--primary-btn)' }};">
@@ -164,4 +156,33 @@
             {{ $catalogo->products->links() }}
         </div>
     </div>
+    <footer class="flex items-center justify-center gap-2 px-4 py-2 text-center text-xs" style="background-color: {{ $catalogo->theme->bg_color ?? '#ffffff' }}; color: var(--text-secondary, #666);">
+        <span class="leading-none">Powered by</span>
+        <a href="{{ url()->to('https://tucatalogolat.lat') }}" class="inline-flex items-center gap-1 font-bold leading-none hover:underline">
+            <span>tucatalogolat.lat</span>
+            <img src="{{ asset('imgs/icono.ico') }}" alt="TuCatalogo.Lat" class="h-4 w-4 object-contain">
+        </a>
+    </footer>
+
+        
 </div>
+
+<style>
+.no-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-btn) transparent;
+}
+.no-scrollbar::-webkit-scrollbar {
+    height: 4px;
+}
+.no-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.no-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--primary-btn);
+    border-radius: 10px;
+}
+</style>
+
+</div>
+

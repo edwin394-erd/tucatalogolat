@@ -47,6 +47,8 @@
     }
 @endphp
 
+<div>
+
 <div class="flex flex-col lg:flex-row min-h-screen"
      style="--primary-btn: {{ $pColor }};
             --bg-main: {{ $bgColor }};
@@ -62,17 +64,26 @@
     <aside class="w-full lg:w-64 shadow-xl flex flex-col py-5 px-4 lg:fixed lg:h-full z-40 transition-colors overflow-hidden"
            style="background-color: var(--bg-card-aside); color: var(--text-secondary);">
 
-        {{-- Perfil / Logo --}}
-        <div class="flex flex-col items-center mb-3 flex-shrink-0">
-            @if ($catalogo->logo_url)
-                <img src="{{ asset('storage/' . $catalogo->logo_url) }}" alt="Logo"
-                     class="w-16 h-16 rounded-full border-4 shadow-md object-cover mb-2"
-                     style="border-color: var(--primary-btn);">
+        {{-- Perfil / Logo sobre el banner --}}
+        <div class="relative -mx-4 -mt-5 mb-3 h-36 w-[calc(100%+2rem)] flex-shrink-0 overflow-hidden rounded-none">
+            @if ($catalogo->banner_url)
+                <img src="{{ asset('storage/' . $catalogo->banner_url) }}" alt="{{ $catalogo->name }}"
+                     class="absolute inset-0 h-full w-full object-cover object-center">
             @else
-                <div class="w-16 h-16 rounded-full border-4 flex items-center justify-center text-[10px] opacity-50 mb-2"
-                     style="border-color: var(--primary-btn); background-color: var(--bg-main);">{{__('messages.no_logo')}}</div>
+                <div class="absolute inset-0" style="background: linear-gradient(135deg, var(--primary-btn), var(--bg-main));"></div>
             @endif
-            <h2 class="text-base font-black text-center leading-tight line-clamp-1" style="color: var(--text-secondary);">{{ $catalogo->name }}</h2>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent"></div>
+            <div class="relative flex h-full flex-col items-center justify-end p-3">
+                @if ($catalogo->logo_url)
+                    <img src="{{ asset('storage/' . $catalogo->logo_url) }}" alt="Logo"
+                         class="h-16 w-16 rounded-full border-4 object-cover shadow-md"
+                         style="border-color: var(--primary-btn);">
+                @else
+                    <div class="flex h-16 w-16 items-center justify-center rounded-full border-4 text-[10px] opacity-80"
+                         style="border-color: var(--primary-btn); background-color: var(--bg-main);">{{__('messages.no_logo')}}</div>
+                @endif
+                <h2 class="mt-2 max-w-full truncate text-center text-base font-black leading-tight text-white drop-shadow">{{ $catalogo->name }}</h2>
+            </div>
         </div>
 
         <x-store-info :catalogo="$catalogo" :icon-color="$iconColor" />
@@ -140,8 +151,8 @@
                 </div>
 
                 <div class="relative w-full md:w-96">
-                    <input type="text" wire:model.live.debounce.300ms="search"
-                           class="w-full p-2.5 pl-10 rounded-2xl border-none shadow-sm focus:ring-2 outline-none"
+                          <input type="text" wire:model.live.debounce.300ms="search"
+                              class="h-10 w-full p-2 pl-10 rounded-full border-none shadow-sm focus:ring-2 outline-none"
                            style="background-color: var(--bg-card-aside); color: var(--text-secondary); --tw-ring-color: var(--primary-btn);"
                            placeholder="{{__('messages.search_products')}}..." />
                     <svg class="absolute left-3 top-3 w-4.5 h-4.5 opacity-40" style="color: var(--text-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -163,10 +174,19 @@
         </div>
     </main>
 
+     
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
     </style>
+</div>
+<footer class="flex items-center justify-center gap-1 px-4 py-2 text-center text-xs" style="background-color: {{ $catalogo->theme->bg_color ?? '#ffffff' }}; color: var(--text-secondary, #666);">
+          <span>Powered by</span>
+          <a href="{{ url()->to('https://tucatalogolat.lat') }}" class="inline-flex items-center gap-1 font-bold hover:underline">
+              <span>tucatalogolat.lat</span>
+              <img src="{{ asset('imgs/icono.ico') }}" alt="TuCatalogo.Lat" class="h-4 w-4 object-contain">
+        </a>
+</footer>
 </div>
 

@@ -22,19 +22,19 @@ class Home extends Component
                 'name' => 'Electronics Store',
                 'slug' => 'electronicsstore',
                 'url' => 'https://tucatalogolat.lat/electronicsstore',
-                'image' => asset('imgs/URBANSTYLE.png'),
+                'image' => asset('imgs/electronicsstore.png'),
             ],
             [
                 'name' => 'Auto Selling',
                 'slug' => 'autoselling',
                 'url' => 'https://tucatalogolat.lat/autoselling',
-                'image' => asset('imgs/URBANSTYLE.png'),
+                'image' => asset('imgs/autoselling.png'),
             ],
             [
                 'name' => 'Super Burger',
                 'slug' => 'superburguer',
                 'url' => 'https://tucatalogolat.lat/superburguer',
-                'image' => asset('imgs/URBANSTYLE.png'),
+                'image' => asset('imgs/superburguers.png'),
             ],
         ];
 
