@@ -191,6 +191,13 @@ return [
     'images_max' => 'Each image must not exceed 2MB in size.',
     'images_limit' => 'A product can have a maximum of 5 images.',
     'storage_usage' => 'Storage used',
+    'all_orders' => 'All orders',
+    'pending_orders' => 'Pending',
+    'completed_orders' => 'Completed',
+    'pending' => 'Pending',
+    'completed' => 'Completed',
+    'mark_completed' => 'Mark as completed',
+    'order_completed' => 'Order marked as completed.',
 
 
     //Categorias

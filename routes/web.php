@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Response;
 Route::get('/', Home::class)->middleware(['guest'])->name('home');
 Route::get('/Login', Login::class)->middleware(['guest'])->name('login');
 Route::get('/Register', Register::class)->middleware(['guest'])->name('register');
+Route::view('/terminos-y-condiciones', 'legal.terms')->name('terms');
 
 Route::get('/Dashboard', Dashboard::class)->middleware(['auth'])->name('dashboard');
 Route::get('/Products', Products::class)->middleware(['auth'])->name('products');

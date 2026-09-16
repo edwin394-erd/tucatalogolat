@@ -22,6 +22,20 @@ class Planes extends Component
             return;
         }
 
+        $currentSubscription = $user->subscriptions()
+            ->where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->latest('expires_at')
+            ->first();
+
+        if ($currentSubscription?->plan_id === $plan->id) {
+            $this->dispatch('alert', type: 'info', message: 'Ya tienes este plan activo.');
+            return;
+        }
+
         $message = "Solicitud de suscripción al plan {$plan->name}:\n\nUsuario: {$user->name} ({$user->email})\nPlan: {$plan->name}\nPrecio: {$plan->price}\nDescripción: {$plan->description}";
 
         $encodedMessage = urlencode($message);
@@ -39,9 +53,19 @@ class Planes extends Component
     
     public function render()
     {
+        $currentSubscription = auth()->user()?->subscriptions()
+            ->where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->latest('expires_at')
+            ->first();
+
         return view('livewire.planes')
         ->extends('layouts.auth2')
         ->section('content')
-        ->with('model', $this->model);
+        ->with('model', $this->model)
+        ->with('currentSubscription', $currentSubscription);
     }
 }

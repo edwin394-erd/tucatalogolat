@@ -9,6 +9,7 @@
             'filter_value' => auth()->user()->catalogo?->id,
             'searching_exceptions' => [],
             'table_type' => 'Pedidos',
+            'status_filter' => '',
         ])
     </div>
 </div>

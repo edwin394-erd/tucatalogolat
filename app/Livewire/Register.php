@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\User;
 use App\Models\Catalogo;
 use App\Models\Subscription;
+use App\Models\Plan;
 
 use Illuminate\Support\Facades\Hash;
 
@@ -23,6 +24,7 @@ class Register extends Component
     public $address;
     public $area_code;
     public $create_catalog = false;
+    public $terms_accepted = false;
 
     protected $rules = [
         'name' => 'required|string|max:255|unique:users,name',
@@ -34,6 +36,7 @@ class Register extends Component
         'role' => 'required|string|max:50',
         'address' => 'required|string|max:255',
         'create_catalog' => 'boolean',
+        'terms_accepted' => 'accepted',
     ];
 
     protected $messages = [
@@ -51,6 +54,7 @@ class Register extends Component
         'telephone.regex' => 'El teléfono debe contener solo números.',
         'role.required' => 'El rol es obligatorio.',
         'address.required' => 'La dirección es obligatoria.',
+        'terms_accepted.accepted' => 'Debes aceptar los Términos y Condiciones para crear tu cuenta.',
     ];
 
     public function updated($propertyName)
@@ -94,12 +98,14 @@ class Register extends Component
                 'telefono_contacto' => $this->area_code . $this->telephone,
             ]);
 
+            $plan = Plan::findOrFail(1);
+
             Subscription::create([
                 'user_id' => $user->id,
-                'plan_id' => 1, // Asignar el plan gratuito
+                'plan_id' => $plan->id,
                 'status' => 'active', // Activar la suscripción
                 'starts_at' => now(),
-                'expires_at' => now()->addMonth(), // Establecer una fecha de expiración (opcional)
+                'expires_at' => now()->addDays($plan->duration_in_days),
             ]);
         }
 
@@ -107,7 +113,7 @@ class Register extends Component
 
         // Redirect or show a success message
         session()->flash('message', 'Registro exitoso. Por favor, inicia sesión.');
-        return redirect()->route('dashboard');
+        return redirect()->route('configuracion');
     }
     }
 

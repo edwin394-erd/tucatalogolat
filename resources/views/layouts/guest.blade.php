@@ -78,17 +78,17 @@
         </button> --}}
 
         <!-- Language switch -->
-        <div class="relative">
+        {{-- <div class="relative">
           <select id="language-select" class="hidden sm:block bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 transition">
             <option value="es" {{ app()->getLocale() == 'es' ? 'selected' : '' }}>🇪🇸 Español</option>
             <option value="en" {{ app()->getLocale() == 'en' ? 'selected' : '' }}>🇺🇸 English</option>
           </select>
-        </div>
+        </div> --}}
 
         <!-- CTA visible on md+ (keeps auth links for guests) -->
         <div class="hidden md:flex items-center gap-2">
           <a href="{{ route('login') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">{{ __('messages.login') }}</a>
-          <a href="https://www.instagram.com/tucatalogolat.lat/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 text-sm rounded-md border border-gray-300 bg-white text-gray-700 shadow-sm hover:bg-gray-100 transition">Solicitar Cuenta</a>
+          <a href="{{ route('register') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md border border-gray-300 bg-white text-gray-700 shadow-sm hover:bg-gray-100 transition">{{ __('messages.register') }}</a>
           {{-- <a href="{{ route('register') }}" wire:navigate class="px-3 py-1.5 text-sm rounded-md bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow hover:from-blue-600 hover:to-purple-700 transition">{{ __('messages.register') }}</a> --}}
         </div>
 
@@ -136,7 +136,7 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@26.5.1/build/js/intlTelInput.min.js"></script>
 <script>
-  const telInputs = document.querySelectorAll('#telephone, #phone, input[type="tel"]');
+  const telInputs = document.querySelectorAll('#phone');
   telInputs.forEach((input) => {
     if (!input || typeof window.intlTelInput !== 'function') return;
     window.intlTelInput(input, {

@@ -264,8 +264,9 @@
 					<div>
 						<h5 class="font-semibold">{{ __('messages.home_follow_us') }}</h5>
 						<div class="mt-2 flex space-x-3">
-							<a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('messages.home_twitter') }}</a>
-							<a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('messages.home_facebook') }}</a>
+							{{-- <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('messages.home_twitter') }}</a>
+							<a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors">{{ __('messages.home_facebook') }}</a> --}}
+							<a href="https://www.instagram.com/tucatalogolat.lat/" target="_blank" class="text-gray-600 hover:text-indigo-600 transition-colors">Instagram</a>
 						</div>
 					</div>
 				</div>

@@ -8,7 +8,7 @@
         'categories' => '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h6v6H4V6zm0 10h6v6H4v-6zm10-10h6v6h-6V6zm0 10h6v6h-6v-6z"/></svg>',
     ];
 @endphp
-<div {{ $attributes->merge(['class' => 'rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 p-5 flex flex-col h-full']) }}>
+<div {{ $attributes->merge(['class' => 'rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 p-4 flex flex-col h-full']) }}>
 
     <div class="flex items-center gap-3">
         @if($icon && isset($icons[$icon]))
@@ -17,7 +17,7 @@
         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ $title }}</p>
     </div>
 
-    <div class="mt-3 flex-grow">
+    <div class="mt-2 flex-grow">
         @if($value !== null)
             <p class="text-3xl font-black text-gray-900">{{ $value }}</p>
             @if($content)
@@ -30,7 +30,7 @@
     </div>
 
     @if($link)
-        <div class="mt-4 pt-3 border-t border-gray-100">
+        <div class="mt-3 border-t border-gray-100 pt-2">
             <a href="{{ $link }}" class="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition">
                 {{ __('messages.show_more') }}
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>

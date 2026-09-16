@@ -22,6 +22,7 @@ class Catalogo extends Model
         'tiktok',
         'horario',
         'theme_id',
+        'design_configured',
         'sucursal',
     ];
 
@@ -32,7 +33,8 @@ class Catalogo extends Model
             && filled($this->logo_url)
             && filled($this->banner_url)
             && filled($this->plantilla_id)
-            && filled($this->theme_id);
+            && filled($this->theme_id)
+            && $this->design_configured;
     }
 
     public function categories()

@@ -36,10 +36,12 @@
     }
 
     $selectedThemeKey = is_object($selectedTheme) ? ($selectedTheme->id ?? 'custom') : ($selectedTheme ?? 'none');
+    $needsBrandSetup = blank($catalogo->description) || blank($catalogo->logo_url) || blank($catalogo->banner_url);
+    $needsDesignSetup = ! $catalogo->design_configured;
 @endphp
 
 <div x-data="{ 
-    activeTab: 'general', 
+    activeTab: @js($needsBrandSetup ? 'general' : ($needsDesignSetup ? 'design' : 'general')), 
     selectedTemplate: @entangle('plantilla_id'), 
     selectedTheme: @entangle('tema_id'), 
     openCustom: false 
@@ -54,6 +56,29 @@
             <p class="text-sm text-gray-500">Personaliza la información, apariencia y redes sociales de tu catálogo.</p>
         </div>
     </div>
+
+    @if($needsBrandSetup)
+        <div class="mb-6 flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900 sm:flex-row sm:items-center sm:justify-between" role="alert">
+            <div class="flex items-start gap-3">
+                <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m0 3.75h.008M10.29 3.86l-7.1 12.28A1.5 1.5 0 004.49 18.4h15.02a1.5 1.5 0 001.3-2.26l-7.1-12.28a1.5 1.5 0 00-2.6 0z"/></svg>
+                <div>
+                    <p class="text-sm font-bold">Primero completa la información de tu marca</p>
+                    <p class="mt-1 text-xs leading-5">Agrega descripción, logo y banner. Después podrás elegir la plantilla y los colores.</p>
+                </div>
+            </div>
+        </div>
+    @elseif($needsDesignSetup)
+        <div class="mb-6 flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900 sm:flex-row sm:items-center sm:justify-between" role="alert">
+            <div class="flex items-start gap-3">
+                <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m0 3.75h.008M10.29 3.86l-7.1 12.28A1.5 1.5 0 004.49 18.4h15.02a1.5 1.5 0 001.3-2.26l-7.1-12.28a1.5 1.5 0 00-2.6 0z"/></svg>
+                <div>
+                    <p class="text-sm font-bold">Completa primero el diseño de tu catálogo</p>
+                    <p class="mt-1 text-xs leading-5">Selecciona una plantilla y una paleta de colores. Son pasos obligatorios para publicar tu catálogo.</p>
+                </div>
+            </div>
+            <button type="button" @click="activeTab = 'design'" class="shrink-0 rounded-lg bg-amber-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-amber-700">Ir a Diseño y Estilo</button>
+        </div>
+    @endif
 
     <!-- Navegación por Pestañas -->
     <div class="flex border-b border-gray-200 mb-8 overflow-x-auto no-scrollbar">
@@ -76,6 +101,9 @@
             class="py-3 px-5 border-b-2 font-medium text-sm transition-all flex items-center gap-2 whitespace-nowrap">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
             Diseño y Estilo
+            @if($needsDesignSetup && ! $needsBrandSetup)
+                <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">Obligatorio</span>
+            @endif
         </button>
     </div>
 
@@ -118,6 +146,10 @@
                         @endif
                     </div>
                 </div>
+            </div>
+            <div class="-mt-6 mb-5 grid grid-cols-1 gap-1 sm:grid-cols-2">
+                <x-input-error for="banner" />
+                <x-input-error for="logo" />
             </div>
 
             <!-- Campos de Información General -->
@@ -205,6 +237,7 @@
             <!-- Estructura de Plantillas -->
             <div class="mb-10">
                 <h3 class="text-base font-semibold text-gray-800 mb-3">{{ __('messages.select_catalog_structure') }}</h3>
+                <x-input-error for="plantilla_id" class="mb-3" />
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach ($plantillas as $template)
                         <div wire:key="template-{{ $template->id }}-{{ $selectedTemplate ?? 'none' }}"
@@ -230,6 +263,7 @@
             <div class="mb-10">
                 <h3 class="text-base font-semibold text-gray-800 mb-1">{{ __('messages.select_theme') }}</h3>
                 <p class="text-xs text-gray-500 mb-4">Elige una paleta cromática optimizada para tu catálogo.</p>
+                <x-input-error for="tema_id" class="mb-3" />
 
                 <div class="flex flex-wrap gap-4">
                     @foreach ($themes as $theme)

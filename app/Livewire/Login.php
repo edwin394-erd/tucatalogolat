@@ -42,8 +42,12 @@ class Login extends Component
 
         // Implement login logic here
         if (auth()->attempt(['email' => $this->email, 'password' => $this->password])) {
-            // Authentication passed
-            return $this->redirect(route('dashboard'));
+            $catalogo = auth()->user()->catalogo;
+            $destination = $catalogo && ! $catalogo->isConfigurationComplete()
+                ? route('configuracion')
+                : route('dashboard');
+
+            return $this->redirect($destination);
         }
 
         // Authentication failed

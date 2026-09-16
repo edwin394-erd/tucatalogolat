@@ -77,7 +77,7 @@
                                         @enderror
                                 </div>
                                 <div class="flex flex-col gap-2">
-    <label for="area-code" class="block text-sm font-medium text-gray-900">Código de Área y Teléfono</label>
+    <label for="area-code" class="block text-sm font-medium text-gray-900">Teléfono</label>
     
     <div class="flex gap-2">
         
@@ -189,13 +189,16 @@
 
 
 <br>
-                                    <div class="flex items-start">
+                                                                        <div class="flex items-start">
                                             <div class="flex items-center h-5">
-                                                <input id="terms" aria-describedby="terms" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-100 inset-shadow-sm focus:ring-3 focus:ring-primary-300" required="">
+                                                                                                <input id="terms" wire:model="terms_accepted" aria-describedby="terms-description" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-100 inset-shadow-sm focus:ring-3 focus:ring-primary-300">
                                             </div>
                                             
                                             <div class="ml-3 text-sm">
-                                                <label for="terms" class="font-light text-gray-500">Acepto los <a class="font-medium text-primary-600 hover:underline" href="#">Términos y Condiciones</a></label>
+                                                                                                <label for="terms" id="terms-description" class="font-light text-gray-500">Acepto los <a class="font-medium text-primary-600 hover:underline" href="{{ route('terms') }}" target="_blank" rel="noopener">Términos y Condiciones</a></label>
+                                                                                                @error('terms_accepted')
+                                                                                                        <span class="mt-1 block text-red-500 text-xs">{{ $message }}</span>
+                                                                                                @enderror
                                             </div>
                                     </div>
                                     <br>

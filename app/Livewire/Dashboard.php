@@ -36,11 +36,26 @@ class Dashboard extends Component
     public $n_visitas_ultimos_7_dias = 0;
     public $pedidos_recientes = [];
     public $visitas_recientes = [];
+    public $plan_name;
+    public $plan_expires_at;
+    public $plan_days_remaining;
+    public $plan_is_expired = false;
 
 
 
     public function render()
     {
+        $subscription = auth()->user()->subscriptions()->with('plan')->latest()->first();
+        $this->plan_name = $subscription?->plan?->name;
+        $this->plan_expires_at = $subscription?->expires_at;
+        $secondsRemaining = $subscription?->expires_at
+            ? now()->diffInSeconds($subscription->expires_at, false)
+            : null;
+        $this->plan_is_expired = $secondsRemaining !== null && $secondsRemaining <= 0;
+        $this->plan_days_remaining = $secondsRemaining === null
+            ? null
+            : max(0, intdiv(max(0, (int) $secondsRemaining), 86400));
+
         if (auth()->user()->catalogo) {
             $catalogo = Catalogo::find(auth()->user()->catalogo->id);
             $this->n_productos = $catalogo->products()->count();
@@ -54,7 +69,7 @@ class Dashboard extends Component
             $this->n_pedidos = (clone $orders)->count();
             $this->n_pedidos_pendientes = (clone $orders)->where('status', 'pending')->count();
             $this->n_pedidos_ultimos_7_dias = (clone $orders)->where('created_at', '>=', now()->subDays(7))->count();
-            $this->total_pedidos = (float) (clone $orders)->sum('total');
+            $this->total_pedidos = (float) (clone $orders)->where('status', 'completed')->sum('total');
             $this->n_visitas = (clone $visits)->count();
             $this->n_visitas_ultimos_7_dias = (clone $visits)->where('visited_at', '>=', now()->subDays(7))->count();
             $this->pedidos_recientes = (clone $orders)->latest()->limit(5)->get();

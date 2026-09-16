@@ -176,6 +176,13 @@ return [
     'images_max' => 'Cada imagen no debe exceder los 2MB de tamaño.',
     'images_limit' => 'Un producto puede tener máximo 5 imágenes.',
     'storage_usage' => 'Espacio usado',
+    'all_orders' => 'Todos los pedidos',
+    'pending_orders' => 'Pendientes',
+    'completed_orders' => 'Completados',
+    'pending' => 'Pendiente',
+    'completed' => 'Completado',
+    'mark_completed' => 'Marcar como completado',
+    'order_completed' => 'Pedido marcado como completado.',
     //Categorias
     'category_name_required' => 'El nombre de la categoría es obligatorio.',
     'category_name_string' => 'El nombre de la categoría debe ser una cadena de texto.',

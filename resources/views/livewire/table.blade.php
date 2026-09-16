@@ -20,6 +20,12 @@
                 <a href="{{ route('create', ['model' => $model]) }}" wire:navigate class="bg-indigo-600 shadow shadow-xl focus:ring-blue-300 text-white rounded-lg px-4 py-2 w-full sm:w-auto text-center">
                     {{ __('messages.add') }}
                 </a>
+            @else
+                <select wire:model.live="statusFilter" class="w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm text-gray-700 focus:border-indigo-500 focus:ring-indigo-500 sm:w-auto">
+                    <option value="">{{ __('messages.all_orders') }}</option>
+                    <option value="pending">{{ __('messages.pending_orders') }}</option>
+                    <option value="completed">{{ __('messages.completed_orders') }}</option>
+                </select>
             @endif
         </div>
     </div>
@@ -61,8 +67,10 @@
                     return '<div class="rounded-lg px-2 py-1 inline-block text-center text-sm ' . $cls . '">' . e($text) . '</div>';
 
                 case $column === 'status':
-                    $cls = $item->status == 'active' ? 'bg-green-100 text-green-700' : ($item->status == 'expired' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700');
-                    return '<div class="rounded-lg px-2 py-1 inline-block text-center text-sm ' . $cls . '">' . e(ucfirst($item->status)) . '</div>';
+                    $isCompleted = $item->status === 'completed';
+                    $cls = $isCompleted ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700';
+                    $label = $isCompleted ? __('messages.completed') : __('messages.pending');
+                    return '<div class="rounded-lg px-2 py-1 inline-block text-center text-sm ' . $cls . '">' . e($label) . '</div>';
 
                 case $column === 'catalogo_name':
                     $url = $item->catalogo ? route('catalogo', ['name' => $item->catalogo->name_handle]) : '#';
@@ -127,6 +135,14 @@
                             </svg>
 
                     </a>
+                    @endif
+
+                    @if ($model === 'Order' && $item->status !== 'completed')
+                    <button wire:click="markCompleted({{ $item->id }})" class="bg-white border border-gray-300 hover:bg-green-50 focus:ring-green-300 text-green-700 shadow-sm rounded-lg px-4 py-2 w-full sm:w-auto" title="{{ __('messages.mark_completed') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />
+                        </svg>
+                    </button>
                     @endif
 
                     <button wire:confirm="¿Estás seguro de que deseas eliminar este registro?" wire:click="delete({{ $item->id }})" class="bg-white border border-gray-300 hover:bg-gray-100 focus:ring-red-300 text-red-700 shadow-sm rounded-lg px-4 py-2 w-full sm:w-auto">
@@ -201,6 +217,14 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                             </svg>
                         </a>
+                    @endif
+
+                    @if ($model === 'Order' && $item->status !== 'completed')
+                        <button wire:click="markCompleted({{ $item->id }})" aria-label="{{ __('messages.mark_completed') }}" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-green-700 hover:bg-green-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6" />
+                            </svg>
+                        </button>
                     @endif
 
                     <button wire:confirm="¿Estás seguro de que deseas eliminar este registro?" wire:click="delete({{ $item->id }})" aria-label="Eliminar" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-red-700 hover:bg-gray-100">

@@ -52,6 +52,8 @@ class Configuracion extends Component
         'url' => 'El formato del enlace no es válido.',
         'name.required' => 'El nombre del catálogo es obligatorio.',
         'name.string' => 'El nombre del catálogo debe ser una cadena de texto.',
+        'plantilla_id.required' => 'Debes seleccionar una plantilla para tu catálogo.',
+        'tema_id.required' => 'Debes seleccionar una paleta de colores para tu catálogo.',
         ];
 
     
@@ -63,7 +65,7 @@ class Configuracion extends Component
         $this->description = $this->catalogo->description;
         $this->banner = $this->catalogo->banner;
         $this->logo = $this->catalogo->logo;
-        $this->plantilla_id = $this->catalogo->plantilla_id;
+        $this->plantilla_id = $this->catalogo->design_configured ? $this->catalogo->plantilla_id : null;
         $this->telefono_contacto = $this->catalogo->telefono_contacto;
         $this->horario = $this->catalogo->horario;
         $this->ubicacion = $this->catalogo->ubicacion;
@@ -73,7 +75,7 @@ class Configuracion extends Component
         $this->twitter = $this->catalogo->twitter;
         $this->tiktok = $this->catalogo->tiktok;
         $this->custom_theme_catalogo =  \App\Models\Theme::where('catalogo_id', $this->catalogo->id)->first() ?? null;
-        $this->tema_id = $this->catalogo->theme_id;
+        $this->tema_id = $this->catalogo->design_configured ? $this->catalogo->theme_id : null;
      
         if($this->custom_theme_catalogo && $this->custom_theme_catalogo->id == $this->tema_id) {
             $this->tema_id = "custom";
@@ -100,7 +102,7 @@ class Configuracion extends Component
         }
 
         if ($temaId === null || $temaId === '') {
-            return 'custom';
+            return null;
         }
 
         return is_numeric($temaId) ? (int) $temaId : $temaId;
@@ -156,14 +158,26 @@ class Configuracion extends Component
 
     public function saveChanges()
 {
-    $themeIdToSave = $this->tema_id;
+    $this->resetErrorBag();
 
-    if($this->tema_id === 'custom') {
-        $this->saveCustomColors();
-        $this->custom_theme_catalogo = \App\Models\Theme::where('catalogo_id', $this->catalogo->id)->first();
-        $this->tema_id = 'custom';
-        $themeIdToSave = $this->custom_theme_catalogo->id;
-    }
+    $themeIdToSave = $this->tema_id;
+    $designSelectionStarted = filled($this->plantilla_id) || filled($this->tema_id);
+
+        if (blank($this->description)) {
+            $this->addError('description', 'Agrega una descripción para tu marca antes de continuar.');
+        }
+
+        if (blank($this->catalogo->logo_url)) {
+            $this->addError('logo', 'Sube un logo para tu marca antes de continuar.');
+        }
+
+        if (blank($this->catalogo->banner_url)) {
+            $this->addError('banner', 'Sube un banner para tu marca antes de continuar.');
+        }
+
+        if ($this->getErrorBag()->isNotEmpty()) {
+            return;
+        }
 
     $nameHandle = \App\Models\Catalogo::generateHandle($this->name);
 
@@ -175,32 +189,52 @@ class Configuracion extends Component
                 $fail('El nombre del catálogo sin espacios ya existe en otro catálogo.');
             }
         }],
-        'description' => 'nullable|string|max:1000',
-        'plantilla_id' => 'required|exists:plantillas,id',
+        'description' => 'required|string|max:1000',
+        'plantilla_id' => $designSelectionStarted ? 'required|exists:plantillas,id' : 'nullable|exists:plantillas,id',
         'telefono_contacto' => 'nullable|string|max:20',
-        'tema_id' => ['nullable'],
+        'tema_id' => [$designSelectionStarted ? 'required' : 'nullable', function ($attribute, $value, $fail) {
+            if ($value === null || $value === '') {
+                return;
+            }
+
+            if ($value !== 'custom' && ! \App\Models\Theme::whereNull('catalogo_id')->whereKey($value)->exists()) {
+                $fail('La paleta de colores seleccionada no es válida.');
+            }
+        }],
         'facebook' => ['nullable', 'url'],
         'instagram' => ['nullable', 'url'],
         'twitter' => ['nullable', 'url'],
         'tiktok' => ['nullable', 'url'],
     ]);
 
+    if ($this->tema_id === 'custom') {
+        $this->saveCustomColors();
+        $this->custom_theme_catalogo = \App\Models\Theme::where('catalogo_id', $this->catalogo->id)->first();
+        $themeIdToSave = $this->custom_theme_catalogo->id;
+    }
+
     // Asignar valores al modelo antes de guardar
-    $this->catalogo->update([
+    $catalogData = [
         'name' => $this->name,
         'name_handle' => $nameHandle,
         'description' => $this->description,
         'horario' => $this->horario,
         'ubicacion' => $this->ubicacion,
-        'plantilla_id' => $this->plantilla_id,
         'telefono_contacto' => $this->telefono_contacto,
-        'theme_id' => $themeIdToSave,
         'ubicacion_mapa' => $this->ubicacion_mapa,
         'instagram' => $this->instagram,
         'facebook' => $this->facebook,
         'twitter' => $this->twitter,
         'tiktok' => $this->tiktok,
-    ]);
+    ];
+
+    if ($designSelectionStarted) {
+        $catalogData['plantilla_id'] = $this->plantilla_id;
+        $catalogData['theme_id'] = $themeIdToSave;
+        $catalogData['design_configured'] = true;
+    }
+
+    $this->catalogo->update($catalogData);
 
    
     session()->flash('message', __('messages.settings_updated'));

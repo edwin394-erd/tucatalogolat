@@ -22,10 +22,11 @@ class Table extends Component
     public $route_name;
     public $searching_exceptions = ['foto'];
     public $titulo = '';
+    public $statusFilter = '';
 
 
 
-    public function mount($model, $columns, $column_names = null, $filter_field = null, $filter_value = null, $table_type = null, $searching_exceptions = [], $titulo = '')
+    public function mount($model, $columns, $column_names = null, $filter_field = null, $filter_value = null, $table_type = null, $searching_exceptions = [], $titulo = '', $status_filter = '')
     {
         // Asigna las propiedades del componente
         $this->model = $model;
@@ -35,6 +36,7 @@ class Table extends Component
         $this->filter_field = $filter_field;
         $this->filter_value = $filter_value;
         $this->table_type = $table_type;
+        $this->statusFilter = $status_filter;
 
         $this->route_name = $model === 'Product' ? 'products' : ($model === 'Category' ? 'categories' : ($model === 'Descuento' ? 'descuentos' : ($model === 'Subscription' ? 'subscripciones' : ($model === 'Plan' ? 'planes' : ($model === 'Order' ? 'orders' : 'items')))));
 
@@ -46,6 +48,11 @@ class Table extends Component
      * Resetea la página de la paginación cuando se actualiza la búsqueda.
      */
     public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatusFilter()
     {
         $this->resetPage();
     }
@@ -67,6 +74,23 @@ class Table extends Component
             $this->sortDirection = 'asc';
         }
         $this->sortBy = $column;
+    }
+
+    public function markCompleted($id)
+    {
+        if ($this->model !== 'Order') {
+            return;
+        }
+
+        $order = \App\Models\Order::query()
+            ->whereKey($id)
+            ->where('catalogo_id', auth()->user()->catalogo?->id)
+            ->first();
+
+        if ($order) {
+            $order->update(['status' => 'completed']);
+            session()->flash('message', __('messages.order_completed'));
+        }
     }
 
     /**
@@ -102,6 +126,10 @@ class Table extends Component
         // Aplica el filtro si está configurado
         if ($this->filter_field && $this->filter_value) {
             $query->where($this->filter_field, $this->filter_value);
+        }
+
+        if ($this->model === 'Order' && $this->statusFilter !== '') {
+            $query->where('status', $this->statusFilter);
         }
 
         // Aplica la búsqueda si hay un término

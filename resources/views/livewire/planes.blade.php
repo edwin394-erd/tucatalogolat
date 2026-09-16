@@ -34,9 +34,15 @@
                 @php
                     $whatsappMessage = "Solicitud de suscripción al plan {$plan->name}:\n\nUsuario: " . auth()->user()->name . " (" . auth()->user()->email . ")\nPlan: {$plan->name}\nPrecio: {$plan->price}\nDescripción: {$plan->description}";
                 @endphp
-                <a href="https://wa.me/584246054544?text={{ rawurlencode($whatsappMessage) }}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex w-full justify-center bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">
-                    Solicitar Suscripción
-                </a>
+                @if($currentSubscription?->plan_id === $plan->id)
+                    <span class="mt-4 inline-flex w-full cursor-not-allowed justify-center rounded-lg bg-gray-200 px-4 py-2 text-gray-500" aria-label="Ya tienes este plan">
+                        Plan actual
+                    </span>
+                @else
+                    <a href="https://wa.me/584246054544?text={{ rawurlencode($whatsappMessage) }}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex w-full justify-center bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">
+                        Solicitar Suscripción
+                    </a>
+                @endif
               
             </div>
         @endforeach
