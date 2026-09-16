@@ -156,7 +156,7 @@
             {{ $catalogo->products->links() }}
         </div>
     </div>
-    <footer class="flex items-center justify-center gap-2 px-4 py-2 text-center text-xs" style="background-color: {{ $catalogo->theme->bg_color ?? '#ffffff' }}; color: var(--text-secondary, #666);">
+    <footer class="flex items-center justify-center gap-2 px-4 py-2 text-center text-xs" style="background-color: {{ $catalogo->theme->bg_color ?? '#ffffff' }}; color: {{ isDarkColor($bgColor) ? '#ffffff' : '#000000' }};">
         <span class="leading-none">Powered by</span>
         <a href="{{ url()->to('https://tucatalogolat.lat') }}" class="inline-flex items-center gap-1 font-bold leading-none hover:underline">
             <span>tucatalogolat.lat</span>
