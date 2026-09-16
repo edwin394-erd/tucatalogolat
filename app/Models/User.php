@@ -6,12 +6,41 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    protected static function booted(): void
+    {
+        static::deleting(function (self $user): void {
+            DB::transaction(function () use ($user): void {
+                $catalogo = $user->catalogo()->with('products', 'products.fotos')->first();
+
+                $user->subscriptions()->delete();
+
+                if (! $catalogo) {
+                    return;
+                }
+
+                foreach ($catalogo->products as $product) {
+                    $product->delete();
+                }
+
+                $catalogo->themes()->delete();
+                Storage::disk('public')->delete(array_filter([
+                    $catalogo->logo_url,
+                    $catalogo->banner_url,
+                ]));
+
+                $catalogo->delete();
+            });
+        });
+    }
 
     /**
      * The attributes that are mass assignable.

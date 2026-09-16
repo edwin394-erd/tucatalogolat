@@ -61,6 +61,11 @@ class Catalogo extends Model
         return $this->belongsTo(Theme::class);
     }
 
+    public function themes()
+    {
+        return $this->hasMany(Theme::class);
+    }
+
     public function visits()
     {
         return $this->hasMany(CatalogVisit::class);
