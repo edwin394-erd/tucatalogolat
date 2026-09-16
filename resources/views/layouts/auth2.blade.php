@@ -27,7 +27,7 @@
 </head>
 
 
-<body class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm h-screen ">
+<body class="min-h-screen bg-gradient-to-br from-yellow-50 to-indigo-100 bg-fixed inset-shadow-sm">
 
   <x-alert alert_type="success" />
 
@@ -49,11 +49,11 @@
 
 <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
    <div class="h-full px-3 py-4 overflow-y-auto bg-white shadow shadow-xl tema1:bg-red-500 ">
-      <div class="flex items-center pl-2.5 mb-5 rounded-xl w-fit px-2">
+     
        
 
-         <x-logo/>
-      </div>
+         <x-logo />
+         <br>
       <ul class="space-y-2 font-medium">
          
          @if(auth()->user()->subscriptions->last())
@@ -116,6 +116,15 @@
             <a href="{{ route('categories') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <x-svg-categories/>
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.categories') }}</span>
+            </a>
+         </li>
+
+         <li class="w-fit h-fit">
+            <a href="{{ route('orders') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+               <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5.25h6m-7.5 0H6.75A2.25 2.25 0 0 0 4.5 7.5v10.75a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V7.5a2.25 2.25 0 0 0-2.25-2.25H16.5M9 5.25a3 3 0 0 1 6 0M8 10.5h8M8 14h8M8 17.5h5" />
+               </svg>
+               <span class="flex-1 ms-3 whitespace-nowrap">Pedidos</span>
             </a>
          </li>
 

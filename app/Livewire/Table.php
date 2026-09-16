@@ -35,7 +35,7 @@ class Table extends Component
         $this->filter_value = $filter_value;
         $this->table_type = $table_type;
 
-        $this->route_name = $model === 'Product' ? 'products' : ($model === 'Category' ? 'categories' : ($model === 'Descuento' ? 'descuentos' : ($model === 'Subscription' ? 'subscripciones' : ($model === 'Plan' ? 'planes' : 'items'))));
+        $this->route_name = $model === 'Product' ? 'products' : ($model === 'Category' ? 'categories' : ($model === 'Descuento' ? 'descuentos' : ($model === 'Subscription' ? 'subscripciones' : ($model === 'Plan' ? 'planes' : ($model === 'Order' ? 'orders' : 'items')))));
 
         // $this->route_name = $model === 'Product' ? 'products' : ($model === 'Category' ? 'categories' : ($model === 'Descuento' ? 'descuentos' : 'items'));
         $this->searching_exceptions = $searching_exceptions;

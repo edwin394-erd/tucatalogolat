@@ -59,6 +59,11 @@ class Catalogo extends Model
         return $this->belongsTo(Theme::class);
     }
 
+    public function visits()
+    {
+        return $this->hasMany(CatalogVisit::class);
+    }
+
     public static function generateHandle(string $name): string
     {
         $handle = Str::slug($name, '');

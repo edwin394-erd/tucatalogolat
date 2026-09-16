@@ -18,12 +18,15 @@ use App\Livewire\Planes;
 use App\Livewire\Subscripciones;
 use App\Livewire\EditItem;
 use App\Livewire\CreateItem;
+use App\Livewire\Orders;
 use App\Http\Controllers\LanguageController;
 use Illuminate\Http\Request;
 use App\Models\Catalogo as CatalogoModel;
 use App\Models\Cart as CartModel;
 use App\Models\CartItem as CartItemModel;
 use App\Models\Product as ProductModel;
+use App\Models\Order as OrderModel;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 
 Route::get('/', Home::class)->middleware(['guest'])->name('home');
@@ -32,6 +35,7 @@ Route::get('/Register', Register::class)->middleware(['guest'])->name('register'
 
 Route::get('/Dashboard', Dashboard::class)->middleware(['auth'])->name('dashboard');
 Route::get('/Products', Products::class)->middleware(['auth'])->name('products');
+Route::get('/Orders', Orders::class)->middleware(['auth'])->name('orders');
 Route::get('/Categories', Categories::class)->middleware(['auth'])->name('categories');
 Route::get('/Descuentos', Descuentos::class)->middleware(['auth'])->name('descuentos');
 Route::get('/Configuracion', Configuracion::class)->middleware(['auth'])->name('configuracion');
@@ -121,6 +125,12 @@ Route::post('/{name}/checkout', function (Request $request, $name) {
         return response()->json(['message' => 'El carrito está vacío.'], 400);
     }
 
+	$validated = $request->validate([
+		'customer_name' => ['required', 'string', 'max:120'],
+		'customer_phone' => ['required', 'string', 'max:40'],
+		'customer_notes' => ['nullable', 'string', 'max:1000'],
+	]);
+
     $message = "Pedido desde tucatalogo.lat\n\nHola me interesan estos productos:\n ";
 
     foreach ($cart->items as $item) {
@@ -137,12 +147,59 @@ Route::post('/{name}/checkout', function (Request $request, $name) {
         $message .= "- {$item->product->name}{$variantText} x{$item->quantity} = $" . ($price * $item->quantity) . "\n";
     }
 
+	$message .= "\nCliente: {$validated['customer_name']}\nTeléfono: {$validated['customer_phone']}";
+	if (! empty($validated['customer_notes'])) {
+		$message .= "\nNotas: {$validated['customer_notes']}";
+	}
+
+	$whatsappPhone = preg_replace('/\D+/', '', (string) $catalogo->telefono_contacto);
+	if (str_starts_with($whatsappPhone, '00')) {
+		$whatsappPhone = substr($whatsappPhone, 2);
+	} elseif (str_starts_with($whatsappPhone, '0')) {
+		$whatsappPhone = '58' . substr($whatsappPhone, 1);
+	}
+	if (strlen($whatsappPhone) < 10) {
+		return response()->json(['message' => 'El catálogo no tiene un número de WhatsApp válido configurado.'], 422);
+	}
+
     $encodedMessage = urlencode($message);
-    $whatsappUrl = "https://wa.me/584246054544?text={$encodedMessage}";
+	$order = DB::transaction(function () use ($cart, $catalogo, $validated) {
+		$total = $cart->items->sum(fn ($item) => $item->quantity * $item->price);
+		$order = OrderModel::create([
+			'catalogo_id' => $catalogo->id,
+			'user_id' => auth()->id(),
+			'session_id' => session()->getId(),
+			'customer_name' => $validated['customer_name'],
+			'customer_phone' => $validated['customer_phone'],
+			'customer_notes' => $validated['customer_notes'] ?? null,
+			'total' => $total,
+			'status' => 'pending',
+		]);
+
+		foreach ($cart->items as $item) {
+			$variantDescription = $item->variant
+				? trim("{$item->variant->size} {$item->variant->color}")
+				: null;
+
+			$order->items()->create([
+				'product_id' => $item->product_id,
+				'variant_id' => $item->variant_id,
+				'product_name' => $item->product?->name ?? 'Producto eliminado',
+				'variant_description' => $variantDescription,
+				'quantity' => $item->quantity,
+				'unit_price' => $item->price,
+				'total' => $item->quantity * $item->price,
+			]);
+		}
+
+		return $order;
+	});
+
+	$whatsappUrl = "https://wa.me/{$whatsappPhone}?text={$encodedMessage}";
 
     $cart->items()->delete();
 
-    return response()->json(['url' => $whatsappUrl]);
+	return response()->json(['url' => $whatsappUrl, 'order_id' => $order->id]);
 })->name('catalogo.checkout');
 
 Route::get('/{name}', Catalogo::class)->name('catalogo');

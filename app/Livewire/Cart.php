@@ -91,7 +91,13 @@ class Cart extends Component
         });
 
         $encodedMessage = urlencode($message);
-        $whatsappUrl = "https://wa.me/".$this->catalogo->telefono_contacto."?text={$encodedMessage}";
+        $whatsappPhone = preg_replace('/\D+/', '', (string) $this->catalogo->telefono_contacto);
+        if (str_starts_with($whatsappPhone, '00')) {
+            $whatsappPhone = substr($whatsappPhone, 2);
+        } elseif (str_starts_with($whatsappPhone, '0')) {
+            $whatsappPhone = '58' . substr($whatsappPhone, 1);
+        }
+        $whatsappUrl = "https://wa.me/{$whatsappPhone}?text={$encodedMessage}";
 
         // Clear cart after sending
         $this->cart->items()->delete();

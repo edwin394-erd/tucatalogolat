@@ -6,6 +6,8 @@ use Livewire\Component;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Catalogo;
+use App\Models\Order;
+use App\Models\CatalogVisit;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class Dashboard extends Component
@@ -26,6 +28,14 @@ class Dashboard extends Component
     public $n_suscripciones_ultimos_7_dias;
     public $n_suscripciones_activas_ultimos_7_dias;
     public $n_suscripciones_expiradas_ultimos_7_dias; 
+    public $n_pedidos = 0;
+    public $n_pedidos_pendientes = 0;
+    public $n_pedidos_ultimos_7_dias = 0;
+    public $total_pedidos = 0;
+    public $n_visitas = 0;
+    public $n_visitas_ultimos_7_dias = 0;
+    public $pedidos_recientes = [];
+    public $visitas_recientes = [];
 
 
 
@@ -38,6 +48,17 @@ class Dashboard extends Component
             $this->n_productos_ultimos_7_dias = $catalogo->products()->where('created_at', '>=', now()->subDays(7))->count();
             $this->n_categorias_ultimos_7_dias = $catalogo->categories()->where('created_at', '>=', now()->subDays(7))->count();
             $this->catalogLink = route('catalogo', $catalogo->name_handle);
+
+            $orders = Order::where('catalogo_id', $catalogo->id);
+            $visits = CatalogVisit::where('catalogo_id', $catalogo->id);
+            $this->n_pedidos = (clone $orders)->count();
+            $this->n_pedidos_pendientes = (clone $orders)->where('status', 'pending')->count();
+            $this->n_pedidos_ultimos_7_dias = (clone $orders)->where('created_at', '>=', now()->subDays(7))->count();
+            $this->total_pedidos = (float) (clone $orders)->sum('total');
+            $this->n_visitas = (clone $visits)->count();
+            $this->n_visitas_ultimos_7_dias = (clone $visits)->where('visited_at', '>=', now()->subDays(7))->count();
+            $this->pedidos_recientes = (clone $orders)->latest()->limit(5)->get();
+            $this->visitas_recientes = (clone $visits)->latest('visited_at')->limit(5)->get();
         }
 
         $this->n_usuarios = \App\Models\User::count();

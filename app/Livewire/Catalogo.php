@@ -7,6 +7,8 @@ use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\CatalogVisit;
+use App\Models\Catalogo as CatalogoModel;
 
 class Catalogo extends Component
 {
@@ -41,12 +43,36 @@ class Catalogo extends Component
             }
 
             $this->name = $resolvedHandle;
+            $this->registerVisit($catalogo);
             $this->selectedCategory = $this->categoryId;
             return;
         }
 
         $this->name = \App\Models\Catalogo::generateHandle($name);
+        $resolvedCatalogo = \App\Models\Catalogo::resolveByName($this->name);
+        if ($resolvedCatalogo) {
+            $this->registerVisit($resolvedCatalogo);
+        }
         $this->selectedCategory = $this->categoryId;
+    }
+
+    private function registerVisit(CatalogoModel $catalogo): void
+    {
+        $sessionId = session()->getId();
+        $alreadyVisited = CatalogVisit::where('catalogo_id', $catalogo->id)
+            ->where('session_id', $sessionId)
+            ->where('visited_at', '>=', now()->startOfDay())
+            ->exists();
+
+        if (! $alreadyVisited) {
+            CatalogVisit::create([
+                'catalogo_id' => $catalogo->id,
+                'session_id' => $sessionId,
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'visited_at' => now(),
+            ]);
+        }
     }
 
     public function updatingSearch()

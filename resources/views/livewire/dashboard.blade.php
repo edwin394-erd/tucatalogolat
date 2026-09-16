@@ -1,103 +1,224 @@
-<div class="px-5 my-5">
+@php
+    $greetingName = auth()->user()->name ?? null;
+    $role = auth()->user()->role;
+@endphp
 
-<div class="px-5 my-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @if(auth()->user()->role == 'admin')
+<div class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-10">
 
-        <x-dashboard-card 
-            title="{{ __('messages.users') }}" 
-            content="Total de usuarios: {{ $n_usuarios }}"
-            :link="route('usuarios')" />
-        <x-dashboard-card
-          title="{{ __('messages.subscriptions') }}" 
-          content="Total de suscripciones activas: {{ $n_suscripciones_activas }}"
-          :link="route('subscripciones')" />
-        
-        {{-- <x-dashboard-card
-          title="{{ __('messages.expired_subscriptions') }}"
-          content="Total de suscripciones expiradas: {{ $n_suscripciones_expiradas }}" />
-        
-        <x-dashboard-card
-          title="{{ __('messages.pending_subscriptions') }}"
-          content="Total de suscripciones pendientes: {{ $n_suscripciones_pendientes }}" /> --}}
-        
-        <x-dashboard-card
-          title="{{ __('messages.plans') }}"
-          content="Total de planes: {{ $n_planes }}"
-          :link="route('planes')" />
-{{--         
-        <x-dashboard-card
-          title="Suscripciones activas en los últimos 7 días" 
-          content="Total de suscripciones activas en los últimos 7 días: {{ $n_suscripciones_activas_ultimos_7_dias }}" />
-
-        <x-dashboard-card
-          title="Suscripciones expiradas en los últimos 7 días"
-          content="Total de suscripciones expiradas en los últimos 7 días: {{ $n_suscripciones_expiradas_ultimos_7_dias }}" /> --}}
-      
-      @elseif(auth()->user()->role == 'user')
-        <x-dashboard-card 
-          title="{{ __('messages.products') }}" 
-          content="{{ __('messages.total_products') }}: {{ $n_productos }}"
-          :link="route('products')"
-          icon="products" />
-
-        <x-dashboard-card 
-          title="{{ __('messages.categories') }}"
-          content="{{ __('messages.total_categories') }}: {{ $n_categorias }}"
-          :link="route('categories')"
-          icon="categories" />
-      @endif
+    {{-- ===================== SALUDO ===================== --}}
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">
+          Hola, {{ $greetingName }}. Bienvenido a tu panel de control.
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">Este es el resumen de tu actividad.</p>
     </div>
 
-    @if($catalogLink)
-        <div class="mt-6 px-5">
-            <div class="shadow-xl rounded-3xl bg-white p-6">
-                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                    <div class="max-w-2xl">
-                        <div class="flex items-center gap-3">
-                            <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
-                                <svg width="18" height="18" viewBox="0 0 16 16" preserveAspectRatio="xMidYMid meet" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M7.05025 1.53553C8.03344 0.552348 9.36692 0 10.7574 0C13.6528 0 16 2.34721 16 5.24264C16 6.63308 15.4477 7.96656 14.4645 8.94975L12.4142 11L11 9.58579L13.0503 7.53553C13.6584 6.92742 14 6.10264 14 5.24264C14 3.45178 12.5482 2 10.7574 2C9.89736 2 9.07258 2.34163 8.46447 2.94975L6.41421 5L5 3.58579L7.05025 1.53553Z" />
-                                    <path d="M7.53553 13.0503L9.58579 11L11 12.4142L8.94975 14.4645C7.96656 15.4477 6.63308 16 5.24264 16C2.34721 16 0 13.6528 0 10.7574C0 9.36693 0.552347 8.03344 1.53553 7.05025L3.58579 5L5 6.41421L2.94975 8.46447C2.34163 9.07258 2 9.89736 2 10.7574C2 12.5482 3.45178 14 5.24264 14C6.10264 14 6.92742 13.6584 7.53553 13.0503Z" />
-                                    <path d="M5.70711 11.7071L11.7071 5.70711L10.2929 4.29289L4.29289 10.2929L5.70711 11.7071Z" />
-                                </svg>
-                            </span>
-                            <div>
-                                <h2 class="text-xl font-semibold text-gray-800">Opciones de catálogo</h2>
-                                <p class="mt-2 text-gray-600">Comparte tu catálogo con un enlace directo o genera un código QR para que tus clientes lo escaneen.</p>
-                            </div>
-                        </div>
-                        <div class="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 break-words">{{ $catalogLink }}</div>
-                        <div class="mt-4 flex flex-col gap-3 sm:flex-row">
-                            <button x-data="{ copied: false }" x-on:click="navigator.clipboard.writeText('{{ $catalogLink }}').then(() => copied = true)" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 py-3 text-white shadow transition hover:bg-indigo-700 focus:outline-none">
-                               
-                                <span x-text="copied ? 'Copiado' : 'Copiar enlace'"></span>
-                            </button>
-                        </div>
+    {{-- ===================== MÉTRICAS PRINCIPALES ===================== --}}
+    <section aria-labelledby="overview-title" class="space-y-4">
+        <h2 id="overview-title" class="text-lg font-bold text-gray-900">Vista general</h2>
+
+        @if($role == 'admin')
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <x-dashboard-card
+                    title="{{ __('messages.users') }}"
+                    :value="$n_usuarios"
+                    content="Usuarios registrados en la plataforma"
+                    :link="route('usuarios')"
+                    icon="users" />
+                <x-dashboard-card
+                    title="{{ __('messages.subscriptions') }}"
+                    :value="$n_suscripciones_activas"
+                    content="Suscripciones activas actualmente"
+                    :link="route('subscripciones')"
+                    icon="subscriptions" />
+                <x-dashboard-card
+                    title="{{ __('messages.plans') }}"
+                    :value="$n_planes"
+                    content="Planes disponibles para contratar"
+                    :link="route('planes')"
+                    icon="plans" />
+            </div>
+        @elseif($role == 'user')
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <x-dashboard-card
+                    title="{{ __('messages.products') }}"
+                    :value="$n_productos"
+                    content="Productos publicados en tu catálogo"
+                    :link="route('products')"
+                    icon="products" />
+                <x-dashboard-card
+                    title="{{ __('messages.categories') }}"
+                    :value="$n_categorias"
+                    content="Categorías creadas para organizar tu catálogo"
+                    :link="route('categories')"
+                    icon="categories" />
+            </div>
+        @endif
+    </section>
+
+    {{-- ===================== RESUMEN DEL CATÁLOGO (solo usuarios) ===================== --}}
+    @if($role == 'user' && $catalogLink)
+        <section aria-labelledby="catalog-stats-title" class="space-y-4">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h2 id="catalog-stats-title" class="text-lg font-bold text-gray-900">Resumen del catálogo</h2>
+                    <p class="text-sm text-gray-500">Actividad reciente de tu tienda.</p>
+                </div>
+                <a href="{{ route('orders') }}" wire:navigate class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">
+                    Ver todos los pedidos →
+                </a>
+            </div>
+
+            {{-- Tarjetas de métricas: un color de ícono distinto por tipo de dato --}}
+            <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M6 6h15l-1.68 9.39a2 2 0 0 1-1.99 1.61H8.31a2 2 0 0 1-1.99-1.61L4.57 4H2"/><circle cx="9" cy="20" r="1"/><circle cx="16" cy="20" r="1"/></svg>
+                        </span>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Pedidos</p>
                     </div>
-                    <div class="rounded-3xl border border-gray-200 bg-gray-50 p-6 flex items-center justify-center">
-                        {!! QrCode::size(180)->generate($catalogLink) !!}
+                    <p class="mt-3 text-2xl font-black text-gray-900">{{ $n_pedidos }}</p>
+                    <p class="mt-1 text-xs text-gray-500">{{ $n_pedidos_ultimos_7_dias }} últimos 7 días</p>
+                </div>
+
+                <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        </span>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Pendientes</p>
+                    </div>
+                    <p class="mt-3 text-2xl font-black text-amber-600">{{ $n_pedidos_pendientes }}</p>
+                    <p class="mt-1 text-xs text-gray-500">Por atender</p>
+                </div>
+
+                <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </span>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Total vendido</p>
+                    </div>
+                    <p class="mt-3 truncate text-2xl font-black text-emerald-600">${{ number_format($total_pedidos, 2) }}</p>
+                    <p class="mt-1 text-xs text-gray-500">Importe registrado</p>
+                </div>
+
+                <div class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </span>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Visitas</p>
+                    </div>
+                    <p class="mt-3 text-2xl font-black text-sky-600">{{ $n_visitas_ultimos_7_dias }}</p>
+                    <p class="mt-1 text-xs text-gray-500">{{ $n_visitas }} acumuladas</p>
+                </div>
+            </div>
+
+            {{-- Listas: pedidos recientes + visitas recientes --}}
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="font-bold text-gray-900">Pedidos recientes</h3>
+                        <a href="{{ route('orders') }}" wire:navigate class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">Ver todos</a>
+                    </div>
+                    <div class="mt-2 divide-y divide-gray-100">
+                        @forelse($pedidos_recientes as $pedido)
+                            <div class="flex items-center justify-between gap-3 py-3">
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-xs font-bold text-gray-600">
+                                        {{ strtoupper(substr($pedido->customer_name ?? '?', 0, 2)) }}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p class="truncate text-sm font-semibold text-gray-800">{{ $pedido->customer_name }}</p>
+                                        <p class="text-xs text-gray-500">{{ $pedido->created_at->format('d/m/Y H:i') }}</p>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0 space-y-1">
+                                    <p class="text-sm font-bold text-gray-800">${{ number_format($pedido->total, 2) }}</p>
+                                    <span class="inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold {{ $pedido->status === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                        {{ ucfirst($pedido->status) }}
+                                    </span>
+                                </div>
+                            </div>
+                        @empty
+                            <p class="py-8 text-center text-sm text-gray-500">Aún no hay pedidos.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="font-bold text-gray-900">Visitas recientes</h3>
+                        <span class="text-xs text-gray-400">Últimas entradas</span>
+                    </div>
+                    <div class="mt-2 divide-y divide-gray-100">
+                        @forelse($visitas_recientes as $visita)
+                            <div class="flex items-center justify-between gap-3 py-3">
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p class="truncate text-sm font-semibold text-gray-800">Visita al catálogo</p>
+                                        <p class="text-xs text-gray-500">{{ $visita->visited_at->format('d/m/Y H:i') }}</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs text-gray-400 shrink-0">{{ $visita->ip_address ?? 'Visitante' }}</span>
+                            </div>
+                        @empty
+                            <p class="py-8 text-center text-sm text-gray-500">Aún no hay visitas registradas.</p>
+                        @endforelse
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     @endif
 
-       
-    </div>
-    
-{{-- <div class="bg-white dark:bg-gray-800 rounded-lg px-6 py-8 ring shadow-xl ring-gray-900/5">
-  <div>
-    <span class="inline-flex items-center justify-center rounded-md bg-indigo-500 p-2 shadow-lg">
-      <svg class="h-6 w-6 stroke-white" ...>
-        <!-- ... -->
-      </svg>
-    </span>
-  </div>
-  <h3 class="text-gray-900 dark:text-white mt-5 text-base font-medium tracking-tight ">Writes upside-down</h3>
-  <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm ">
-    The Zero Gravity Pen can be used to write in any orientation, including upside-down. It even works in outer space.
-  </p>
-</div> --}}
-   
+    {{-- ===================== COMPARTIR CATÁLOGO ===================== --}}
+    @if($catalogLink)
+        <section aria-labelledby="share-catalog-title" class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+            <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+
+                <div class="max-w-2xl">
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+                                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                                <path d="M8.6 13.5l6.8 3.9M15.4 6.6L8.6 10.5"/>
+                            </svg>
+                        </span>
+                        <div>
+                            <h2 id="share-catalog-title" class="text-lg font-bold text-gray-900">Comparte tu catálogo</h2>
+                            <p class="text-sm text-gray-500">Con un enlace directo o un código QR para que tus clientes lo escaneen.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4 shrink-0 text-gray-400">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        <span class="min-w-0 flex-1 truncate text-sm text-gray-700">{{ $catalogLink }}</span>
+                    </div>
+
+                    <div class="mt-4">
+                        <button x-data="{ copied: false }"
+                                x-on:click="navigator.clipboard.writeText('{{ $catalogLink }}').then(() => { copied = true; setTimeout(() => copied = false, 2000) })"
+                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
+                                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            <span x-text="copied ? '¡Copiado!' : 'Copiar enlace'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex shrink-0 items-center justify-center rounded-2xl border border-gray-200 bg-white p-4">
+                    {!! QrCode::size(160)->generate($catalogLink) !!}
+                </div>
+            </div>
+        </section>
+    @endif
 
 </div>

@@ -59,7 +59,8 @@
             }
         @endphp
 
-        <div x-data="cartPage()" x-init="init()" class="grid gap-6 lg:grid-cols-[2fr_1fr]">
+        <div x-data="cartPage()" x-init="init()">
+            <div class="grid gap-6 lg:grid-cols-[2fr_1fr]">
 
             {{-- Lista de productos: fondo bg-card-aside → todo su texto va en text-secondary --}}
             <div class="rounded-3xl shadow p-4 sm:p-6" style="background-color: var(--bg-card-aside); color: var(--text-secondary);">
@@ -117,9 +118,39 @@
                 </div>
 
                 <div class="mt-5 space-y-3">
-                    <button @click="checkout()" class="w-full rounded-3xl px-4 py-3 text-sm sm:text-base font-semibold hover:opacity-90 transition" style="background-color: var(--primary-btn); color: {{ $iconColor }};">{{ __('messages.checkout') }}</button>
+                    <button @click="openCheckout()" class="w-full rounded-3xl px-4 py-3 text-sm sm:text-base font-semibold hover:opacity-90 transition" style="background-color: var(--primary-btn); color: {{ $iconColor }};">{{ __('messages.checkout') }}</button>
                     <button @click="clear()" class="w-full rounded-3xl border px-4 py-3 text-sm sm:text-base font-medium" style="border-color: var(--primary-btn); background-color: transparent; color: var(--text-secondary);">{{ __('messages.clear_cart') }}</button>
                 </div>
+            </div>
+            </div>
+
+        <div x-show="checkoutOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" @keydown.escape.window="checkoutOpen = false">
+            <div @click.outside="checkoutOpen = false" class="w-full max-w-md rounded-3xl p-5 sm:p-6 shadow-2xl" style="background-color: var(--bg-card-aside); color: var(--text-secondary);">
+                <div class="flex items-center justify-between gap-4">
+                    <h2 class="text-lg font-bold">Datos para el pedido</h2>
+                    <button type="button" @click="checkoutOpen = false" class="text-2xl leading-none opacity-60 hover:opacity-100" aria-label="Cerrar">&times;</button>
+                </div>
+                <p class="mt-1 text-sm opacity-70">Completa tus datos antes de enviar el pedido por WhatsApp.</p>
+
+                <form class="mt-5 space-y-3" @submit.prevent="submitCheckout()">
+                    <label class="block text-sm font-medium">
+                        Nombre completo
+                        <input x-model.trim="customerName" required maxlength="120" type="text" class="mt-1 w-full rounded-2xl border-0 px-4 py-3 outline-none focus:ring-2" style="background-color: var(--bg-main); color: var(--text-primary); --tw-ring-color: var(--primary-btn);">
+                    </label>
+                    <label class="block text-sm font-medium">
+                        Teléfono
+                        <input x-model.trim="customerPhone" required maxlength="40" type="tel" class="mt-1 w-full rounded-2xl border-0 px-4 py-3 outline-none focus:ring-2" style="background-color: var(--bg-main); color: var(--text-primary); --tw-ring-color: var(--primary-btn);">
+                    </label>
+                    <label class="block text-sm font-medium">
+                        Nota <span class="font-normal opacity-60">(opcional)</span>
+                        <textarea x-model.trim="customerNotes" maxlength="1000" rows="3" class="mt-1 w-full resize-none rounded-2xl border-0 px-4 py-3 outline-none focus:ring-2" style="background-color: var(--bg-main); color: var(--text-primary); --tw-ring-color: var(--primary-btn);"></textarea>
+                    </label>
+                    <p x-show="checkoutError" x-text="checkoutError" class="text-sm font-medium text-red-600"></p>
+                    <button type="submit" :disabled="checkoutLoading" class="w-full rounded-3xl px-4 py-3 font-semibold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60" style="background-color: var(--primary-btn); color: {{ $iconColor }};">
+                        <span x-show="!checkoutLoading">Enviar pedido por WhatsApp</span>
+                        <span x-show="checkoutLoading">Registrando pedido...</span>
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -127,8 +158,14 @@
             function cartPage(){
                 return {
                     itemsData: {!! json_encode($itemsPayload) !!},
+                    checkoutOpen: false,
+                    checkoutLoading: false,
+                    checkoutError: '',
+                    customerName: '',
+                    customerPhone: '',
+                    customerNotes: '',
                     init(){
-                        var routeName = '{{ $catalogo->name }}';
+                        var routeName = '{{ $catalogo->name_handle ?? $catalogo->name }}';
                         var key = 'cart_' + (routeName || 'global');
                         if (!window.Alpine) return;
 
@@ -169,34 +206,47 @@
                     remove(pid){ try { if (Alpine.store('cart')) { delete Alpine.store('cart').items[pid]; Alpine.store('cart').save(); Alpine.store('cart')._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: Alpine.store('cart').count() } })); } } catch(e){} },
                     clear(){ if (window.cartReset) window.cartReset(); },
                     total(){ var t = 0; if (!(Alpine.store && Alpine.store('cart'))) return 0; var items = Alpine.store('cart').items; for (var pid in items){ var q = Number(items[pid]||0); var price = this.itemsData[pid] ? Number(this.itemsData[pid].price) : 0; t += q * price; } return t; },
-                    checkout(){
+                    openCheckout(){
+                        if (!Alpine.store('cart') || Object.keys(Alpine.store('cart').items || {}).length === 0) return;
+                        this.checkoutError = '';
+                        this.checkoutOpen = true;
+                    },
+                    submitCheckout(){
                         var routeName = '{{ $catalogo->name_handle ?? $catalogo->name }}';
                         var token = (document.querySelector('meta[name="csrf-token"]') || {}).getAttribute('content') || '';
+                        this.checkoutLoading = true;
+                        this.checkoutError = '';
 
-                        function doCheckout(){
-                            fetch('/' + routeName + '/checkout', {
+                        var doCheckout = () => fetch('/' + routeName + '/checkout', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
+                                    'Accept': 'application/json',
                                     'X-CSRF-TOKEN': token
-                                }
+                                },
+                                body: JSON.stringify({
+                                    customer_name: this.customerName,
+                                    customer_phone: this.customerPhone,
+                                    customer_notes: this.customerNotes
+                                })
                             })
-                            .then(function(response){ return response.json(); })
-                            .then(function(data){
+                            .then(response => response.json().then(data => ({ response: response, data: data })))
+                            .then(({ response, data }) => {
+                                if (!response.ok) {
+                                    const errors = data.errors ? Object.values(data.errors).flat() : [];
+                                    throw new Error(errors[0] || data.message || 'No se pudo registrar el pedido.');
+                                }
                                 if (data && data.url) {
                                     window.location.href = data.url;
                                 }
-                            })
-                            .catch(function(){
-                                window.location.reload();
                             });
-                        }
 
-                        if (window.cartSyncNow) {
-                            window.cartSyncNow().then(doCheckout);
-                        } else {
-                            doCheckout();
-                        }
+                        var sync = window.cartSyncNow ? window.cartSyncNow() : Promise.resolve();
+                        sync.then(doCheckout)
+                            .catch(error => {
+                                this.checkoutLoading = false;
+                                this.checkoutError = error.message || 'No se pudo registrar el pedido.';
+                            });
                     }
                 }
             }

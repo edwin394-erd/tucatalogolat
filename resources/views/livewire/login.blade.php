@@ -1,8 +1,8 @@
-<section class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm md:px-10 min-h-[calc(100vh-4rem)] flex items-center justify-center">
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto w-full lg:py-0">
+<section class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm min-h-[calc(100dvh-4rem)] px-3 py-6 sm:px-6 sm:py-10 md:px-10 flex items-center justify-center">
+        <div class="flex flex-col items-center justify-center w-full max-w-md mx-auto">
                 {{-- <x-logo /><br> --}}
-            <div class="w-full bg-white rounded-lg shadow border border-gray-300 md:mt-0 sm:max-w-md xl:p-0">
-                    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                        <div class="w-full bg-white rounded-lg shadow border border-gray-300">
+                                        <div class="p-5 space-y-5 sm:p-8 sm:space-y-6">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                                     {{ __('messages.login_title') }}
                             </h1>
@@ -33,7 +33,7 @@
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror
                                     </div>
-                                    <div class="flex items-center justify-between">
+                                    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                                             <div class="flex items-start">
                                                     <div class="flex items-center h-5">
                                                         <input id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-100 inset-shadow-sm focus:ring-3 focus:ring-gray-300" required="">
