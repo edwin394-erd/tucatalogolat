@@ -1,4 +1,4 @@
-<div>
+<div class="mx-auto w-full max-w-5xl">
     @php
         if ($model == 'Descuento') {
             $route_name = 'descuentos';
@@ -12,11 +12,10 @@
             $route_name = 'planes';
         }
     @endphp
-    <a href="{{ route($route_name) }}" wire:navigate class="text-blue-500 hover:underline mb-4 inline-block">
-        &larr; {{ __('messages.back') }}
+<div class="relative w-full rounded-xl bg-white p-3 shadow-sm sm:p-5 lg:p-6">
+    <a href="{{ route($route_name) }}" wire:navigate title="{{ __('messages.back') }}" aria-label="{{ __('messages.back') }}" class="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-lg text-blue-500 transition hover:bg-blue-50 hover:text-blue-700">
+        <span aria-hidden="true">&larr;</span>
     </a>
-
-<div class="p-4 md:p-5 bg-white md:m-10 rounded-lg md:w-1/2" >
 
     @if($model == 'Product')
         

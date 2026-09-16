@@ -27,7 +27,7 @@
     @php
         // Renderiza el valor de una columna para un item dado. Se usa tanto en la
         // tabla (md+) como en las cards (móvil) para no duplicar esta lógica.
-        $renderCell = function ($item, $column, $compact = false) {
+        $renderCell = function ($item, $column, $compact = false) use ($storageUsage) {
             $clampStyle = 'display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;';
 
             switch (true) {
@@ -68,6 +68,19 @@
                     $url = $item->catalogo ? route('catalogo', ['name' => $item->catalogo->name_handle]) : '#';
                     $name = $item->catalogo ? $item->catalogo->name : 'N/A';
                     return '<a href="' . e($url) . '" class="text-blue-600 hover:underline" target="_blank">' . e($name) . '</a>';
+
+                case $column === 'storage_usage':
+                    $bytes = $storageUsage[$item->id] ?? 0;
+                    if ($bytes < 1024) {
+                        $size = $bytes . ' B';
+                    } elseif ($bytes < 1024 * 1024) {
+                        $size = number_format($bytes / 1024, 1) . ' KB';
+                    } elseif ($bytes < 1024 * 1024 * 1024) {
+                        $size = number_format($bytes / (1024 * 1024), 1) . ' MB';
+                    } else {
+                        $size = number_format($bytes / (1024 * 1024 * 1024), 2) . ' GB';
+                    }
+                    return '<span class="inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700">' . e($size) . '</span>';
 
                 default:
                     return '<div class="text-sm break-words" style="' . $clampStyle . '">' . e($item->$column) . '</div>';

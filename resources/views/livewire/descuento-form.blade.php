@@ -1,8 +1,8 @@
 <div>
     <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ $ItemId ? __('messages.edit_discount') : __('messages.create_discount') }}</h2>
         <hr class="border-gray-400 my-4">
-  <form class="p-4 md:p-5" wire:submit.prevent="save" novalidate>
-                <div class="grid gap-4 mb-4 grid-cols-2">
+    <form class="p-0" wire:submit.prevent="save" novalidate>
+                                <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                     <div class="col-span-1">
                         <label for="name" class="block mb-2 text-sm font-medium text-gray-900 :text-white">{{ __('messages.name') }}</label>
                         <input type="text" name="name" id="name" wire:model="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 :bg-gray-600 :border-gray-500 :placeholder-gray-400 :text-white :focus:ring-primary-500 :focus:border-primary-500" placeholder="{{ __('messages.discount_name_placeholder') }}" required="">

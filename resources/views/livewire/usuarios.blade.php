@@ -6,9 +6,9 @@
         @livewire('table', [
             'model' => 'User',
             'titulo' => __('messages.users'),
-            'columns' => ['name', 'email', 'role', 'telephone', 'catalogo_name','subscription', 'fecha_de_corte'],
-            'column_names' => [__('messages.name'), __('messages.email'), __('messages.role'), __('messages.telephone'), __('messages.catalog'), __('messages.subscription'), __('messages.cut_off_date')],
-            'searching_exceptions' => ['subscription', 'fecha_de_corte'],
+            'columns' => ['name', 'email', 'role', 'telephone', 'catalogo_name', 'storage_usage', 'subscription', 'fecha_de_corte'],
+            'column_names' => [__('messages.name'), __('messages.email'), __('messages.role'), __('messages.telephone'), __('messages.catalog'), __('messages.storage_usage'), __('messages.subscription'), __('messages.cut_off_date')],
+            'searching_exceptions' => ['subscription', 'storage_usage', 'fecha_de_corte'],
             'filter_field' => null,
             'filter_value' => null,
             'table_type' => __('messages.users'),

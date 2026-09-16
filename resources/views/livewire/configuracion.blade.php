@@ -199,6 +199,8 @@
 
         <!-- ================= PESTAÑA 3: DISEÑO Y ESTILO ================= -->
         <div x-show="activeTab === 'design'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.9fr)] gap-8 items-start">
+                <div>
             
             <!-- Estructura de Plantillas -->
             <div class="mb-10">
@@ -294,8 +296,10 @@
                 </div>
             </div>
 
+                </div>
+
             <!-- Vista Previa en Vivo -->
-            <div x-data="{ device: 'desktop' }" class="border-t border-gray-200 pt-8">
+            <div x-data="{ device: 'desktop' }" class="lg:sticky lg:top-4 lg:self-start border-t border-gray-200 pt-8 lg:border-t-0 lg:pt-0">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-semibold text-gray-800">{{ __('messages.live_preview') ?? 'Vista previa en vivo' }}</h3>
 
@@ -337,7 +341,7 @@
                              :class="device === 'desktop' ? 'rounded-b-xl' : 'rounded-b-[1.5rem] border-x-4 border-b-4 border-gray-900'"
                              style="background-color: {{ $selectedTheme->bg_color ?? '#F2F2F2' }};">
 
-                            <div class="overflow-y-auto" :class="device === 'desktop' ? 'h-[380px]' : 'h-[480px]'">
+                            <div class="overflow-y-auto" :class="device === 'desktop' ? 'h-[300px]' : 'h-[390px]'">
 
                                 {{-- Plantilla 1: catálogo clásico --}}
                                 <div x-show="selectedTemplate == 1" class="min-h-full">
@@ -454,6 +458,7 @@
 
                     </div>
                 </div>
+            </div>
             </div>
 
            <!-- Modal Editor Personalizado con Preview de Contraste en Vivo -->

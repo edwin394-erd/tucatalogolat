@@ -1,9 +1,25 @@
-<div x-data="{ showProductModal: false }" @click="showProductModal = true" @keydown.enter.prevent="showProductModal = true" @keydown.space.prevent="showProductModal = true" tabindex="0" role="button" class="relative rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col h-full group border border-black/5 bg-[var(--bg-card-aside)] shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.14)] transition-shadow duration-500 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10">
+<div x-data="{
+        showProductModal: false,
+        cardIndex: 0,
+        galleryIndex: 0,
+        rotationTimer: null,
+        images: @js($item->fotos->map(fn ($foto) => asset('storage/' . $foto->url))->values()),
+        startRotation() {
+            if (this.images.length < 2 || this.rotationTimer) return;
+            this.rotationTimer = setInterval(() => {
+                this.cardIndex = (this.cardIndex + 1) % this.images.length;
+            }, 1800);
+        },
+        stopRotation() {
+            clearInterval(this.rotationTimer);
+            this.rotationTimer = null;
+        },
+    }" @click="galleryIndex = 0; showProductModal = true" @keydown.enter.prevent="galleryIndex = 0; showProductModal = true" @keydown.space.prevent="galleryIndex = 0; showProductModal = true" tabindex="0" role="button" class="relative rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col h-full group border border-black/5 bg-[var(--bg-card-aside)] shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.14)] transition-shadow duration-500 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10">
 
     {{-- Imagen --}}
-    <div class="relative w-full aspect-square overflow-hidden shrink-0">
+    <div class="relative w-full aspect-square overflow-hidden shrink-0" @mouseenter="startRotation()" @mouseleave="stopRotation()">
         @if(!empty($item->fotos) && isset($item->fotos[0]))
-            <img src="{{ asset('storage/' . $item->fotos[0]->url) }}"
+            <img :src="images[cardIndex]" src="{{ asset('storage/' . $item->fotos[0]->url) }}"
                  class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                  loading="lazy" alt="{{ $item->name }}">
         @else
@@ -17,6 +33,12 @@
                  style="background-color: color-mix(in srgb, var(--primary-btn) 85%, transparent); color: {{ $iconColor }};">
                 -{{ round((1 - $item->precio_descuento / $item->price) * 100) }}%
             </div>
+        @endif
+
+        @if($item->fotos->count() > 1)
+            <span class="absolute bottom-2 right-2 rounded-full bg-black/55 px-2 py-1 text-[9px] font-semibold text-white backdrop-blur-sm">
+                {{ $item->fotos->count() }} fotos
+            </span>
         @endif
 
     </div>
@@ -96,11 +118,29 @@
             </header>
 
             <main class="grid grid-cols-1 flex-1 gap-5 sm:gap-6 overflow-y-auto p-5 sm:p-6 sm:grid-cols-[160px_1fr] md:grid-cols-[180px_1fr]">
-                <div class="relative mx-auto w-full max-w-[130px] sm:max-w-none h-[130px] sm:h-auto overflow-hidden rounded-2xl bg-[var(--bg-main)] shadow-inner sm:mx-0 sm:aspect-square">
-                    @if(!empty($item->fotos) && isset($item->fotos[0]))
-                        <img src="{{ asset('storage/' . $item->fotos[0]->url) }}" alt="{{ $item->name }}" class="w-full h-full object-cover" loading="lazy">
+                <div class="min-w-0">
+                    <div class="relative mx-auto h-[130px] w-full max-w-[130px] overflow-hidden rounded-2xl bg-[var(--bg-main)] shadow-inner sm:mx-0 sm:h-auto sm:max-w-none sm:aspect-square">
+                    @if($item->fotos->isNotEmpty())
+                        <img :src="images[galleryIndex]" src="{{ asset('storage/' . $item->fotos[0]->url) }}" alt="{{ $item->name }}" class="h-full w-full object-cover" loading="lazy">
+
+                        @if($item->fotos->count() > 1)
+                            <button type="button" @click.stop="galleryIndex = (galleryIndex - 1 + images.length) % images.length" class="absolute left-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-lg text-white backdrop-blur-sm transition hover:bg-black/65" aria-label="Imagen anterior">&lsaquo;</button>
+                            <button type="button" @click.stop="galleryIndex = (galleryIndex + 1) % images.length" class="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-lg text-white backdrop-blur-sm transition hover:bg-black/65" aria-label="Imagen siguiente">&rsaquo;</button>
+                        @endif
                     @else
                         <div class="flex h-full w-full items-center justify-center text-xs opacity-50">Sin imagen</div>
+                    @endif
+
+                    </div>
+
+                    @if($item->fotos->count() > 1)
+                        <div class="mt-3 flex flex-wrap items-center justify-center gap-2" @click.stop>
+                            @foreach($item->fotos as $index => $foto)
+                                <button type="button" @click="galleryIndex = {{ $index }}" :class="galleryIndex === {{ $index }} ? 'ring-2 ring-[var(--primary-btn)] opacity-100' : 'opacity-60 hover:opacity-100'" class="h-11 w-11 overflow-hidden rounded-xl bg-[var(--bg-main)] p-0.5 transition-all duration-200" aria-label="Ver imagen {{ $index + 1 }}">
+                                    <img src="{{ asset('storage/' . $foto->url) }}" alt="" class="h-full w-full rounded-[0.6rem] object-cover">
+                                </button>
+                            @endforeach
+                        </div>
                     @endif
                 </div>
 

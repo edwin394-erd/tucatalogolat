@@ -27,7 +27,7 @@
 </head>
 
 
-<body class="min-h-screen bg-gradient-to-br from-yellow-50 to-indigo-100 bg-fixed inset-shadow-sm">
+<body class="min-h-screen overflow-x-hidden bg-gradient-to-br from-yellow-50 to-indigo-100 bg-fixed inset-shadow-sm">
 
   <x-alert alert_type="success" />
 
@@ -39,22 +39,23 @@
 </button>
 
     <!-- Language switch -->
-    <div class="hidden sm:block ml-4">
+   {{-- <div class="fixed right-4 top-3 z-50 hidden sm:block">
       <select id="language-select" class="bg-white/60 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-300 transition">
         <option value="es" {{ app()->getLocale() == 'es' ? 'selected' : '' }}>🇪🇸 Español</option>
         <option value="en" {{ app()->getLocale() == 'en' ? 'selected' : '' }}>🇺🇸 English</option>
       </select>
-    </div>
+    </div> --}}
 
 
 <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-   <div class="h-full px-3 py-4 overflow-y-auto bg-white shadow shadow-xl tema1:bg-red-500 ">
+   <div class="h-full overflow-y-auto bg-white px-3 py-4 shadow-xl tema1:bg-red-500 sm:px-4">
      
        
 
-         <x-logo />
-         <br>
-      <ul class="space-y-2 font-medium">
+         <a href="{{ url('/') }}" class="flex justify-center px-2" aria-label="TuCatalogo.Lat">
+            <img src="{{ asset('imgs/logo.png') }}" alt="TuCatalogo.Lat" class="h-10 w-auto max-w-full object-contain">
+         </a>
+      <ul class="mt-5 space-y-1 font-medium">
          
          @if(auth()->user()->subscriptions->last())
             @if(auth()->user()->subscriptions->last()->expires_at > now())
@@ -76,8 +77,8 @@
             </div>
             @endif
          @endif
-         <li class="  w-fit h-fit">
-            <a href="{{ route('dashboard') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('dashboard') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <svg class="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
                   <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
                   <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
@@ -88,39 +89,39 @@
 
 
 
-         <li class="  w-fit h-fit">
-            <a href="{{ route('cuenta') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('cuenta') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <svg class="w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                </svg>
                <span class="ms-3">{{ __('messages.account') }}</span>
             </a>
          </li>
-          <li class="  w-fit h-fit">
-            <a href="{{ route('planes') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+               <li class="h-fit w-full">
+                  <a href="{{ route('planes') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <x-svg-plans/>
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.plans') }}</span>
             </a>
          </li>
 
          @if(auth()->user()->role == 'user')
-         <li class="  w-fit h-fit">
-            <a href="{{ route('products') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('products') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
               <x-svg-products/>
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.products') }}</span>
                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">{{ $productsCount }}</span>
             </a>
          </li>
         
-         <li class="  w-fit h-fit">
-            <a href="{{ route('categories') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('categories') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <x-svg-categories/>
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.categories') }}</span>
             </a>
          </li>
 
-         <li class="w-fit h-fit">
-            <a href="{{ route('orders') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('orders') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5.25h6m-7.5 0H6.75A2.25 2.25 0 0 0 4.5 7.5v10.75a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V7.5a2.25 2.25 0 0 0-2.25-2.25H16.5M9 5.25a3 3 0 0 1 6 0M8 10.5h8M8 14h8M8 17.5h5" />
                </svg>
@@ -138,8 +139,8 @@
             </a>
          </li> --}}
 
-         <li class="  w-fit h-fit">
-            <a href="{{ route('configuracion') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('configuracion') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900">
             <path fill-rule="evenodd" d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 0 0-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 0 0-2.282.819l-.922 1.597a1.875 1.875 0 0 0 .432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 0 0 0 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 0 0-.432 2.385l.922 1.597a1.875 1.875 0 0 0 2.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 0 0 2.28-.819l.923-1.597a1.875 1.875 0 0 0-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 0 0 0-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 0 0-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 0 0-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 0 0-1.85-1.567h-1.843ZM12 15.75a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5Z" clip-rule="evenodd" />
             </svg>
@@ -149,8 +150,8 @@
             </a>
          </li>
 
-         <li class="  w-fit h-fit">
-            <a href="{{ route('catalogo', auth()->user()->catalogo->name_handle) }}" class="px-3 flex items-centtext-lg er p-2 text-gray-900 rounded-xl hover:bg-gray-100 group" wire:current='font-bold text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('catalogo', auth()->user()->catalogo->name_handle) }}" class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-100 group" wire:current='font-bold text-blue-500'>
              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900">
             <path d="M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z" />
             <path fill-rule="evenodd" d="M3 20.25v-8.755c1.42.674 3.08.673 4.5 0A5.234 5.234 0 0 0 9.75 12c.804 0 1.568-.182 2.25-.506a5.234 5.234 0 0 0 2.25.506c.804 0 1.567-.182 2.25-.506 1.42.674 3.08.675 4.5.001v8.755h.75a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1 0-1.5H3Zm3-6a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-.75.75h-3a.75.75 0 0 1-.75-.75v-3Zm8.25-.75a.75.75 0 0 0-.75.75v5.25c0 .414.336.75.75.75h3a.75.75 0 0 0 .75-.75v-5.25a.75.75 0 0 0-.75-.75h-3Z" clip-rule="evenodd" />
@@ -162,14 +163,14 @@
 
 
          @elseif(auth()->user()->role == 'admin')
-         <li class="  w-fit h-fit">
-            <a href="{{ route('usuarios') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('usuarios') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <x-svg-users/>
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.users') }}</span>
             </a>
          </li>
-         <li class="  w-fit h-fit">
-            <a href="{{ route('subscripciones') }}" wire:navigate.hover class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+         <li class="h-fit w-full">
+            <a href="{{ route('subscripciones') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
                <x-svg-subscriptions/>
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.subscriptions') }}</span>
             </a>
@@ -182,9 +183,9 @@
 
          
         
-         <li class="  w-fit h-fit">
+         <li class="h-fit w-full">
 
-            <button class="px-3 flex items-center p-2 text-gray-900 rounded-xl hover:bg-gray-200 group gap-3 w-full" data-modal-target="LogoutModal" data-modal-toggle="LogoutModal" type="button">
+            <button class="flex w-full items-center gap-3 rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" data-modal-target="LogoutModal" data-modal-toggle="LogoutModal" type="button">
                <svg class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"/>
                </svg>
@@ -214,14 +215,14 @@
 
 </x-modal>
 
-<div class="md:p-4 md:ml-64">
+<main class="min-w-0 p-2 sm:ml-64 sm:p-4">
 
    
   @yield('content')
 
 
   
-</div>
+</main>
  
 
 

@@ -189,6 +189,8 @@ return [
     'precio_descuento_required' => 'The discount price is required.',
     'images_mimes' => 'Each image must be a file of type: jpg, jpeg, png.',
     'images_max' => 'Each image must not exceed 2MB in size.',
+    'images_limit' => 'A product can have a maximum of 5 images.',
+    'storage_usage' => 'Storage used',
 
 
     //Categorias

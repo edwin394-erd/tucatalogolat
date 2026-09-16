@@ -114,7 +114,7 @@ return [
     'custom' => 'Personalizado',
     'discounts' => 'Descuentos',
     'photo' => 'Foto',
-    'discount' => 'Descuento',
+    'discount' => 'Precio Descuento',
     'stock' => 'Stock',
     'amount' => 'Monto',
     'type' => 'Tipo',
@@ -174,6 +174,8 @@ return [
     'precio_descuento_required' => 'El precio de descuento es obligatorio.',
     'images_mimes' => 'Cada imagen debe ser un archivo de tipo: jpg, jpeg, png.',
     'images_max' => 'Cada imagen no debe exceder los 2MB de tamaño.',
+    'images_limit' => 'Un producto puede tener máximo 5 imágenes.',
+    'storage_usage' => 'Espacio usado',
     //Categorias
     'category_name_required' => 'El nombre de la categoría es obligatorio.',
     'category_name_string' => 'El nombre de la categoría debe ser una cadena de texto.',

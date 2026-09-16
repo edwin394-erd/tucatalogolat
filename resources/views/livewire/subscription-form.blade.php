@@ -1,8 +1,8 @@
 <div>
-    <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ $ItemId ? 'Editar Subscripcion' : 'Crear Subscripcion' }}</h2>
-        <hr class="border-gray-400 my-4">
-                <div class="grid gap-4 mb-4 grid-cols-2">
-                    <div class="col-span-2">
+    <h2 class="mb-3 text-xl font-bold text-gray-700 sm:text-2xl">{{ $ItemId ? 'Editar Subscripcion' : 'Crear Subscripcion' }}</h2>
+        <hr class="my-3 border-gray-400">
+                <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                    <div class="col-span-full">
                         <label for="user_id" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">Usuario</label>
                         <select id="user_id" wire:model="user_id" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500">
                             <option value="">Selecciona un usuario</option>
@@ -13,7 +13,7 @@
                         <x-input-error for="user_id" />
                     </div>
 
-                    <div class="col-span-2">
+                    <div class="col-span-full">
                         <label for="plan_id" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">Plan</label>
                         <select id="plan_id" wire:model="plan_id" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500">
                             <option value="">Selecciona un plan</option>

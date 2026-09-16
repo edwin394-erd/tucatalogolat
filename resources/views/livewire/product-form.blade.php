@@ -1,6 +1,6 @@
 
   <div>
-        <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ $ItemId ? __('messages.edit_product') : __('messages.create_product') }}</h2>
+        <h2 class="mb-3 text-xl font-bold text-gray-700 sm:text-2xl">{{ $ItemId ? __('messages.edit_product') : __('messages.create_product') }}</h2>
         @if($maximoProductos && !$ItemId && $productosActuales >= $maximoProductos) 
             <div class="bg-red-100 text-red-700 text-sm font-medium inline-flex items-center px-2.5 py-2 rounded dark:bg-red-200 dark:text-red-900 " role="alert">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 me-1">
@@ -9,20 +9,20 @@
                 {{ __('messages.max_products_reached') }}
             </div>
         @endif
-        <hr class="border-gray-400 my-4">
+        <hr class="my-3 border-gray-400">
        @if($categories->isEmpty())
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
                 <p class="font-bold">{{ __('messages.attention') }}</p>
                 <p>{{ __('messages.product_needs_category') }} <a href="{{ route('create', ['model' => 'Category']) }}" class="text-blue-600 underline">{{ __('messages.create_category') }}</a></p>
             </div>
         @endif
-        <div class="grid gap-4 mb-4 grid-cols-2">
-            <div class="col-span-2 sm:col-span-1">
+        <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            <div class="col-span-full sm:col-span-1">
                 <label for="name" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.product_name') }}</label>
                 <input type="text" wire:model="name" name="name" id="name" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500" placeholder="{{ __('messages.product_name_placeholder') }}">
                 <x-input-error for="name" class="mt-2" />
             </div>
-              <div class="col-span-2 sm:col-span-1">
+              <div class="col-span-full sm:col-span-1">
                 <label for="category" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.category') }}</label>
                 <select name="category" id="category" wire:model="category" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500">
                     <option value="">{{ __('messages.select_category') }}</option>
@@ -32,14 +32,14 @@
                 </select>
                 <x-input-error for="category" class="mt-2" />
             </div>
-            <div class="col-span-2 sm:col-span-1">
+            <div class="col-span-full sm:col-span-1">
                 <label for="price" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.price') }}</label>
                 <input type="number" wire:model="price" name="price" id="price" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500" placeholder="$2999">
                 <x-input-error for="price" class="mt-2" />
             </div>
         
 
-            <div class="col-span-2 sm:col-span-1">
+            <div class="col-span-full sm:col-span-1">
                 <div class="flex" x-data="{ checked: false }">
                     <div class="col-span-1 sm:col-span-1 flex items-center">
                         <label for="precio_descuento" class="block mb-2 mr-2 text-sm font-medium text-gray-900">{{ __('messages.discount_price_optional') }}</label>
@@ -55,7 +55,7 @@
             
 
             
-            <div class="col-span-2">
+            <div class="col-span-full">
                 <label for="description" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.product_description') }}</label>
                 <textarea id="description" rows="4" wire:model="description" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-100 inset-shadow-sm rounded-lg border border-gray-300 focus:ring-gray-500 focus:border-gray-500 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500" placeholder="{{ __('messages.product_description_placeholder') }}"></textarea>
                 <x-input-error for="description" class="mt-2" />

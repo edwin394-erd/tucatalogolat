@@ -80,11 +80,30 @@
                             </div>
                             <div class="space-y-4">
                                 @foreach($categoryProducts as $item)
-                                    <div class="flex flex-col gap-4 rounded-3xl border p-4 md:flex-row md:items-center md:justify-between" style="background-color: {{ $sColor }};">
+                                    <div x-data="{
+                                        galleryIndex: 0,
+                                        rotationTimer: null,
+                                        images: @js($item->fotos->map(fn ($foto) => asset('storage/' . $foto->url))->values()),
+                                        startRotation() {
+                                            if (this.images.length < 2 || this.rotationTimer) return;
+                                            this.rotationTimer = setInterval(() => {
+                                                this.galleryIndex = (this.galleryIndex + 1) % this.images.length;
+                                            }, 1800);
+                                        },
+                                        stopRotation() {
+                                            clearInterval(this.rotationTimer);
+                                            this.rotationTimer = null;
+                                        },
+                                    }" class="flex flex-col gap-4 rounded-3xl border p-4 md:flex-row md:items-center md:justify-between" style="background-color: {{ $sColor }};">
                                         <div class="flex-1 md:flex md:items-center md:gap-4">
                                             @if($item->fotos->isNotEmpty())
-                                                <div class="h-32 w-full overflow-hidden rounded-3xl bg-gray-100 md:h-28 md:w-28">
-                                                    <img src="{{ asset('storage/' . $item->fotos->first()->url) }}" alt="{{ $item->name }}" class="h-full w-full object-cover">
+                                                <div class="relative h-32 w-full overflow-hidden rounded-3xl bg-gray-100 md:h-28 md:w-28" @mouseenter="startRotation()" @mouseleave="stopRotation()">
+                                                    <img :src="images[galleryIndex]" src="{{ asset('storage/' . $item->fotos->first()->url) }}" alt="{{ $item->name }}" class="h-full w-full object-cover">
+                                                    @if($item->fotos->count() > 1)
+                                                        <button type="button" @click.stop="galleryIndex = (galleryIndex - 1 + images.length) % images.length" class="absolute left-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white" aria-label="Imagen anterior">&lsaquo;</button>
+                                                        <button type="button" @click.stop="galleryIndex = (galleryIndex + 1) % images.length" class="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/45 text-white" aria-label="Imagen siguiente">&rsaquo;</button>
+                                                        <span class="absolute bottom-2 right-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white">{{ $item->fotos->count() }}</span>
+                                                    @endif
                                                 </div>
                                             @endif
                                             <div class="mt-4 md:mt-0">

@@ -39,7 +39,7 @@ class ProductForm extends Component
         'category' => 'required|exists:categories,id',
         'visible' => 'required|boolean',
         'description' => 'nullable|string',
-        'images' => 'array',
+        'images' => 'array|max:5',
         'images.*' => 'mimes:jpeg,png,jpg,gif,webp|max:2048',
         'variants' => 'array',
         'variants.*.size' => 'nullable|string|max:50',
@@ -60,6 +60,7 @@ public function messages(): array
         'precio_descuento.required' => __('messages.precio_descuento_required'),
         'images.*.mimes' => __('messages.images_mimes'),
         'images.*.max' => __('messages.images_max'),
+        'images.max' => __('messages.images_limit'),
     ];
 }
     
@@ -148,6 +149,11 @@ public function messages(): array
 
     if (count($this->images) + count($this->existingImages) === 0) {
         $this->addError('images', 'El producto debe tener al menos una imagen.');
+        return;
+    }
+
+    if (count($this->images) + count($this->existingImages) > 5) {
+        $this->addError('images', __('messages.images_limit'));
         return;
     }
 

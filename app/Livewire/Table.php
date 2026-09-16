@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Storage;
 
 class Table extends Component
 {
@@ -54,6 +55,10 @@ class Table extends Component
      */
     public function sortBy($column)
     {
+        if ($column === 'storage_usage') {
+            return;
+        }
+
         // Si la columna es la misma, cambia la dirección del orden
         if ($this->sortBy === $column) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -89,6 +94,10 @@ class Table extends Component
     {
         $modelClass = '\\App\\Models\\' . $this->model;
         $query = $modelClass::orderBy('created_at', 'desc');
+
+        if ($this->model === 'User') {
+            $query->with('catalogo.products.fotos');
+        }
 
         // Aplica el filtro si está configurado
         if ($this->filter_field && $this->filter_value) {
@@ -126,6 +135,13 @@ class Table extends Component
         // Obtiene los elementos paginados y ordenados
         $items = $query->orderBy($this->sortBy, $this->sortDirection)
                        ->paginate(8);
+
+        $storageUsage = [];
+        if ($this->model === 'User') {
+            foreach ($items as $item) {
+                $storageUsage[$item->id] = $this->catalogStorageBytes($item);
+            }
+        }
         
         return view('livewire.table', [
             'items' => $items,
@@ -134,6 +150,36 @@ class Table extends Component
             'sortBy' => $this->sortBy,
             'sortDirection' => $this->sortDirection,
             'table_type' => $this->table_type,
+            'storageUsage' => $storageUsage,
         ]);
+    }
+
+    private function catalogStorageBytes($user): int
+    {
+        if (! $user->catalogo) {
+            return 0;
+        }
+
+        $paths = collect([
+            $user->catalogo->logo_url,
+            $user->catalogo->banner_url,
+        ])->merge($user->catalogo->products->flatMap(function ($product) {
+            return $product->fotos->pluck('url');
+        }))->filter()->unique();
+
+        return $paths->sum(function ($path) {
+            try {
+                $disk = Storage::disk('public');
+
+                if ($disk->exists($path)) {
+                    return $disk->size($path);
+                }
+
+                $publicPath = public_path('storage/' . ltrim($path, '/'));
+                return is_file($publicPath) ? filesize($publicPath) : 0;
+            } catch (\Throwable) {
+                return 0;
+            }
+        });
     }
 }
