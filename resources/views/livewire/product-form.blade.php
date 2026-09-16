@@ -106,7 +106,7 @@
             @endif
         </div>
         <input id="dropzone-file" type="file" class="hidden" wire:model="images" multiple
-               @change="previews = Array.from($event.target.files).map(f => URL.createObjectURL(f))" />
+             @change="previews.push(...Array.from($event.target.files).map(f => URL.createObjectURL(f)))" />
     </label>
 </div>
 
