@@ -22,6 +22,23 @@
 @else
 <div class="px-5 my-5">
     <h1 class="text-2xl font-bold text-gray-700 mb-5">{{ __('messages.subscriptions') }}</h1>
+    @if($currentSubscription)
+        @php
+            $remainingPlanDays = $currentSubscription->expires_at
+                ? (int) ceil(now()->diffInDays($currentSubscription->expires_at))
+                : null;
+        @endphp
+        <div class="mb-5 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-indigo-800">
+            <p class="font-semibold">Plan actual: {{ $currentSubscription->plan->name }}</p>
+            <p class="text-sm">
+                @if($currentSubscription->expires_at)
+                    Te quedan {{ $remainingPlanDays }} días de suscripción.
+                @else
+                    Tu suscripción no tiene fecha de vencimiento.
+                @endif
+            </p>
+        </div>
+    @endif
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach(\App\Models\Plan::where('is_active', 1)->get() as $plan)
@@ -35,8 +52,15 @@
                     $whatsappMessage = "Solicitud de suscripción al plan {$plan->name}:\n\nUsuario: " . auth()->user()->name . " (" . auth()->user()->email . ")\nPlan: {$plan->name}\nPrecio: {$plan->price}\nDescripción: {$plan->description}";
                 @endphp
                 @if($currentSubscription?->plan_id === $plan->id)
-                    <span class="mt-4 inline-flex w-full cursor-not-allowed justify-center rounded-lg bg-gray-200 px-4 py-2 text-gray-500" aria-label="Ya tienes este plan">
-                        Plan actual
+                    <span class="mt-4 inline-flex w-full cursor-not-allowed flex-col items-center justify-center rounded-lg bg-gray-200 px-4 py-2 text-gray-500" aria-label="Ya tienes este plan">
+                        <span>Plan actual</span>
+                        <span class="text-xs">
+                            @if($currentSubscription->expires_at)
+                                {{ $remainingPlanDays }} días restantes
+                            @else
+                                Sin vencimiento
+                            @endif
+                        </span>
                     </span>
                 @else
                     <div x-data="{ open: false }" class="relative mt-4">

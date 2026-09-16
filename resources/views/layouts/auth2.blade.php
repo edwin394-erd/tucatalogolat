@@ -120,13 +120,19 @@
          <div class="mb-4 flex items-center justify-between gap-2">
          @if(auth()->user()->subscriptions->last())
             @if(auth()->user()->subscriptions->last()->expires_at > now())
+            @php
+               $remainingPlanDays = (int) ceil(now()->diffInDays(auth()->user()->subscriptions->last()->expires_at));
+            @endphp
             
-            <div class="bg-indigo-100 text-indigo-800 text-sm font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-indigo-200 dark:text-indigo-900" role="alert">
-               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+            <div class="min-w-0 flex-1 bg-indigo-100 text-indigo-800 text-sm font-medium inline-flex items-center px-2 py-1 rounded dark:bg-indigo-200 dark:text-indigo-900" role="alert">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 shrink-0">
                   <path  fill-rule="evenodd" d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z" clip-rule="evenodd" />
                   </svg>
 
-               <span class="ml-2">Plan {{ auth()->user()->subscriptions->last()->plan->name }}</span>
+               <span class="ml-1.5 min-w-0 leading-tight">
+                  <span class="block truncate">Plan {{ auth()->user()->subscriptions->last()->plan->name }}</span>
+                  <span class="block text-xs font-normal">{{ $remainingPlanDays }} días restantes</span>
+               </span>
             </div>
             @else
             <div class="bg-red-100 text-red-800 text-sm font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900" role="alert">

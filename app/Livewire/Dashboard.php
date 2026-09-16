@@ -54,7 +54,7 @@ class Dashboard extends Component
         $this->plan_is_expired = $secondsRemaining !== null && $secondsRemaining <= 0;
         $this->plan_days_remaining = $secondsRemaining === null
             ? null
-            : max(0, intdiv(max(0, (int) $secondsRemaining), 86400));
+            : (int) ceil(max(0, $secondsRemaining) / 86400);
 
         if (auth()->user()->catalogo) {
             $catalogo = Catalogo::find(auth()->user()->catalogo->id);

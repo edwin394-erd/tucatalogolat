@@ -145,6 +145,7 @@ public function messages(): array
     
   public function save()
 {
+        $this->resetErrorBag();
     $this->validate();
 
     if (count($this->images) + count($this->existingImages) === 0) {
