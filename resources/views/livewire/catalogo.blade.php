@@ -44,6 +44,15 @@
         return ['label' => '✗ Texto ilegible', 'class' => 'bg-red-100 text-red-700'];
     }
 @endphp
+<style>
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+</style>
 
 <div class="min-h-screen pb-16"
      style="--primary-btn: {{ $pColor }};
@@ -61,37 +70,39 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Banner & Logo --}}
-        <div class="relative">
-            <div class="w-full aspect-[21/9] sm:aspect-[3/1] max-h-96 overflow-hidden rounded-2xl sm:rounded-3xl shadow-lg">
-                @if ($catalogo->banner_url)
-                    <img src="{{ asset('storage/' . $catalogo->banner_url) }}" alt="Banner" class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105">
-                @else
-                    <div class="w-full h-full flex items-center justify-center italic"
-                         style="background: linear-gradient(to right, rgba(200,200,200,0.2), var(--primary-btn)); opacity: 0.5; color: var(--text-secondary);">
-                        {{ __('messages.no_banner') }}
-                    </div>
-                @endif
+    {{-- Header compacto: banner + logo + título en un solo bloque, sin salto de espacio --}}
+<div class="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg mb-8">
+    <div class="w-full aspect-[16/7] sm:aspect-[3/1] max-h-72">
+        @if ($catalogo->banner_url)
+            <img src="{{ asset('storage/' . $catalogo->banner_url) }}" alt="Banner" class="w-full h-full object-cover object-center">
+        @else
+            <div class="w-full h-full" style="background: linear-gradient(135deg, var(--primary-btn), var(--bg-card-aside));"></div>
+        @endif
+
+        {{-- Degradado reforzado: más oscuro y con más recorrido, para garantizar lectura sobre CUALQUIER imagen --}}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 via-40% to-transparent"></div>
+    </div>
+
+    {{-- Logo + nombre + descripción, superpuestos abajo del banner --}}
+    <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex items-center gap-3 sm:gap-4">
+        @if ($catalogo->logo_url)
+            <img src="{{ asset('storage/' . $catalogo->logo_url) }}" alt="Logo" class="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-2 border-white shadow-xl object-cover flex-shrink-0">
+        @else
+            <div class="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-2 border-white shadow-xl flex items-center justify-center font-bold text-white flex-shrink-0"
+                 style="background-color: var(--primary-btn);">
+                {{ strtoupper(substr($catalogo->name ?? 'C', 0, 2)) }}
             </div>
+        @endif
 
-            <div class="absolute left-1/2 -bottom-12 sm:-bottom-16 lg:-bottom-20 transform -translate-x-1/2">
-                @if ($catalogo->logo_url)
-                    <img src="{{ asset('storage/' . $catalogo->logo_url) }}" alt="Logo" class="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full border-4 border-white shadow-xl object-cover" style="border-color: var(--primary-btn); background: white;">
-                @else
-                    <div class="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full border-4 border-white shadow-xl flex items-center justify-center font-bold text-white"
-                         style="background-color: var(--primary-btn);">
-                        {{ strtoupper(substr($catalogo->name ?? 'C', 0, 2)) }}
-                    </div>
-                @endif
-            </div>
+        <div class="min-w-0">
+            <h1 class="text-lg sm:text-2xl lg:text-3xl font-extrabold text-white truncate [text-shadow:_0_1px_4px_rgb(0_0_0_/_70%)]">{{ $catalogo->name }}</h1>
+            {{-- <p class="text-xs sm:text-sm text-white/90 line-clamp-1 sm:line-clamp-2 [text-shadow:_0_1px_3px_rgb(0_0_0_/_70%)]">{{ $catalogo->description }}</p> --}}
         </div>
-
-        {{-- Título: el margen coincide con lo que sobresale el logo, sin espacio muerto extra --}}
-        <div class="pt-16 sm:pt-20 lg:pt-24 pb-8 text-center max-w-2xl mx-auto">
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2 tracking-tight" style="color: var(--text-primary);">{{ $catalogo->name }}</h1>
-            <p class="text-base sm:text-lg leading-relaxed line-clamp-3" style="color: var(--text-primary);">{{ $catalogo->description }}</p>
+        <div class="ml-auto flex-shrink-0">
+            <x-store-info :catalogo="$catalogo" :icon-color="$iconColor" />
         </div>
-
-        <x-store-info :catalogo="$catalogo" :icon-color="$iconColor" />
+    </div>
+</div>
 
         {{-- Toolbar: buscador + categorías en una sola fila en desktop, apilados en móvil --}}
         <div class="sticky top-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 mb-6 backdrop-blur-sm"
