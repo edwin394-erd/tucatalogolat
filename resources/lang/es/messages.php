@@ -234,8 +234,8 @@ return [
 
     // Home page
     'home_hero_badge' => 'Prueba gratis 14 días',
-    'home_hero_title' => 'Catálogos digitales por suscripción para pymes',
-    'home_hero_subtitle' => 'Crea, publica y comparte catálogos profesionales en minutos. Incrementa ventas y presencia en línea sin complicaciones.',
+    'home_hero_title' => 'Tienda online por suscripción para tu negocio',
+    'home_hero_subtitle' => 'Crea, publica y comparte tu tienda online profesional en minutos. Incrementa ventas y presencia en línea sin complicaciones.',
     'home_start_now' => 'Comenzar ahora',
     'home_view_plans' => 'Ver planes',
     'home_feature_templates' => 'Plantillas profesionales',

@@ -194,16 +194,17 @@
 					@foreach ($plans as $plan)
 						<div data-animate
 						     style="transition-delay: {{ $loop->index * 100 }}ms"
-						     class="opacity-0 translate-y-6 transition-all duration-700 ease-out relative bg-white p-6 rounded-2xl border {{ $loop->index === 1 ? 'border-indigo-600 shadow-xl ring-1 ring-indigo-600' : 'border-gray-100 shadow-sm' }} hover:shadow-xl hover:-translate-y-1 transition-all">
+							     class="opacity-0 translate-y-6 transition-all duration-700 ease-out relative flex h-full flex-col bg-white p-6 rounded-2xl border {{ $loop->index === 1 ? 'border-indigo-600 shadow-xl ring-1 ring-indigo-600' : 'border-gray-100 shadow-sm' }} hover:shadow-xl hover:-translate-y-1 transition-all">
 							@if ($loop->index === 1)
 								<span class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-semibold text-white bg-indigo-600 rounded-full shadow">
 									{{ __('messages.home_most_popular') ?? 'Más popular' }}
 								</span>
 							@endif
-							<h4 class="text-xl font-semibold">{{ $plan->name }}</h4>
-							<p class="mt-2 text-gray-600">{{ $plan->description }}</p>
-							<div class="mt-4 text-3xl font-bold">${{ number_format($plan->price) }}<span class="text-base font-medium text-gray-600">/mes</span></div>
-							<ul class="mt-4 text-sm text-gray-600 space-y-2">
+								<div class="flex-1">
+									<h4 class="text-xl font-semibold">{{ $plan->name }}</h4>
+									<p class="mt-2 text-gray-600">{{ $plan->description }}</p>
+									<div class="mt-4 text-3xl font-bold">${{ number_format((float) $plan->price, 2) }}<span class="text-base font-medium text-gray-600">/mes</span></div>
+									<ul class="mt-4 text-sm text-gray-600 space-y-2">
 								@foreach (explode(';', $plan->features) as $feature)
 									<li class="flex items-start gap-2">
 										<svg class="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>
