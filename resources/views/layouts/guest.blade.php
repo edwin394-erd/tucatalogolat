@@ -109,8 +109,8 @@
         <ul class="flex flex-col gap-2">
           <li><a href="{{ route('home') }}" wire:navigate class="block px-3 py-2 rounded-md text-blue-700 bg-blue-50">{{ __('messages.home') }}</a></li>
           <li><a href="{{ route('login') }}" wire:navigate class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">{{ __('messages.login') }}</a></li>
-          <li><a href="https://www.instagram.com/tucatalogolat.lat/" target="_blank" rel="noopener noreferrer" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Solicitar Cuenta</a></li>
-          {{-- <li><a href="{{ route('register') }}" wire:navigate class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">{{ __('messages.register') }}</a></li> --}}
+          {{-- <li><a href="https://www.instagram.com/tucatalogolat.lat/" target="_blank" rel="noopener noreferrer" class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">Solicitar Cuenta</a></li> --}}
+          <li><a href="{{ route('register') }}" wire:navigate class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100">{{ __('messages.register') }}</a></li>
 
         </ul>
       </div>
