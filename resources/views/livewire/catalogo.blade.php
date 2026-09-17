@@ -62,7 +62,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Banner & Logo --}}
-    {{-- Header compacto: banner + logo + título en un solo bloque, sin salto de espacio --}}
+{{-- Header compacto: banner + logo + título en un solo bloque, sin salto de espacio --}}
 <div class="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg mb-8">
     <div class="w-full aspect-[16/7] sm:aspect-[3/1] max-h-72">
         @if ($catalogo->banner_url)
@@ -71,11 +71,16 @@
             <div class="w-full h-full" style="background: linear-gradient(135deg, var(--primary-btn), var(--bg-card-aside));"></div>
         @endif
 
-        {{-- Degradado reforzado: más oscuro y con más recorrido, para garantizar lectura sobre CUALQUIER imagen --}}
         <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 via-40% to-transparent"></div>
     </div>
 
-    {{-- Logo + nombre + descripción, superpuestos abajo del banner --}}
+
+   {{-- Iconos en la esquina superior derecha, SOLO en móvil --}}
+    <div class="absolute top-3 right-3 sm:hidden">
+        <x-store-info :catalogo="$catalogo" :icon-color="$iconColor" />
+    </div>
+
+    {{-- Logo + nombre, superpuestos abajo del banner --}}
     <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 flex items-center gap-3 sm:gap-4">
         @if ($catalogo->logo_url)
             <img src="{{ asset('storage/' . $catalogo->logo_url) }}" alt="Logo" class="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-2 border-white shadow-xl object-cover flex-shrink-0">
@@ -88,9 +93,10 @@
 
         <div class="min-w-0">
             <h1 class="text-lg sm:text-2xl lg:text-3xl font-extrabold text-white truncate [text-shadow:_0_1px_4px_rgb(0_0_0_/_70%)]">{{ $catalogo->name }}</h1>
-            {{-- <p class="text-xs sm:text-sm text-white/90 line-clamp-1 sm:line-clamp-2 [text-shadow:_0_1px_3px_rgb(0_0_0_/_70%)]">{{ $catalogo->description }}</p> --}}
         </div>
-        <div class="ml-auto flex-shrink-0">
+
+        {{-- Iconos junto al nombre, SOLO en pantallas sm+ (se ocultan en móvil, ya están arriba) --}}
+        <div class="ml-auto flex-shrink-0 hidden sm:block">
             <x-store-info :catalogo="$catalogo" :icon-color="$iconColor" />
         </div>
     </div>
