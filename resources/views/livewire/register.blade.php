@@ -1,7 +1,6 @@
 
 <section class="bg-gradient-to-br from-yellow-50 to-indigo-100 inset-shadow-sm md:p-10  ">
     <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
-            <x-logo /><br>
             <div class="w-full bg-white  rounded-lg shadow-xl border border-gray-300 mx-0 md:mt-0 sm:max-w-xl xl:==p-0 ">
                     <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
                             <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-700 md:text-2xl">
