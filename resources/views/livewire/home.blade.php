@@ -190,30 +190,37 @@
 				<p data-animate class="opacity-0 translate-y-6 transition-all duration-700 ease-out text-center text-gray-600 mt-2">
 					{{ __('messages.home_pricing_subtitle') }}
 				</p>
-				<div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+				<div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
 					@foreach ($plans as $plan)
+						@php
+							$whatsappMessage = "Hola, me interesa el plan {$plan->name}. Quisiera más información sobre la suscripción.";
+						@endphp
 						<div data-animate
 						     style="transition-delay: {{ $loop->index * 100 }}ms"
-						     class="opacity-0 translate-y-6 transition-all duration-700 ease-out relative bg-white p-6 rounded-2xl border {{ $loop->index === 1 ? 'border-indigo-600 shadow-xl ring-1 ring-indigo-600' : 'border-gray-100 shadow-sm' }} hover:shadow-xl hover:-translate-y-1 transition-all">
+						     class="opacity-0 translate-y-6 transition-all duration-700 ease-out relative flex h-full flex-col bg-white p-6 rounded-2xl border {{ $loop->index === 1 ? 'border-indigo-600 shadow-xl ring-1 ring-indigo-600' : 'border-gray-100 shadow-sm' }} hover:shadow-xl hover:-translate-y-1 transition-all">
 							@if ($loop->index === 1)
 								<span class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-semibold text-white bg-indigo-600 rounded-full shadow">
 									{{ __('messages.home_most_popular') ?? 'Más popular' }}
 								</span>
 							@endif
-							<h4 class="text-xl font-semibold">{{ $plan->name }}</h4>
-							<p class="mt-2 text-gray-600">{{ $plan->description }}</p>
+							<div class="flex-1">
+								<h4 class="text-xl font-semibold">{{ $plan->name }}</h4>
+								<p class="mt-2 text-gray-600">{{ $plan->description }}</p>
 								<div class="mt-4 text-3xl font-bold">${{ number_format((float) $plan->price, 2) }}<span class="text-base font-medium text-gray-600">/mes</span></div>
-							<ul class="mt-4 text-sm text-gray-600 space-y-2">
-								@foreach (explode(';', $plan->features) as $feature)
-									<li class="flex items-start gap-2">
-										<svg class="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>
-										{{ $feature }}
-									</li>
-								@endforeach
-							</ul>
-							<a href="{{ route('login') }}"
-							   class="mt-6 inline-block w-full text-center px-4 py-2.5 rounded-xl text-white transition-all duration-300 hover:-translate-y-0.5 {{ $loop->index === 1 ? 'bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/30' : 'bg-gray-800 hover:bg-gray-900' }}">
-								{{ __('messages.home_start_now') }}
+								<ul class="mt-4 text-sm text-gray-600 space-y-2">
+									@foreach (explode(';', $plan->features) as $feature)
+										<li class="flex items-start gap-2">
+											<svg class="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M7.629 13.37 4.26 10l1.061-1.06 2.308 2.308 5.642-5.642L14.58 7.9z"/></svg>
+											{{ $feature }}
+										</li>
+									@endforeach
+								</ul>
+							</div>
+							<a href="https://wa.me/584246054544?text={{ rawurlencode($whatsappMessage) }}"
+							   target="_blank"
+							   rel="noopener noreferrer"
+							   class="mt-6 inline-flex w-full items-center justify-center px-4 py-2.5 rounded-xl text-white transition-all duration-300 hover:-translate-y-0.5 {{ $loop->index === 1 ? 'bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/30' : 'bg-gray-800 hover:bg-gray-900' }}">
+								Solicitar Suscripción
 							</a>
 						</div>
 					@endforeach
