@@ -12,6 +12,12 @@
     </div>
 
     <div>
+        <label for="features" class="block text-sm font-medium text-gray-700">{{ __('messages.features') ?? 'Características' }}</label>
+        <textarea wire:model="features" id="features" rows="4" placeholder="Ej: Acceso a 100 productos; Plantillas básicas; Soporte por email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        @error('features') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    </div>
+
+    <div>
         <label for="price" class="block text-sm font-medium text-gray-700">{{ __('messages.price') }}</label>
         <input type="number" step="0.01" wire:model="price" id="price" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
         @error('price') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror

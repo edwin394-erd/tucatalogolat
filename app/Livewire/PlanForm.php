@@ -10,6 +10,7 @@ class PlanForm extends Component
     public $ItemId;
     public $name;
     public $description;
+    public $features;
     public $price;
     public $max_products;
     public $duration_in_days;
@@ -18,6 +19,7 @@ class PlanForm extends Component
     protected $rules = [
         'name' => 'required|string|max:255',
         'description' => 'nullable|string',
+        'features' => 'nullable|string',
         'price' => 'required|numeric|min:0',
         'max_products' => 'required|integer|min:0',
         'duration_in_days' => 'required|integer|min:1',
@@ -33,6 +35,7 @@ class PlanForm extends Component
             if ($plan) {
                 $this->name = $plan->name;
                 $this->description = $plan->description;
+                $this->features = $plan->features;
                 $this->price = $plan->price;
                 $this->max_products = $plan->max_products;
                 $this->duration_in_days = $plan->duration_in_days;
@@ -41,6 +44,7 @@ class PlanForm extends Component
         } else {
             $this->name = '';
             $this->description = '';
+            $this->features = '';
             $this->price = '';
             $this->max_products = '';
             $this->duration_in_days = '';
@@ -57,6 +61,7 @@ class PlanForm extends Component
             $plan->update([
                 'name' => $this->name,
                 'description' => $this->description,
+                'features' => $this->features,
                 'price' => $this->price,
                 'max_products' => $this->max_products,
                 'duration_in_days' => $this->duration_in_days,
@@ -67,6 +72,7 @@ class PlanForm extends Component
             Plan::create([
                 'name' => $this->name,
                 'description' => $this->description,
+                'features' => $this->features,
                 'price' => $this->price,
                 'max_products' => $this->max_products,
                 'duration_in_days' => $this->duration_in_days,

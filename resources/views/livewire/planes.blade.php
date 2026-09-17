@@ -8,8 +8,8 @@
         @livewire('table', [
             'model' => 'Plan',
             'titulo' => __('messages.plans'),
-            'columns' => ['name', 'description', 'price', 'max_products', 'duration_in_days'],
-            'column_names' => [__('messages.name'), __('messages.description'), __('messages.price'), __('messages.max_products'), __('messages.duration_days')],
+            'columns' => ['name', 'description', 'features', 'price', 'max_products', 'duration_in_days'],
+            'column_names' => [__('messages.name'), __('messages.description'), __('messages.features') ?? 'Características', __('messages.price'), __('messages.max_products'), __('messages.duration_days')],
             'filter_field' => null,
             'filter_value' => null,
             'searching_exceptions' => [],

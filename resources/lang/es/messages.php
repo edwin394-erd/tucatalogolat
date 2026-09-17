@@ -66,6 +66,7 @@ return [
     'name' => 'Nombre',
     'category_name_placeholder' => 'Escribe un nombre de categoría aquí',
     'description' => 'Descripción',
+    'features' => 'Características',
     'new_password_optional' => 'Nueva contraseña (opcional)',
     'current_password_required' => 'Contraseña actual (requerida para cualquier cambio)',
     'confirm_new_password' => 'Confirmar nueva contraseña',
