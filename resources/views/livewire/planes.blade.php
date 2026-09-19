@@ -73,10 +73,10 @@
             <div><p class="font-bold">Comprobante en revisión</p><p class="mt-1 text-sm text-amber-800">Tu solicitud para {{ $latestPaymentRequest->plan->name }} fue recibida. Te avisaremos cuando termine la revisión.</p></div>
         </div>
     @elseif($latestPaymentRequest && $latestPaymentRequest->payment_status === 'rejected')
-        <div x-data="{ show: true }" x-show="show" class="mb-6 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-rose-950">
+        <div x-data="{ show: localStorage.getItem('subscription-rejected-{{ $latestPaymentRequest->id }}') !== 'dismissed' }" x-show="show" x-cloak class="mb-6 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-rose-950">
             <div class="mt-0.5 rounded-full bg-rose-100 p-2 text-rose-700"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8 8 8 8M16 8l-8 8"/></svg></div>
             <div class="flex-1"><p class="font-bold">No pudimos validar el comprobante</p><p class="mt-1 text-sm text-rose-800">Puedes realizar el pago nuevamente y enviar un comprobante legible.</p></div>
-            <button type="button" @click="show = false" class="rounded-lg p-1 text-rose-500 hover:bg-rose-100 hover:text-rose-800" aria-label="Cerrar notificación">&times;</button>
+            <button type="button" @click="show = false; localStorage.setItem('subscription-rejected-{{ $latestPaymentRequest->id }}', 'dismissed')" class="rounded-lg p-1 text-rose-500 hover:bg-rose-100 hover:text-rose-800" aria-label="Cerrar notificación">&times;</button>
         </div>
     @endif
     
