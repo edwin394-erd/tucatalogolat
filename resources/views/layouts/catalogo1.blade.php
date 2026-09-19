@@ -20,9 +20,17 @@
     <meta name="twitter:description" content="@yield('description', 'Descubre productos, servicios y tiendas en TuCatalogo.Lat.')">
     <meta name="twitter:image" content="@yield('og_image', asset('imgs/icono.ico'))">
     <link rel="canonical" href="@yield('canonical', url()->current())">
-    <link rel="icon" type="image/png" href="{{ asset('imgs/icono.ico') }}" />
-    <link rel="shortcut icon" href="{{ asset('imgs/icono.ico') }}" />
-    <link rel="apple-touch-icon" href="{{ asset('imgs/icono.ico') }}" />
+    @php
+        $catalogoFavicon = isset($catalogo) && $catalogo?->logo_url
+            ? asset('storage/' . $catalogo->logo_url)
+            : asset('imgs/icono.ico');
+        $catalogoFaviconVersion = isset($catalogo) && $catalogo?->updated_at
+            ? '?v=' . $catalogo->updated_at->timestamp
+            : '';
+    @endphp
+    <link rel="icon" href="{{ $catalogoFavicon . $catalogoFaviconVersion }}" />
+    <link rel="shortcut icon" href="{{ $catalogoFavicon . $catalogoFaviconVersion }}" />
+    <link rel="apple-touch-icon" href="{{ $catalogoFavicon . $catalogoFaviconVersion }}" />
     <title>@yield('title', 'Catalogo')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
