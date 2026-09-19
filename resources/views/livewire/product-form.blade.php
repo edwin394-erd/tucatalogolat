@@ -125,7 +125,7 @@
                 </label>
             </div>
 
-            <template x-if="sizeEnabled">
+            <div x-show="sizeEnabled" x-cloak>
                 <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3" wire:key="size-options-block">
                     <div class="mb-2 flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-700">Tallas disponibles</span>
@@ -163,9 +163,9 @@
                         @endforeach
                     </div>
                 </div>
-            </template>
+            </div>
 
-            <template x-if="colorEnabled">
+            <div x-show="colorEnabled" x-cloak>
                 <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3" wire:key="color-options-block">
                     <div class="mb-2 flex items-center justify-between">
                         <span class="text-sm font-medium text-gray-700">Colores disponibles</span>
@@ -203,7 +203,7 @@
                         @endforeach
                     </div>
                 </div>
-            </template>
+            </div>
 
             <div class="mt-4">
                 <div class="mb-2 text-sm font-medium text-gray-700">Variantes personalizadas</div>
