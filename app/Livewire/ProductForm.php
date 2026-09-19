@@ -216,6 +216,13 @@ class ProductForm extends Component
         $this->sizeOptions[] = ['value' => '', 'price_adjustment' => 0, 'available' => true];
     }
 
+    public function ensureSizeOption()
+    {
+        if (empty($this->sizeOptions)) {
+            $this->addSizeOption();
+        }
+    }
+
     public function removeSizeOption($index)
     {
         unset($this->sizeOptions[$index]);
@@ -225,6 +232,13 @@ class ProductForm extends Component
     public function addColorOption()
     {
         $this->colorOptions[] = ['value' => '', 'price_adjustment' => 0, 'available' => true];
+    }
+
+    public function ensureColorOption()
+    {
+        if (empty($this->colorOptions)) {
+            $this->addColorOption();
+        }
     }
 
     public function removeColorOption($index)

@@ -116,11 +116,11 @@
 
             <div class="flex flex-wrap gap-4 mb-3 text-sm text-gray-700">
                 <label class="inline-flex items-center gap-2">
-                    <input type="checkbox" x-model="sizeEnabled" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <input type="checkbox" x-model="sizeEnabled" @change="if ($event.target.checked) $wire.ensureSizeOption()" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                     Talla
                 </label>
                 <label class="inline-flex items-center gap-2">
-                    <input type="checkbox" x-model="colorEnabled" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <input type="checkbox" x-model="colorEnabled" @change="if ($event.target.checked) $wire.ensureColorOption()" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                     Color
                 </label>
             </div>
