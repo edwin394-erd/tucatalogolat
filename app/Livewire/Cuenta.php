@@ -20,7 +20,8 @@ class Cuenta extends Component
         $user = auth()->user();
         $this->correo = $user->email;
         $this->telefono = $user->telephone;
-        $this->plan = $user->subscriptions->last() ? $user->subscriptions->last()->plan->name : __('messages.no_plan');
+        $latestSubscription = $user->subscriptions()->latest('expires_at')->first();
+        $this->plan = $latestSubscription && $latestSubscription->plan ? $latestSubscription->plan->name : __('messages.no_plan');
     }
 
     public function saveChanges()
@@ -87,7 +88,8 @@ class Cuenta extends Component
         $user = auth()->user();
         $correo = $user->email;
         $telefono = $user->telephone;
-        $plan = $user->subscriptions->last() ? $user->subscriptions->last()->plan->name : __('messages.no_plan');
+        $latestSubscription = $user->subscriptions()->latest('expires_at')->first();
+        $plan = $latestSubscription && $latestSubscription->plan ? $latestSubscription->plan->name : __('messages.no_plan');
 
         return view('livewire.cuenta', compact('correo', 'telefono', 'plan'))
             ->extends('layouts.auth2')

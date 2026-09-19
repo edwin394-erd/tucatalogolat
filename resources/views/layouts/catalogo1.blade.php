@@ -30,6 +30,7 @@
 
 
 <body class="bg-gray-100 ">
+    <x-alert alert_type="success" />
     {{-- scripts already included via @vite above --}}
     {{-- Banner and profile pic --}}
     

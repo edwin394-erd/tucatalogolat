@@ -85,39 +85,90 @@ Route::post('/{name}/cart-sync', function(Request $request, $name){
 
 	$payload = $request->json()->all();
 	$raw = $payload['items'] ?? [];
-	// Normalize to int keys => int qty
+	$rawProducts = $payload['products'] ?? [];
+	$rawVariants = $payload['variants'] ?? [];
+	$rawSelections = $payload['selections'] ?? [];
 	$items = [];
-	foreach ($raw as $k => $v) {
-		$items[(int)$k] = (int)$v;
+	$products = [];
+	if ($rawProducts) {
+		foreach ($rawProducts as $lineKey => $productId) {
+			$products[(string) $lineKey] = (int) $productId;
+			$items[(string) $lineKey] = (int) ($raw[$lineKey] ?? 0);
+		}
+	} else {
+		foreach ($raw as $productId => $quantity) {
+			$lineKey = (string) $productId;
+			$products[$lineKey] = (int) $productId;
+			$items[$lineKey] = (int) $quantity;
+		}
+	}
+	$variants = [];
+	$selections = [];
+	foreach ($rawVariants as $lineKey => $variantId) {
+		$variants[(string) $lineKey] = $variantId ? (int) $variantId : null;
+	}
+	foreach ($rawSelections as $lineKey => $selectionIds) {
+		$selections[(string) $lineKey] = array_values(array_unique(array_map('intval', (array) $selectionIds)));
+		sort($selections[(string) $lineKey]);
 	}
 
 	// Remove items not present in payload
 	foreach ($cart->items()->get() as $ci) {
-		$pid = $ci->product_id;
-		if (! array_key_exists($pid, $items) || ($items[$pid] <= 0)) {
+		$lineExists = false;
+		foreach ($products as $lineKey => $productId) {
+			$storedSelections = array_values(array_unique(array_map('intval', $ci->variant_selections ?? [])));
+			sort($storedSelections);
+			if ($productId === $ci->product_id && (int) ($variants[$lineKey] ?? null) === (int) $ci->variant_id && ($selections[$lineKey] ?? []) === $storedSelections && ($items[$lineKey] ?? 0) > 0) {
+				$lineExists = true;
+				break;
+			}
+		}
+		if (! $lineExists) {
 			$ci->delete();
 		}
 	}
 
 	// Add/update incoming items
-	foreach ($items as $pid => $qty) {
+	foreach ($items as $lineKey => $qty) {
 		$qty = (int) $qty;
 		if ($qty <= 0) continue;
+		$pid = $products[$lineKey] ?? null;
+		if (! $pid) continue;
 		$product = ProductModel::find($pid);
 		if (! $product) continue;
+		$variantId = $variants[$lineKey] ?? null;
+		$selectionIds = $selections[$lineKey] ?? ($variantId ? [$variantId] : []);
+		$selectionVariants = $product->variants()->whereIn('id', $selectionIds)->get();
+		if (count($selectionIds) !== $selectionVariants->count()) continue;
+		$variant = $variantId ? $product->variants()->whereKey($variantId)->first() : null;
+		if ($variantId && (! $variant || ! $variant->available)) continue;
+		if ($selectionVariants->contains(fn ($selectedVariant) => ! $selectedVariant->available)) continue;
 
-		$existing = $cart->items()->where('product_id', $product->id)->first();
+		$existing = $cart->items()->where('product_id', $product->id)->where('variant_id', $variantId)->get()->first(function ($candidate) use ($selectionIds) {
+			$stored = array_values(array_unique(array_map('intval', $candidate->variant_selections ?? [])));
+			sort($stored);
+			return $stored === $selectionIds;
+		});
 		if ($existing) {
 			$existing->quantity = $qty;
 			$existing->save();
 		} else {
 			// use Cart::addProduct to keep pricing logic
-			$cart->addProduct($product, $qty);
+			$cart->addProduct($product, $qty, $variantId, $selectionIds);
 		}
 	}
 
 	$cart->load('items.product');
-	return response()->json(['count' => $cart->count, 'items' => $cart->items->map(function($i){ return ['product_id'=>$i->product_id,'quantity'=>$i->quantity]; })]);
+	return response()->json(['count' => $cart->count, 'items' => $cart->items->map(function($i){
+		return [
+			'line_key' => $i->product_id . ':' . implode('-', $i->variant_selections ?: [$i->variant_id ?: '0']),
+			'product_id' => $i->product_id,
+			'variant_id' => $i->variant_id,
+			'variant_selections' => $i->variant_selections,
+			'variant_description' => $i->variant_description,
+			'quantity' => $i->quantity,
+		];
+	})]);
 })->name('catalogo.cartSync');
 
 Route::post('/{name}/checkout', function (Request $request, $name) {
@@ -141,7 +192,7 @@ Route::post('/{name}/checkout', function (Request $request, $name) {
     foreach ($cart->items as $item) {
         $variantText = '';
         if ($item->variant) {
-            $variantText = " ({$item->variant->size} {$item->variant->color})";
+			$variantText = ' (' . ($item->variant_description ?: trim(($item->variant->name ? $item->variant->name . ': ' : '') . $item->variant->size . ' ' . $item->variant->color)) . ')';
         }
 
         $price = $item->product->precio_descuento ?? $item->product->price;
@@ -182,9 +233,9 @@ Route::post('/{name}/checkout', function (Request $request, $name) {
 		]);
 
 		foreach ($cart->items as $item) {
-			$variantDescription = $item->variant
-				? trim("{$item->variant->size} {$item->variant->color}")
-				: null;
+			$variantDescription = $item->variant_description ?: ($item->variant
+				? trim(($item->variant->name ? $item->variant->name . ': ' : '') . $item->variant->size . ' ' . $item->variant->color)
+				: null);
 
 			$order->items()->create([
 				'product_id' => $item->product_id,

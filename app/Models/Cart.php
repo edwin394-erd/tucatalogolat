@@ -86,17 +86,27 @@ class Cart extends Model
             ->first();
     }
 
-    public function addProduct(Product $product, int $quantity = 1, $variantId = null)
+    public function addProduct(Product $product, int $quantity = 1, $variantId = null, array $variantSelections = [])
     {
-        $item = $this->items()->where('product_id', $product->id)->where('variant_id', $variantId)->first();
+        $variantSelections = array_values(array_unique(array_map('intval', $variantSelections)));
+        if (empty($variantSelections) && $variantId) {
+            $variantSelections = [(int) $variantId];
+        }
+        sort($variantSelections);
+        $variantDescription = $this->buildVariantDescription($variantSelections);
+        $item = $this->items()
+            ->where('product_id', $product->id)
+            ->where('variant_id', $variantId)
+            ->get()
+            ->first(fn ($candidate) => $this->sameVariantSelections($candidate->variant_selections, $variantSelections));
 
         if ($item) {
             $item->quantity += $quantity;
             $item->save();
         } else {
             $price = $product->precio_descuento ?? $product->price;
-            if ($variantId) {
-                $variant = ProductVariant::find($variantId);
+            foreach ($variantSelections as $selectionId) {
+                $variant = $product->variants()->find($selectionId);
                 if ($variant) {
                     $price += $variant->price_adjustment;
                 }
@@ -106,9 +116,36 @@ class Cart extends Model
                 'quantity' => $quantity,
                 'price' => $price,
                 'variant_id' => $variantId,
+                'variant_selections' => $variantSelections ?: null,
+                'variant_description' => $variantDescription,
             ]);
         }
 
         $this->load('items.product');
+    }
+
+    private function sameVariantSelections(?array $stored, array $selected): bool
+    {
+        $stored = array_values(array_unique(array_map('intval', $stored ?? [])));
+        sort($stored);
+
+        return $stored === $selected;
+    }
+
+    private function buildVariantDescription(array $selectionIds): ?string
+    {
+        if (empty($selectionIds)) {
+            return null;
+        }
+
+        $variants = ProductVariant::whereIn('id', $selectionIds)->get();
+
+        return $variants->map(function ($variant) {
+            $value = $variant->name
+                ? ($variant->size ?: $variant->color)
+                : trim($variant->size . ' ' . $variant->color);
+
+            return trim(($variant->name ? $variant->name . ': ' : '') . $value);
+        })->filter()->unique()->implode(' / ') ?: null;
     }
 }

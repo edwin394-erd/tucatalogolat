@@ -52,7 +52,8 @@
                     return $compact ? '' : '<span class="text-gray-500">No image</span>';
 
                 case $column === 'subscription':
-                    return '<div class="text-sm break-words" style="' . $clampStyle . '">' . e($item->subscriptions->isNotEmpty() ? $item->subscriptions->last()->plan->name : 'Sin suscripción') . '</div>';
+                    $latestSubscription = $item->subscriptions()->latest('expires_at')->first();
+                    return '<div class="text-sm break-words" style="' . $clampStyle . '">' . e($latestSubscription && $latestSubscription->plan ? $latestSubscription->plan->name : 'Sin suscripción') . '</div>';
 
                 case $column === 'user_id':
                     return '<div class="text-sm break-words" style="' . $clampStyle . '">' . e($item->user ? $item->user->name : 'N/A') . '</div>';
@@ -61,9 +62,10 @@
                     return '<div class="text-sm break-words" style="' . $clampStyle . '">' . e($item->plan ? $item->plan->name : 'N/A') . '</div>';
 
                 case $column === 'fecha_de_corte':
-                    $expired = $item->subscriptions->isNotEmpty() && $item->subscriptions->last()->expires_at < now();
+                    $latestSubscription = $item->subscriptions()->latest('expires_at')->first();
+                    $expired = $latestSubscription && $latestSubscription->expires_at && $latestSubscription->expires_at->isPast();
                     $cls = $expired ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700';
-                    $text = $item->subscriptions->isNotEmpty() ? $item->subscriptions->last()->expires_at->format('d/m/Y') : 'N/A';
+                    $text = $latestSubscription && $latestSubscription->expires_at ? $latestSubscription->expires_at->format('d/m/Y') : 'N/A';
                     return '<div class="rounded-lg px-2 py-1 inline-block text-center text-sm ' . $cls . '">' . e($text) . '</div>';
 
                 case $column === 'status':

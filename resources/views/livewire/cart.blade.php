@@ -44,7 +44,9 @@
             $itemsPayload = [];
             foreach ($cart->items as $ci) {
                 $product = $ci->product;
-                $itemsPayload[$ci->product_id] = [
+                $selectionIds = $ci->variant_selections ?: ($ci->variant_id ? [$ci->variant_id] : []);
+                $lineKey = $ci->product_id . ':' . implode('-', $selectionIds ?: ['0']);
+                $itemsPayload[$lineKey] = [
                     'cart_item_id' => $ci->id,
                     'product_id' => $ci->product_id,
                     'quantity' => $ci->quantity,
@@ -54,7 +56,10 @@
                             \Illuminate\Support\Str::limit($product->description, 60) : ''),
                     'price' => $ci->price,
                     'image' => $product && $product->fotos->first() ? asset('storage/' . $product->fotos->first()->url) : null,
-                    'variant' => $ci->variant ? ['size' => $ci->variant->size, 'color' => $ci->variant->color] : null,
+                    'variant' => $ci->variant ? ['name' => $ci->variant->name, 'size' => $ci->variant->size, 'color' => $ci->variant->color] : null,
+                    'variant_description' => $ci->variant_description,
+                    'variant_id' => $ci->variant_id,
+                    'variant_selections' => $selectionIds,
                 ];
             }
         @endphp
@@ -88,6 +93,7 @@
                                     <div class="min-w-0 flex-1">
                                         <h3 class="font-semibold text-sm sm:text-base line-clamp-2" style="color: var(--text-primary);" x-text="itemsData[pid] ? itemsData[pid].name : 'Producto'">Producto</h3>
                                         <p class="text-xs sm:text-sm mt-1 line-clamp-2" style="color: var(--text-primary); opacity: 0.65;" x-text="itemsData[pid] ? itemsData[pid].short_description : ''"></p>
+                                        <p x-show="itemsData[pid] && itemsData[pid].variant_description" class="mt-1 text-xs font-medium" style="color: var(--text-primary); opacity: 0.75;" x-text="itemsData[pid] ? itemsData[pid].variant_description : ''"></p>
                                         <p class="mt-2 text-sm sm:text-base font-semibold" style="color: var(--text-primary);">$<span x-text="(itemsData[pid] ? Number(itemsData[pid].price).toFixed(2) : '0.00')"></span></p>
                                     </div>
                                 </div>
@@ -166,36 +172,46 @@
                     customerNotes: '',
                     init(){
                         var routeName = '{{ $catalogo->name_handle ?? $catalogo->name }}';
-                        var key = 'cart_' + (routeName || 'global');
+                        var key = 'cart_v2_' + (routeName || 'global');
                         if (!window.Alpine) return;
 
                         if (!Alpine.store || !Alpine.store('cart')) {
                             Alpine.store('cart', {
                                 items: JSON.parse(localStorage.getItem(key) || '{}'),
-                                save: function(){ localStorage.setItem(key, JSON.stringify(this.items)); },
+                                products: JSON.parse(localStorage.getItem(key + '_products') || '{}'),
+                                variants: JSON.parse(localStorage.getItem(key + '_variants') || '{}'),
+                                selections: JSON.parse(localStorage.getItem(key + '_selections') || '{}'),
+                                save: function(){ localStorage.setItem(key, JSON.stringify(this.items)); localStorage.setItem(key + '_products', JSON.stringify(this.products)); localStorage.setItem(key + '_variants', JSON.stringify(this.variants)); localStorage.setItem(key + '_selections', JSON.stringify(this.selections)); },
                                 count: function(){ return Object.values(this.items).reduce(function(a,b){ return a + (Number(b)||0); }, 0); },
+                                quantityFor: function(id){ id = String(id); var self = this; return Object.keys(this.items).reduce(function(total, lineKey){ return total + (String(self.products[lineKey] || lineKey.split(':')[0]) === id ? (Number(self.items[lineKey]) || 0) : 0); }, 0); },
+                                hydrate: function(lines){ this.items = {}; this.products = {}; this.variants = {}; this.selections = {}; (lines || []).forEach(function(line){ var lineKey = line.line_key || (line.product_id + ':' + (line.variant_id || '0')); this.items[lineKey] = Number(line.quantity) || 0; this.products[lineKey] = Number(line.product_id); if (line.variant_id) this.variants[lineKey] = Number(line.variant_id); if (line.variant_selections) this.selections[lineKey] = line.variant_selections; }, this); this.save(); },
                                 _syncTimer: null,
-                                _scheduleSync: function(){ var self = this; if (self._syncTimer) clearTimeout(self._syncTimer); self._syncTimer = setTimeout(function(){ try { var token = (document.querySelector('meta[name="csrf-token"]')||{}).getAttribute('content')||''; fetch('/' + routeName + '/cart-sync', { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': token }, body: JSON.stringify({ items: self.items }) }).then(function(r){ return r.json(); }).then(function(data){ window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: data.count } })); }).catch(function(){}); } catch(e){} }, 400); },
-                                add: function(id){ id = String(id); this.items[id] = (this.items[id]||0) + 1; this.save(); this._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: this.count() } })); },
-                                increase: function(id){ this.add(id); },
-                                decrease: function(id){ id = String(id); if (!this.items[id]) return; this.items[id] = (this.items[id]||0) - 1; if (this.items[id] <= 0) delete this.items[id]; this.save(); this._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: this.count() } })); }
+                                _scheduleSync: function(){ var self = this; if (self._syncTimer) clearTimeout(self._syncTimer); self._syncTimer = setTimeout(function(){ try { var token = (document.querySelector('meta[name="csrf-token"]')||{}).getAttribute('content')||''; fetch('/' + routeName + '/cart-sync', { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': token }, body: JSON.stringify({ items: self.items, products: self.products, variants: self.variants, selections: self.selections }) }).then(function(r){ return r.json(); }).then(function(data){ if (data.items && self.hydrate) self.hydrate(data.items); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: data.count } })); }).catch(function(){}); } catch(e){} }, 400); },
+                                findKey: function(id){ id = String(id); return Object.keys(this.items).find(function(lineKey){ return String(this.products[lineKey] || lineKey.split(':')[0]) === id; }, this); },
+                                add: function(id, variantId, selectionIds){ id = String(id); selectionIds = (selectionIds || (variantId ? [variantId] : [])).map(Number).sort(function(a,b){ return a-b; }); var lineKey = id + ':' + (selectionIds.join('-') || '0'); this.items[lineKey] = (this.items[lineKey]||0) + 1; this.products[lineKey] = Number(id); if (variantId) this.variants[lineKey] = Number(variantId); this.selections[lineKey] = selectionIds; this.save(); this._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: this.count() } })); },
+                                increase: function(id){ id = String(id); var lineKey = this.items[id] ? id : this.findKey(id); if (lineKey) { this.items[lineKey] += 1; this.save(); this._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: this.count() } })); } else this.add(id); },
+                                decrease: function(id){ id = String(id); var lineKey = this.items[id] ? id : this.findKey(id); if (!lineKey) return; this.items[lineKey] -= 1; if (this.items[lineKey] <= 0) { delete this.items[lineKey]; delete this.products[lineKey]; delete this.variants[lineKey]; delete this.selections[lineKey]; } this.save(); this._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: this.count() } })); }
                             });
 
                             try {
                                 var s = Alpine.store('cart');
-                                if (Object.keys(s.items || {}).length === 0) {
-                                    var seeded = {};
-                                    for (var k in this.itemsData) {
-                                        if (this.itemsData[k] && this.itemsData[k].quantity) seeded[k] = this.itemsData[k].quantity;
-                                    }
-                                    if (Object.keys(seeded).length > 0) { s.items = seeded; s.save(); }
-                                }
+                                var serverLines = Object.keys(this.itemsData).map(function(lineKey) {
+                                    var line = this.itemsData[lineKey];
+                                    return {
+                                        line_key: lineKey,
+                                        product_id: line.product_id,
+                                        variant_id: line.variant_id,
+                                        variant_selections: line.variant_selections,
+                                        quantity: line.quantity,
+                                    };
+                                }, this);
+                                if (s.hydrate) s.hydrate(serverLines);
                             } catch(e){}
-                            window.cartAdd = window.cartAdd || function(id){ try { if (Alpine.store('cart')) Alpine.store('cart').add(id); } catch(e){} };
+                            window.cartAdd = window.cartAdd || function(id, variantId, selectionIds){ try { if (Alpine.store('cart')) Alpine.store('cart').add(id, variantId, selectionIds); } catch(e){} };
                             window.cartIncrease = window.cartIncrease || function(id){ try { if (Alpine.store('cart')) Alpine.store('cart').increase(id); } catch(e){} };
                             window.cartDecrease = window.cartDecrease || function(id){ try { if (Alpine.store('cart')) Alpine.store('cart').decrease(id); } catch(e){} };
                             window.cartReset = window.cartReset || function(){ try { if (Alpine.store('cart')) { Alpine.store('cart').items = {}; if (typeof Alpine.store('cart').save === 'function') Alpine.store('cart').save(); } window.dispatchEvent(new CustomEvent('cart-reset')); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: 0 } })); } catch(e){} };
-                            window.cartSyncNow = window.cartSyncNow || function(){ try { var token = (document.querySelector('meta[name="csrf-token"]')||{}).getAttribute('content')||''; return fetch('/' + routeName + '/cart-sync', { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': token }, body: JSON.stringify({ items: Alpine.store('cart').items }) }).then(function(r){ return r.json(); }).then(function(data){ window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: data.count } })); return data; }).catch(function(){ return Promise.resolve(); }); } catch(e){ return Promise.resolve(); } };
+                            window.cartSyncNow = window.cartSyncNow || function(){ try { var token = (document.querySelector('meta[name="csrf-token"]')||{}).getAttribute('content')||''; return fetch('/' + routeName + '/cart-sync', { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': token }, body: JSON.stringify({ items: Alpine.store('cart').items, products: Alpine.store('cart').products, variants: Alpine.store('cart').variants, selections: Alpine.store('cart').selections }) }).then(function(r){ return r.json(); }).then(function(data){ if (data.items && Alpine.store('cart').hydrate) Alpine.store('cart').hydrate(data.items); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: data.count } })); return data; }).catch(function(){ return Promise.resolve(); }); } catch(e){ return Promise.resolve(); } };
                         }
 
                         window.addEventListener('cart-updated', () => { /* reactive via store */ });
@@ -203,7 +219,7 @@
                     },
                     increase(pid){ window.cartIncrease(pid); },
                     decrease(pid){ window.cartDecrease(pid); },
-                    remove(pid){ try { if (Alpine.store('cart')) { delete Alpine.store('cart').items[pid]; Alpine.store('cart').save(); Alpine.store('cart')._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: Alpine.store('cart').count() } })); } } catch(e){} },
+                    remove(pid){ try { if (Alpine.store('cart')) { delete Alpine.store('cart').items[pid]; delete Alpine.store('cart').products[pid]; delete Alpine.store('cart').variants[pid]; Alpine.store('cart').save(); Alpine.store('cart')._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: Alpine.store('cart').count() } })); } } catch(e){} },
                     clear(){ if (window.cartReset) window.cartReset(); },
                     total(){ var t = 0; if (!(Alpine.store && Alpine.store('cart'))) return 0; var items = Alpine.store('cart').items; for (var pid in items){ var q = Number(items[pid]||0); var price = this.itemsData[pid] ? Number(this.itemsData[pid].price) : 0; t += q * price; } return t; },
                     openCheckout(){

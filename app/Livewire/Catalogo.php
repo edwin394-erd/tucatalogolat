@@ -95,7 +95,8 @@ class Catalogo extends Component
             $this->redirectRoute('configuracion');
         }
 
-            $this->subscripcionActiva = $catalogo->user->subscriptions->last() && $catalogo->user->subscriptions->last()->expires_at > now();
+            $latestSubscription = $catalogo->user->subscriptions()->latest('expires_at')->first();
+            $this->subscripcionActiva = $latestSubscription && $latestSubscription->expires_at && $latestSubscription->expires_at->isFuture();
 
             if (!$this->subscripcionActiva) {
                 return view('livewire.expiro')->extends('layouts.guest')->section('content')
@@ -104,7 +105,7 @@ class Catalogo extends Component
 
 
         $products = $catalogo->products()
-            ->with('fotos')
+            ->with(['fotos', 'variants'])
             ->when($this->search, function ($query) {
                 $searchWords = collect(preg_split('/\s+/', trim($this->search)))
                     ->filter()

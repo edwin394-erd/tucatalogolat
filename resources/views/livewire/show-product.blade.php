@@ -17,7 +17,11 @@
                             <select wire:model="selectedVariantId" class="mt-1 block w-full border-gray-300 rounded-md">
                                 <option value="">Seleccionar...</option>
                                 @foreach($product->variants as $variant)
-                                    <option value="{{ $variant->id }}">{{ $variant->size }} {{ $variant->color }} (+{{ $variant->price_adjustment }})</option>
+                                    @php
+                                        $variantLabel = trim(($variant->name ? $variant->name . ': ' : '') . ($variant->size ?: '') . ' ' . ($variant->color ?: ''));
+                                        $variantLabel = trim($variantLabel);
+                                    @endphp
+                                    <option value="{{ $variant->id }}">{{ $variantLabel ?: 'Variante' }} @if($variant->price_adjustment > 0) (+{{ $variant->price_adjustment }}) @endif</option>
                                 @endforeach
                             </select>
                         </div>

@@ -45,7 +45,7 @@ class Dashboard extends Component
 
     public function render()
     {
-        $subscription = auth()->user()->subscriptions()->with('plan')->latest()->first();
+        $subscription = auth()->user()->subscriptions()->with('plan')->latest('expires_at')->first();
         $this->plan_name = $subscription?->plan?->name;
         $this->plan_expires_at = $subscription?->expires_at;
         $secondsRemaining = $subscription?->expires_at

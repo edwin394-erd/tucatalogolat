@@ -36,6 +36,14 @@ class ShowProduct extends Component
         $catalogo = \App\Models\Catalogo::resolveByName($this->name) ?? \App\Models\Catalogo::where('name_handle', \App\Models\Catalogo::generateHandle($this->name))->firstOrFail();
         $product = Product::where('catalogo_id', $catalogo->id)->findOrFail($productId);
 
+        if ($this->selectedVariantId) {
+            $variant = $product->variants->find($this->selectedVariantId);
+            if ($variant && ! $variant->available) {
+                session()->now('message', 'La variante seleccionada no está disponible.');
+                return;
+            }
+        }
+
         $cart = \App\Models\Cart::current($catalogo->id);
         $cart->addProduct($product, 1, $this->selectedVariantId);
 

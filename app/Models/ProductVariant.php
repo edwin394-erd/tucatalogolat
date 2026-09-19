@@ -11,10 +11,16 @@ class ProductVariant extends Model
 
     protected $fillable = [
         'product_id',
+        'name',
         'size',
         'color',
         'price_adjustment',
         'stock',
+        'available',
+    ];
+
+    protected $casts = [
+        'available' => 'boolean',
     ];
 
     public function product()

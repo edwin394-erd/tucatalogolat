@@ -118,32 +118,6 @@
       <ul class="mt-5 space-y-1 font-medium">
          
          <div class="mb-4 flex items-center justify-between gap-2">
-         @if(auth()->user()->subscriptions->last())
-            @if(auth()->user()->subscriptions->last()->expires_at > now())
-            @php
-               $remainingPlanDays = (int) ceil(now()->diffInDays(auth()->user()->subscriptions->last()->expires_at));
-            @endphp
-            
-            <div class="min-w-0 flex-1 bg-indigo-100 text-indigo-800 text-sm font-medium inline-flex items-center px-2 py-1 rounded dark:bg-indigo-200 dark:text-indigo-900" role="alert">
-               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 shrink-0">
-                  <path  fill-rule="evenodd" d="M14.615 1.595a.75.75 0 0 1 .359.852L12.982 9.75h7.268a.75.75 0 0 1 .548 1.262l-10.5 11.25a.75.75 0 0 1-1.272-.71l1.992-7.302H3.75a.75.75 0 0 1-.548-1.262l10.5-11.25a.75.75 0 0 1 .913-.143Z" clip-rule="evenodd" />
-                  </svg>
-
-               <span class="ml-1.5 min-w-0 leading-tight">
-                  <span class="block truncate">Plan {{ auth()->user()->subscriptions->last()->plan->name }}</span>
-                  <span class="block text-xs font-normal">{{ $remainingPlanDays }} días restantes</span>
-               </span>
-            </div>
-            @else
-            <div class="bg-red-100 text-red-800 text-sm font-medium inline-flex items-center px-2.5 py-0.5 rounded dark:bg-red-200 dark:text-red-900" role="alert">
-               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
-                  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
-                  </svg>
-
-               <span class="ml-2">{{ __('messages.subscription_expired') }}</span>
-            </div>
-            @endif
-         @endif
             <button type="button" @click="startTutorial()" title="Abrir tutorial" aria-label="Abrir tutorial" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-indigo-100 bg-indigo-50 px-2.5 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-300">
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 11v5m0-8h.01"/></svg>
                <span>Tutorial</span>
@@ -231,14 +205,6 @@
          </li>
 
          <li class="h-fit w-full">
-            @php
-               $catalogSubscription = auth()->user()->subscriptions()->latest('expires_at')->first();
-               $catalogAccessActive = $catalogSubscription
-                   && $catalogSubscription->status === 'active'
-                   && $catalogSubscription->expires_at
-                   && $catalogSubscription->expires_at->isFuture();
-            @endphp
-            @if($catalogAccessActive)
             <a data-tour="catalog" href="{{ route('catalogo', auth()->user()->catalogo->name_handle) }}" class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-100 group" wire:current='font-bold text-blue-500'>
              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900">
             <path d="M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z" />
@@ -247,15 +213,6 @@
 
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.catalog') }}</span>
             </a>
-            @else
-            <span class="flex w-full cursor-not-allowed items-center rounded-xl p-2.5 text-gray-400" title="{{ __('messages.subscription_expired') }}" aria-disabled="true">
-               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 w-5 h-5 text-gray-400">
-                  <path fill-rule="evenodd" d="M12 2.25a9.75 9.75 0 1 0 9.75 9.75A9.75 9.75 0 0 0 12 2.25Zm.75 5.25a.75.75 0 0 0-1.5 0v5.25c0 .414.336.75.75.75h3.75a.75.75 0 0 0 0-1.5h-3V7.5Z" clip-rule="evenodd" />
-               </svg>
-               <span class="ms-3 flex-1 whitespace-nowrap">{{ __('messages.catalog') }}</span>
-               <span class="text-xs font-semibold text-red-500">{{ __('messages.subscription_expired') }}</span>
-            </span>
-            @endif
          </li>
 
 

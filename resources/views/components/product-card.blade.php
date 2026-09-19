@@ -1,9 +1,131 @@
+@php
+    $standardVariants = $item->variants->filter(fn ($variant) => blank($variant->name));
+    $variantGroups = collect();
+
+    if ($standardVariants->contains(fn ($variant) => filled($variant->size))) {
+        $variantGroups->push([
+            'key' => 'size',
+            'name' => 'Talla',
+            'options' => $standardVariants->filter(fn ($variant) => filled($variant->size))
+                ->groupBy('size')
+                ->map(fn ($variants, $value) => [
+                    'id' => 'size-' . $value,
+                    'value' => $value,
+                    'label' => $value,
+                    'price_adjustment' => (float) $variants->first()->price_adjustment,
+                    'available' => $variants->contains(fn ($variant) => (bool) $variant->available),
+                ])->values(),
+        ]);
+    }
+
+    if ($standardVariants->contains(fn ($variant) => filled($variant->color))) {
+        $variantGroups->push([
+            'key' => 'color',
+            'name' => 'Color',
+            'options' => $standardVariants->filter(fn ($variant) => filled($variant->color))
+                ->groupBy('color')
+                ->map(fn ($variants, $value) => [
+                    'id' => 'color-' . $value,
+                    'value' => $value,
+                    'label' => $value,
+                    'price_adjustment' => (float) $variants->first()->price_adjustment,
+                    'available' => $variants->contains(fn ($variant) => (bool) $variant->available),
+                ])->values(),
+        ]);
+    }
+
+    $variantGroups = $variantGroups->concat(
+        $item->variants->filter(fn ($variant) => filled($variant->name))
+            ->groupBy('name')
+            ->map(fn ($variants, $groupName) => [
+                'key' => 'custom-' . $groupName,
+                'name' => $groupName,
+                'options' => $variants->map(fn ($variant) => [
+                    'id' => $variant->id,
+                    'value' => $variant->id,
+                    'label' => trim($variant->size ?: $variant->color) ?: 'Variante',
+                    'price_adjustment' => (float) $variant->price_adjustment,
+                    'available' => (bool) $variant->available,
+                ])->values(),
+            ])->values()
+    )->values();
+@endphp
+
 <div x-data="{
         showProductModal: false,
         cardIndex: 0,
         galleryIndex: 0,
         rotationTimer: null,
         images: @js($item->fotos->map(fn ($foto) => asset('storage/' . $foto->url))->values()),
+        basePrice: @js((float) ($item->precio_descuento ?? $item->price)),
+        variants: @js($item->variants->map(fn ($variant) => [
+            'id' => $variant->id,
+            'name' => $variant->name,
+            'size' => $variant->size,
+            'color' => $variant->color,
+            'label' => trim(($variant->name ? $variant->name . ': ' : '') . ($variant->size ?: '') . ' ' . ($variant->color ?: '')) ?: 'Variante',
+            'available' => (bool) $variant->available,
+            'price_adjustment' => (float) $variant->price_adjustment,
+        ])->values()),
+        variantGroups: @js($variantGroups),
+        selectedOptions: {},
+        selectedVariantIds: [],
+        selectedVariantId: '',
+        variantError: false,
+        optionLabel(option) {
+            const adjustment = Number(option.price_adjustment || 0);
+            if (!adjustment) return option.label;
+            const sign = adjustment > 0 ? '+' : '';
+            return option.label + ' (' + sign + adjustment.toFixed(2).replace(/\.00$/, '') + '$)';
+        },
+        selectedPrice() {
+            return this.basePrice + this.variants
+                .filter((variant) => this.selectedVariantIds.includes(Number(variant.id)))
+                .reduce((total, variant) => total + Number(variant.price_adjustment || 0), 0);
+        },
+        resolveVariantSelections() {
+            const selectedSize = this.selectedOptions.size;
+            const selectedColor = this.selectedOptions.color;
+            const selections = [];
+            const standardVariant = this.variants.find((variant) =>
+                (!selectedSize || variant.size === selectedSize) &&
+                (!selectedColor || variant.color === selectedColor) &&
+                !variant.name
+            );
+
+            if (standardVariant && (selectedSize || selectedColor)) {
+                selections.push(Number(standardVariant.id));
+            }
+
+            Object.keys(this.selectedOptions)
+                .filter((key) => key.indexOf('custom-') === 0)
+                .forEach((key) => selections.push(Number(this.selectedOptions[key])));
+
+            this.selectedVariantIds = [...new Set(selections)].sort((left, right) => left - right);
+            this.selectedVariantId = this.selectedVariantIds.length ? String(this.selectedVariantIds[0]) : '';
+        },
+        selectVariant(group, option) {
+            this.selectedOptions[group.key] = option.value;
+            this.resolveVariantSelections();
+            this.variantError = false;
+        },
+        addSelectedVariant() {
+            const allGroupsSelected = this.variantGroups.every((group) => this.selectedOptions[group.key]);
+            this.resolveVariantSelections();
+            if (this.variants.length > 0 && (!this.selectedVariantIds.length || !allGroupsSelected)) {
+                this.variantError = true;
+                return;
+            }
+
+            const selectedVariants = this.variants.filter((variant) => this.selectedVariantIds.includes(Number(variant.id)));
+            if (selectedVariants.some((variant) => !variant.available)) {
+                this.variantError = true;
+                return;
+            }
+
+            this.variantError = false;
+            window.cartAdd({{ $item->id }}, this.selectedVariantId || null, this.selectedVariantIds);
+        },
         startRotation() {
             if (this.images.length < 2 || this.rotationTimer) return;
             this.rotationTimer = setInterval(() => {
@@ -73,8 +195,8 @@
 
         {{-- Acción principal --}}
         <div x-data class="mt-auto pt-0.5">
-            <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) == 0">
-                <button type="button" x-on:click.stop="window.cartAdd({{ $item->id }})" title="Agregar al carrito"
+            <template x-if="(Alpine.store('cart') && Alpine.store('cart').quantityFor({{ $item->id }})) == 0">
+                <button type="button" x-on:click.stop="variants.length ? (showProductModal = true) : window.cartAdd({{ $item->id }})" title="Agregar al carrito"
                         class="w-full h-8 sm:h-10 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold shadow-md transition-all duration-200 hover:shadow-lg hover:brightness-105 active:scale-[0.98]"
                         style="background-color: var(--primary-btn); color: {{ $iconColor }};">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 sm:w-4.5 sm:h-4.5">
@@ -82,13 +204,13 @@
                         <circle cx="9" cy="20" r="1" />
                         <circle cx="16" cy="20" r="1" />
                     </svg>
-                    <span class="hidden xs:inline sm:inline">Agregar</span>
+                    <span class="hidden xs:inline sm:inline" x-text="variants.length ? 'Elegir opciones' : 'Agregar'"></span>
                 </button>
             </template>
-            <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) > 0">
+            <template x-if="(Alpine.store('cart') && Alpine.store('cart').quantityFor({{ $item->id }})) > 0">
                 <div class="flex items-center justify-between w-full h-8 sm:h-10 rounded-xl sm:rounded-2xl border border-black/10 bg-white/50 backdrop-blur-sm px-1 sm:px-1.5 shadow-inner">
                     <button type="button" @click.stop="window.cartDecrease({{ $item->id }})" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white/70 text-sm sm:text-base font-semibold transition hover:bg-white active:scale-95 text-[var(--text-secondary)]">−</button>
-                    <div class="flex-1 text-center text-xs sm:text-sm font-bold text-[var(--text-secondary)]" x-text="Alpine.store('cart') ? (Alpine.store('cart').items['{{ $item->id }}'] || 0) : 0"></div>
+                    <div class="flex-1 text-center text-xs sm:text-sm font-bold text-[var(--text-secondary)]" x-text="Alpine.store('cart') ? Alpine.store('cart').quantityFor({{ $item->id }}) : 0"></div>
                     <button type="button" @click.stop="window.cartIncrease({{ $item->id }})" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
                 </div>
             </template>
@@ -149,10 +271,10 @@
                         <span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--text-secondary)] opacity-50">Precio</span>
                         <p class="text-xl sm:text-2xl font-black text-[var(--text-secondary)]">
                             @if($item->precio_descuento)
-                                ${{ number_format($item->precio_descuento, 2) }}
+                                $<span x-text="selectedPrice().toFixed(2)">{{ number_format($item->precio_descuento, 2) }}</span>
                                 <span class="ml-2 text-sm font-normal line-through text-[var(--text-secondary)] opacity-50">${{ number_format($item->price, 2) }}</span>
                             @else
-                                ${{ number_format($item->price, 2) }}
+                                $<span x-text="selectedPrice().toFixed(2)">{{ number_format($item->price, 2) }}</span>
                             @endif
                         </p>
                     </div>
@@ -160,6 +282,26 @@
                     <div>
                         <span class="text-xs font-semibold text-[var(--text-secondary)] opacity-80">Descripción</span>
                         <p class="mt-0.5 max-h-32 overflow-y-auto text-sm leading-relaxed break-words text-[var(--text-secondary)] opacity-70" style="display: block; word-break: break-word;">{{ $item->description }}</p>
+                    </div>
+
+                    <div x-show="variantGroups.length > 0" class="space-y-5 border-t border-black/[0.08] pt-4">
+                        <template x-for="group in variantGroups" :key="group.name">
+                            <section>
+                                <div class="mb-2 flex items-center justify-between gap-3">
+                                    <h4 class="text-xs font-bold uppercase tracking-[0.16em] text-[var(--text-secondary)]" x-text="group.name"></h4>
+                                    <span class="text-xs text-[var(--text-secondary)] opacity-55">Elige una opción</span>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="option in group.options" :key="option.id">
+                                        <button type="button" @click.stop="selectVariant(group, option)" :disabled="!option.available"
+                                                :class="option.available ? (String(selectedOptions[group.key]) === String(option.value) ? 'border-[var(--primary-btn)] bg-[var(--primary-btn)] text-white shadow-sm' : 'border-black/[0.10] bg-[var(--bg-main)] text-[var(--text-secondary)] hover:border-[var(--primary-btn)]') : 'cursor-not-allowed border-black/[0.06] bg-black/[0.02] text-[var(--text-secondary)] opacity-45 line-through'"
+                                                class="min-h-11 rounded-xl border px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--primary-btn)] focus:ring-offset-1"
+                                                x-text="optionLabel(option)"></button>
+                                    </template>
+                                </div>
+                            </section>
+                        </template>
+                        <p x-show="variantError" x-cloak class="text-xs font-medium text-red-600">Selecciona una opción disponible para continuar.</p>
                     </div>
 
                     @if(!empty($item->category_id) || !empty($item->categoria) || !empty($item->stock))
@@ -182,19 +324,19 @@
             </main>
 
             <footer class="flex items-center justify-end gap-3 border-t border-black/5 px-5 sm:px-6 py-3 sm:py-4 shrink-0" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
-                <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) == 0">
-                    <button type="button" x-data="{ anim:false }" @click.stop="anim = true; window.cartAdd({{ $item->id }}); setTimeout(() => anim = false, 350)"
+                <template x-if="variants.length > 0 || (Alpine.store('cart') && Alpine.store('cart').quantityFor({{ $item->id }})) == 0">
+                    <button type="button" x-data="{ anim:false }" @click.stop="anim = true; addSelectedVariant(); setTimeout(() => anim = false, 350)"
                             :class="anim ? 'scale-105 shadow-2xl ring-4 ring-black/5' : ''"
                             class="w-full sm:w-auto rounded-2xl px-6 py-2.5 text-sm font-semibold transition transform duration-200 ease-out hover:scale-105 active:scale-95 shadow-md"
                             style="background-color: var(--primary-btn); color: {{ $iconColor }};">
-                        Agregar al carrito
+                        <span>Agregar al carrito</span>
                     </button>
                 </template>
 
-                <template x-if="(Alpine.store('cart') && (Alpine.store('cart').items['{{ $item->id }}'] || 0)) > 0">
+                <template x-if="variants.length === 0 && (Alpine.store('cart') && Alpine.store('cart').quantityFor({{ $item->id }})) > 0">
                     <div class="flex items-center justify-between w-full sm:w-auto min-w-[140px] h-11 rounded-2xl border border-black/10 bg-white/50 backdrop-blur-sm px-1.5 shadow-inner">
                         <button type="button" @click.stop="window.cartDecrease({{ $item->id }})" class="w-8 h-8 rounded-xl bg-white/70 text-lg font-semibold transition hover:bg-white active:scale-95 text-[var(--text-secondary)]">−</button>
-                        <div class="flex-1 text-center text-sm font-bold text-[var(--text-secondary)]" x-text="Alpine.store('cart') ? (Alpine.store('cart').items['{{ $item->id }}'] || 0) : 0"></div>
+                        <div class="flex-1 text-center text-sm font-bold text-[var(--text-secondary)]" x-text="Alpine.store('cart') ? Alpine.store('cart').quantityFor({{ $item->id }}) : 0"></div>
                         <button type="button" @click.stop="window.cartIncrease({{ $item->id }})" class="w-8 h-8 rounded-xl text-lg font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
                     </div>
                 </template>

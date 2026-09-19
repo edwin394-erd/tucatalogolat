@@ -1,5 +1,4 @@
-
-  <div>
+<div>
         <h2 class="mb-3 text-xl font-bold text-gray-700 sm:text-2xl">{{ $ItemId ? __('messages.edit_product') : __('messages.create_product') }}</h2>
         @if($maximoProductos && !$ItemId && $productosActuales >= $maximoProductos) 
             <div class="bg-red-100 text-red-700 text-sm font-medium inline-flex items-center px-2.5 py-2 rounded dark:bg-red-200 dark:text-red-900 " role="alert">
@@ -49,24 +48,17 @@
                 </div>
                 
                 <input type="number" wire:model='precio_descuento' id="precio_descuento" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500" placeholder="$2000">
-                {{-- <input type="number" wire:model="precio_descuento" name="precio_descuento" id="precio_descuento" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-600 focus:border-gray-600 block w-full p-2.5 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500" placeholder="$2999"> --}}
                 <x-input-error for="precio_descuento" class="mt-2" />
             </div>
-            
 
-            
             <div class="col-span-full">
                 <label for="description" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.product_description') }}</label>
                 <textarea id="description" rows="4" wire:model="description" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-100 inset-shadow-sm rounded-lg border border-gray-300 focus:ring-gray-500 focus:border-gray-500 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500" placeholder="{{ __('messages.product_description_placeholder') }}"></textarea>
                 <x-input-error for="description" class="mt-2" />
             </div>
-
-           
-
-           
-           
         </div>
-                <label for="Imagen" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.product_image') }}</label>
+
+        <label for="Imagen" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.product_image') }}</label>
 
        <div class="flex flex-wrap items-center justify-center w-full mb-2" x-data="{ previews: [] }">
     <label for="dropzone-file" class="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-100 inset-shadow-sm gg:hover:bg-gray-800 gg:bg-gray-700 hover:bg-gray-100 gg:border-gray-600 gg:hover:border-gray-500 gg:hover:bg-gray-600">
@@ -75,7 +67,7 @@
                 <div class="flex flex-wrap items-center justify-center gap-4 mb-2">
                     {{-- Imágenes ya guardadas (sin cambios) --}}
                     @foreach($existingImages as $foto)
-                        <div class="relative w-24 h-24">
+                        <div class="relative w-24 h-24" wire:key="existing-photo-{{ $foto['id'] }}">
                             <img src="{{ asset('storage/' . $foto['url']) }}" alt="Foto guardada" class="w-full h-full object-cover rounded" />
                             <button type="button" wire:click="markImageForDeletion({{ $foto['id'] }})" class="absolute top-0 right-0 p-1 text-white bg-red-500 rounded-full hover:bg-red-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -115,36 +107,131 @@
         <br>
 
         <!-- Variantes -->
-        {{-- <div class="col-span-2">
+        <div class="col-span-2 mt-4" wire:key="variants-section"
+             x-data="{
+                sizeEnabled: @entangle('allowSizeVariants').live,
+                colorEnabled: @entangle('allowColorVariants').live,
+             }">
             <label class="block mb-2 text-sm font-medium text-gray-900">Variantes (opcional)</label>
-            <button type="button" wire:click="addVariant" class="mb-2 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1">
-                Agregar Variante
-            </button>
-            <div class="space-y-2">
-                @foreach($variants as $index => $variant)
-                    <div class="flex items-center space-x-2 bg-gray-50 p-2 rounded">
-                        <input type="text" wire:model="variants.{{ $index }}.size" placeholder="Talla (ej. M)" class="flex-1 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
-                        <input type="text" wire:model="variants.{{ $index }}.color" placeholder="Color (ej. Rojo)" class="flex-1 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
-                        <input type="number" wire:model="variants.{{ $index }}.price_adjustment" placeholder="Ajuste precio (ej. 10)" step="0.01" class="flex-1 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
-                        <input type="number" wire:model="variants.{{ $index }}.stock" placeholder="Stock" min="0" class="flex-1 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
-                        <button type="button" wire:click="removeVariant({{ $index }})" class="text-red-600 hover:text-red-800">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
+
+            <div class="flex flex-wrap gap-4 mb-3 text-sm text-gray-700">
+                <label class="inline-flex items-center gap-2">
+                    <input type="checkbox" x-model="sizeEnabled" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    Talla
+                </label>
+                <label class="inline-flex items-center gap-2">
+                    <input type="checkbox" x-model="colorEnabled" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    Color
+                </label>
+            </div>
+
+            <template x-if="sizeEnabled">
+                <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3" wire:key="size-options-block">
+                    <div class="mb-2 flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Tallas disponibles</span>
+                        <button type="button" wire:click="addSizeOption" class="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 gg:border-blue-500/40 gg:bg-blue-900/30 gg:text-blue-300 gg:hover:bg-blue-900/50" aria-label="Agregar talla">
+                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+                            Agregar talla
+                        </button>
+                    </div>
+                    <div class="space-y-2">
+                        @foreach($sizeOptions as $index => $option)
+                            <div class="flex items-center gap-2" wire:key="size-option-{{ $index }}">
+                                <input type="text" wire:model="sizeOptions.{{ $index }}.value" placeholder="Ej. S, M, L, 42" class="flex-1 min-w-32 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                <input type="number" step="0.01" wire:model="sizeOptions.{{ $index }}.price_adjustment" placeholder="Cargo extra" aria-label="Cargo extra de talla" class="w-28 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                <label class="inline-flex items-center gap-2 text-xs text-gray-700">
+                                    <input type="checkbox" wire:model="sizeOptions.{{ $index }}.available" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                    Disponible
+                                </label>
+                                <button type="button" wire:click="removeSizeOption({{ $index }})" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-red-200 text-red-600 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 gg:border-red-500/40 gg:text-red-300 gg:hover:bg-red-900/30" aria-label="Quitar talla" title="Quitar talla">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </template>
+
+            <template x-if="colorEnabled">
+                <div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3" wire:key="color-options-block">
+                    <div class="mb-2 flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Colores disponibles</span>
+                        <button type="button" wire:click="addColorOption" class="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 gg:border-blue-500/40 gg:bg-blue-900/30 gg:text-blue-300 gg:hover:bg-blue-900/50" aria-label="Agregar color">
+                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+                            Agregar color
+                        </button>
+                    </div>
+                    <div class="space-y-2">
+                        @foreach($colorOptions as $index => $option)
+                            <div class="flex items-center gap-2" wire:key="color-option-{{ $index }}">
+                                <input type="text" wire:model="colorOptions.{{ $index }}.value" placeholder="Ej. Rojo, Azul, Negro" class="flex-1 min-w-32 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                <input type="number" step="0.01" wire:model="colorOptions.{{ $index }}.price_adjustment" placeholder="Cargo extra" aria-label="Cargo extra de color" class="w-28 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                <label class="inline-flex items-center gap-2 text-xs text-gray-700">
+                                    <input type="checkbox" wire:model="colorOptions.{{ $index }}.available" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                    Disponible
+                                </label>
+                                <button type="button" wire:click="removeColorOption({{ $index }})" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-red-200 text-red-600 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 gg:border-red-500/40 gg:text-red-300 gg:hover:bg-red-900/30" aria-label="Quitar color" title="Quitar color">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </template>
+
+            <div class="mt-4">
+                <div class="mb-2 text-sm font-medium text-gray-700">Variantes personalizadas</div>
+            </div>
+
+            <div class="space-y-3">
+                @foreach($customVariants as $variantIndex => $customVariant)
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 space-y-3" wire:key="custom-variant-{{ $variantIndex }}">
+                        <div class="flex items-center justify-between gap-3">
+                            <input type="text" wire:model="customVariants.{{ $variantIndex }}.name" placeholder="Nombre de la variante (ej. Talla, Material)" class="flex-1 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                            <button type="button" wire:click="removeCustomVariant({{ $variantIndex }})" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-red-200 text-red-600 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 gg:border-red-500/40 gg:text-red-300 gg:hover:bg-red-900/30" aria-label="Quitar variante personalizada" title="Quitar variante personalizada">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="space-y-2">
+                            @foreach($customVariant['values'] ?? [] as $valueIndex => $value)
+                                <div class="flex items-center gap-2" wire:key="custom-variant-value-{{ $variantIndex }}-{{ $valueIndex }}">
+                                    <input type="text" wire:model="customVariants.{{ $variantIndex }}.values.{{ $valueIndex }}.value" placeholder="Ej. Grande, Mediano, Pequeño" class="flex-1 min-w-32 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                    <input type="number" step="0.01" wire:model="customVariants.{{ $variantIndex }}.values.{{ $valueIndex }}.price_adjustment" placeholder="Cargo extra" aria-label="Cargo extra del valor" class="w-28 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                    <label class="inline-flex items-center gap-2 text-xs text-gray-700">
+                                        <input type="checkbox" wire:model="customVariants.{{ $variantIndex }}.values.{{ $valueIndex }}.available" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                        Disponible
+                                    </label>
+                                    <button type="button" wire:click="removeCustomVariantValue({{ $variantIndex }}, {{ $valueIndex }})" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-red-200 text-red-600 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 gg:border-red-500/40 gg:text-red-300 gg:hover:bg-red-900/30" aria-label="Quitar valor" title="Quitar valor">
+                                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <button type="button" wire:click="addCustomVariantValue({{ $variantIndex }})" class="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 gg:border-blue-500/40 gg:bg-blue-900/30 gg:text-blue-300 gg:hover:bg-blue-900/50" aria-label="Agregar valor">
+                            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+                            Agregar valor
                         </button>
                     </div>
                 @endforeach
             </div>
-        </div> --}}
-        <br>
-      
-         
-            <div class="col-span-1 sm:col-span-1 flex items-center mt-2">
-                <input type="checkbox" id="visible" wire:model="visible"  class="w-4 h-4 text-gray-600 bg-gray-100 border-gray-300 rounded focus:ring-gray-500 focus:ring-2" checked="true">
-                <label for="visible" class="ml-2 text-sm font-medium text-gray-900 gg:text-white" checked>{{ __('messages.visible') }}</label>
-                <x-input-error for="visible" class="ml-4" />
+
+            <div class="mt-3 flex justify-end">
+                <button type="button" wire:click="addCustomVariant" class="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition hover:border-blue-300 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 gg:border-blue-500/40 gg:bg-blue-900/30 gg:text-blue-300 gg:hover:bg-blue-900/50" aria-label="Agregar variante personalizada">
+                    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+                    Agregar variante
+                </button>
             </div>
-       
+        </div>
+        <br>
+
+        <div class="col-span-1 sm:col-span-1 flex items-center mt-2">
+            <input type="checkbox" id="visible" wire:model="visible"  class="w-4 h-4 text-gray-600 bg-gray-100 border-gray-300 rounded focus:ring-gray-500 focus:ring-2" checked="true">
+            <label for="visible" class="ml-2 text-sm font-medium text-gray-900 gg:text-white" checked>{{ __('messages.visible') }}</label>
+            <x-input-error for="visible" class="ml-4" />
+        </div>
+
         <div class="{{ $maximoProductos && !$ItemId && $productosActuales >= $maximoProductos ? ' justify-end pointer-events-none' : '' }} flex justify-end">
 
             @if($maximoProductos && !$ItemId && $productosActuales >= $maximoProductos)
@@ -173,5 +260,3 @@
             @endif
         </div>
 </div>
-
-    
