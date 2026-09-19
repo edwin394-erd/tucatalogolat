@@ -21,6 +21,18 @@ class Planes extends Component
         'proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
     ];
 
+    protected $messages = [
+        'proof.required' => 'Debes seleccionar el comprobante de pago.',
+        'proof.file' => 'El comprobante seleccionado no es un archivo válido.',
+        'proof.mimes' => 'El comprobante debe estar en formato JPG, PNG o PDF.',
+        'proof.max' => 'El comprobante no puede superar los 5 MB.',
+    ];
+
+    public function updatedProof(): void
+    {
+        $this->validateOnly('proof');
+    }
+
     public function subscribe($planId)
     {
         $plan = Plan::find($planId);
