@@ -6,7 +6,7 @@
   <form class="p-4 md:p-5" wire:submit.prevent="saveChanges" novalidate>
      <div>
         <label for="plan" class="block mb-2 text-sm font-medium text-gray-900">{{ __('messages.plan') }}</label>
-        <input type="text" wire:model.blur="plan" name="plan" id="plan" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="{{ __('messages.plan') }}" required="">
+        <input type="text" wire:model.blur="plan" name="plan" id="plan" class="bg-gray-100 inset-shadow-sm border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="{{ __('messages.plan') }}" required="" readonly>
         @error('plan')
                 <span class="text-red-500 text-sm">{{ $message }}</span>
         @enderror
