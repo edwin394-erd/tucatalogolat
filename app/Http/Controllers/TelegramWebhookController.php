@@ -74,6 +74,12 @@ class TelegramWebhookController extends Controller
             return;
         }
 
+        $this->telegram('editMessageCaption', [
+            'chat_id' => data_get($message, 'chat.id'),
+            'message_id' => data_get($message, 'message_id'),
+            'caption' => data_get($message, 'caption', '') . "\n\n" . $text,
+        ]);
+
         $this->telegram('editMessageReplyMarkup', [
             'chat_id' => data_get($message, 'chat.id'),
             'message_id' => data_get($message, 'message_id'),
