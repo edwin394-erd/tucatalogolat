@@ -37,7 +37,7 @@
                 <h1 class="text-2xl sm:text-3xl font-bold leading-tight" style="color: var(--text-primary);">{{ __('messages.cart') }}</h1>
                 <p class="text-sm mt-1" style="color: var(--text-primary); opacity: 0.65;">{{ __('messages.cart_description') }}</p>
             </div>
-            <a href="{{ route('catalogo', $catalogo->name_handle) }}" class="w-full sm:w-auto text-center px-4 py-2.5 rounded-full shadow hover:opacity-90 transition text-sm sm:text-base" style="background-color: var(--primary-btn); color: {{ $iconColor }};">{{ __('messages.continue_shopping') }}</a>
+            <a href="{{ route('catalogo', $catalogo->name_handle) }}" wire:navigate @click.prevent="const href = $event.currentTarget.href; (window.cartSyncNow ? window.cartSyncNow() : Promise.resolve()).then(() => { if (window.Alpine && typeof Alpine.navigate === 'function') Alpine.navigate(href); else window.location.assign(href); })" class="w-full sm:w-auto text-center px-4 py-2.5 rounded-full shadow hover:opacity-90 transition text-sm sm:text-base" style="background-color: var(--primary-btn); color: {{ $iconColor }};">{{ __('messages.continue_shopping') }}</a>
         </div>
 
         @php
@@ -210,12 +210,12 @@
                             window.cartAdd = window.cartAdd || function(id, variantId, selectionIds){ try { if (Alpine.store('cart')) Alpine.store('cart').add(id, variantId, selectionIds); } catch(e){} };
                             window.cartIncrease = window.cartIncrease || function(id){ try { if (Alpine.store('cart')) Alpine.store('cart').increase(id); } catch(e){} };
                             window.cartDecrease = window.cartDecrease || function(id){ try { if (Alpine.store('cart')) Alpine.store('cart').decrease(id); } catch(e){} };
-                            window.cartReset = window.cartReset || function(){ try { if (Alpine.store('cart')) { Alpine.store('cart').items = {}; if (typeof Alpine.store('cart').save === 'function') Alpine.store('cart').save(); } window.dispatchEvent(new CustomEvent('cart-reset')); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: 0 } })); } catch(e){} };
+                            window.cartReset = window.cartReset || function(){ try { var store = Alpine.store('cart'); if (store) { store.items = {}; store.products = {}; store.variants = {}; store.selections = {}; if (typeof store.save === 'function') store.save(); } window.dispatchEvent(new CustomEvent('cart-reset')); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: 0 } })); if (window.cartSyncNow) window.cartSyncNow(); } catch(e){} };
                             window.cartSyncNow = window.cartSyncNow || function(){ try { var token = (document.querySelector('meta[name="csrf-token"]')||{}).getAttribute('content')||''; return fetch('/' + routeName + '/cart-sync', { method: 'POST', headers: { 'Content-Type':'application/json', 'X-CSRF-TOKEN': token }, body: JSON.stringify({ items: Alpine.store('cart').items, products: Alpine.store('cart').products, variants: Alpine.store('cart').variants, selections: Alpine.store('cart').selections }) }).then(function(r){ return r.json(); }).then(function(data){ if (data.items && Alpine.store('cart').hydrate) Alpine.store('cart').hydrate(data.items); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: data.count } })); return data; }).catch(function(){ return Promise.resolve(); }); } catch(e){ return Promise.resolve(); } };
                         }
 
                         window.addEventListener('cart-updated', () => { /* reactive via store */ });
-                        window.addEventListener('cart-reset', () => { try { if (Alpine.store('cart')) { Alpine.store('cart').items = {}; Alpine.store('cart').save(); } } catch(e){} });
+                        window.addEventListener('cart-reset', () => { try { var store = Alpine.store('cart'); if (store) { store.items = {}; store.products = {}; store.variants = {}; store.selections = {}; store.save(); } } catch(e){} });
                     },
                     increase(pid){ window.cartIncrease(pid); },
                     decrease(pid){ window.cartDecrease(pid); },

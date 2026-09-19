@@ -78,6 +78,14 @@
             const sign = adjustment > 0 ? '+' : '';
             return option.label + ' (' + sign + adjustment.toFixed(2).replace(/\.00$/, '') + '$)';
         },
+        showVariantError() {
+            this.variantError = true;
+            setTimeout(() => {
+                if (this.$refs.variantErrorMessage) {
+                    this.$refs.variantErrorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 50);
+        },
         selectedPrice() {
             return this.basePrice + this.variants
                 .filter((variant) => this.selectedVariantIds.includes(Number(variant.id)))
@@ -113,13 +121,13 @@
             const allGroupsSelected = this.variantGroups.every((group) => this.selectedOptions[group.key]);
             this.resolveVariantSelections();
             if (this.variants.length > 0 && (!this.selectedVariantIds.length || !allGroupsSelected)) {
-                this.variantError = true;
+                this.showVariantError();
                 return;
             }
 
             const selectedVariants = this.variants.filter((variant) => this.selectedVariantIds.includes(Number(variant.id)));
             if (selectedVariants.some((variant) => !variant.available)) {
-                this.variantError = true;
+                this.showVariantError();
                 return;
             }
 
@@ -302,7 +310,7 @@
                                 </div>
                             </section>
                         </template>
-                        <p x-show="variantError" x-cloak class="text-xs font-medium text-red-600">Selecciona una opción disponible para continuar.</p>
+                        <p x-ref="variantErrorMessage" x-show="variantError" x-cloak class="text-xs font-medium text-red-600">Selecciona una opción disponible para continuar.</p>
                     </div>
 
                     @if(!empty($item->category_id) || !empty($item->categoria) || !empty($item->stock))

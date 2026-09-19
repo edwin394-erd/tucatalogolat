@@ -20,7 +20,7 @@
         window.cartAdd = window.cartAdd || function(id, variantId){ try { var key = 'cart_' + (routeName || 'global'); var lineKey = String(id) + ':' + (variantId || '0'); var items = JSON.parse(localStorage.getItem(key) || '{}'); var products = JSON.parse(localStorage.getItem(key + '_products') || '{}'); var variants = JSON.parse(localStorage.getItem(key + '_variants') || '{}'); items[lineKey] = (items[lineKey]||0) + 1; products[lineKey] = Number(id); if (variantId) variants[lineKey] = Number(variantId); localStorage.setItem(key, JSON.stringify(items)); localStorage.setItem(key + '_products', JSON.stringify(products)); localStorage.setItem(key + '_variants', JSON.stringify(variants)); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: Object.values(items).reduce(function(a,b){ return a + (Number(b)||0); },0) } })); } catch(e){} };
         window.cartIncrease = window.cartIncrease || function(id){ window.cartAdd(id); };
         window.cartDecrease = window.cartDecrease || function(id){ try { var key = 'cart_' + (routeName || 'global'); var items = JSON.parse(localStorage.getItem(key) || '{}'); if (!items[String(id)]) return; items[String(id)] = (items[String(id)]||0) - 1; if (items[String(id)] <= 0) delete items[String(id)]; localStorage.setItem(key, JSON.stringify(items)); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: Object.values(items).reduce(function(a,b){ return a + (Number(b)||0); },0) } })); } catch(e){} };
-        window.cartReset = window.cartReset || function(){ try { var key = 'cart_' + (routeName || 'global'); localStorage.removeItem(key); window.dispatchEvent(new CustomEvent('cart-reset')); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: 0 } })); } catch(e){} };
+        window.cartReset = window.cartReset || function(){ try { var key = 'cart_v2_' + (routeName || 'global'); localStorage.removeItem(key); localStorage.removeItem(key + '_products'); localStorage.removeItem(key + '_variants'); localStorage.removeItem(key + '_selections'); window.dispatchEvent(new CustomEvent('cart-reset')); window.dispatchEvent(new CustomEvent('cart-updated', { detail: { count: 0 } })); } catch(e){} };
 
         // Alpine store for client-side cart (optimistic UI)
         document.addEventListener('alpine:init', function(){
@@ -78,10 +78,16 @@
                     // If server reports empty cart, make sure client store/localStorage is cleared too
                     if (c === 0) {
                         try {
-                            var key = 'cart_' + (routeName || 'global');
+                            var key = 'cart_v2_' + (routeName || 'global');
                             localStorage.removeItem(key);
+                            localStorage.removeItem(key + '_products');
+                            localStorage.removeItem(key + '_variants');
+                            localStorage.removeItem(key + '_selections');
                             if (window.Alpine && Alpine.store && Alpine.store('cart')) {
                                 Alpine.store('cart').items = {};
+                                Alpine.store('cart').products = {};
+                                Alpine.store('cart').variants = {};
+                                Alpine.store('cart').selections = {};
                                 if (typeof Alpine.store('cart').save === 'function') Alpine.store('cart').save();
                             }
                             window.dispatchEvent(new CustomEvent('cart-reset'));
@@ -118,6 +124,7 @@
             setTimeout(function(){ clearInterval(interval); }, 5000);
         }
         update();
+        window.addEventListener('pageshow', update);
         waitForLivewire();
     })();
 </script>
