@@ -295,7 +295,7 @@
                                     <template x-for="option in group.options" :key="option.id">
                                         <button type="button" @click.stop="selectVariant(group, option)" :disabled="!option.available"
                                             :class="option.available ? (String(selectedOptions[group.key]) === String(option.value) ? 'border-white shadow-lg ring-2 ring-[var(--primary-btn)]' : 'border-transparent shadow-sm hover:brightness-110') : 'cursor-not-allowed border-black/[0.06] bg-black/[0.02] text-[var(--text-secondary)] opacity-45 line-through'"
-                                            :style="option.available ? 'background-color: var(--primary-btn); color: {{ $iconColor }};' : ''"
+                                                :style="option.available ? (String(selectedOptions[group.key]) === String(option.value) ? 'background-color: color-mix(in srgb, var(--primary-btn) 88%, black); color: {{ $iconColor }};' : 'background-color: var(--primary-btn); color: {{ $iconColor }};') : ''"
                                                 class="min-h-11 rounded-xl border px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--primary-btn)] focus:ring-offset-1"
                                                 x-text="optionLabel(option)"></button>
                                     </template>
