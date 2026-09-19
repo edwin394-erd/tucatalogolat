@@ -135,6 +135,19 @@
                         </button>
                     </div>
                     <div class="space-y-2">
+                        @if(empty($sizeOptions))
+                            <div class="flex items-center gap-2" wire:key="size-option-placeholder">
+                                <input type="text" wire:model="sizeOptions.0.value" placeholder="Ej. S, M, L, 42" class="flex-1 min-w-32 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                <input type="number" step="0.01" wire:model="sizeOptions.0.price_adjustment" placeholder="Cargo extra" aria-label="Cargo extra de talla" class="w-28 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                <label class="inline-flex items-center gap-2 text-xs text-gray-700">
+                                    <input type="checkbox" wire:model="sizeOptions.0.available" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                    Disponible
+                                </label>
+                                <button type="button" wire:click="removeSizeOption(0)" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-red-200 text-red-600 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1" aria-label="Quitar talla" title="Quitar talla">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
+                        @endif
                         @foreach($sizeOptions as $index => $option)
                             <div class="flex items-center gap-2" wire:key="size-option-{{ $index }}">
                                 <input type="text" wire:model="sizeOptions.{{ $index }}.value" placeholder="Ej. S, M, L, 42" class="flex-1 min-w-32 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
@@ -162,6 +175,19 @@
                         </button>
                     </div>
                     <div class="space-y-2">
+                        @if(empty($colorOptions))
+                            <div class="flex items-center gap-2" wire:key="color-option-placeholder">
+                                <input type="text" wire:model="colorOptions.0.value" placeholder="Ej. Rojo, Azul, Negro" class="flex-1 min-w-32 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                <input type="number" step="0.01" wire:model="colorOptions.0.price_adjustment" placeholder="Cargo extra" aria-label="Cargo extra de color" class="w-28 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
+                                <label class="inline-flex items-center gap-2 text-xs text-gray-700">
+                                    <input type="checkbox" wire:model="colorOptions.0.available" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                    Disponible
+                                </label>
+                                <button type="button" wire:click="removeColorOption(0)" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-red-200 text-red-600 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1" aria-label="Quitar color" title="Quitar color">
+                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </button>
+                            </div>
+                        @endif
                         @foreach($colorOptions as $index => $option)
                             <div class="flex items-center gap-2" wire:key="color-option-{{ $index }}">
                                 <input type="text" wire:model="colorOptions.{{ $index }}.value" placeholder="Ej. Rojo, Azul, Negro" class="flex-1 min-w-32 bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2">
