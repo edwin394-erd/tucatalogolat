@@ -105,8 +105,8 @@
                 @else
                     <button type="button" @click="open = true" class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-100"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/></svg>Elegir este plan</button>
 
-                    <div x-show="open" x-cloak x-transition.opacity @keydown.escape.window="open = false" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm" @click.self="open = false">
-                        <div class="w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl" @click.stop>
+                    <div x-show="open" x-cloak x-transition.opacity @keydown.escape.window="open = false" class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm sm:items-center" @click.self="open = false">
+                        <div class="my-auto max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-3xl bg-white shadow-2xl" @click.stop>
                             <div class="flex items-start justify-between border-b border-slate-100 p-6">
                                 <div><p class="text-xs font-bold uppercase tracking-wider text-indigo-600">Paso 1 de 2</p><h3 class="mt-1 text-xl font-bold text-slate-900">Paga y envía tu comprobante</h3><p class="mt-1 text-sm text-slate-500">{{ $plan->name }} · ${{ number_format((float) $plan->price, 2) }}</p></div>
                                 <button type="button" @click="open = false" class="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Cerrar modal">&times;</button>
