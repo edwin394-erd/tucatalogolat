@@ -72,6 +72,9 @@
         selectedVariantIds: [],
         selectedVariantId: '',
         variantError: false,
+        normalizeVariantValue(value) {
+            return value === null || value === undefined ? '' : String(value).trim();
+        },
         optionLabel(option) {
             const adjustment = Number(option.price_adjustment || 0);
             if (!adjustment) return option.label;
@@ -96,9 +99,9 @@
             const selectedColor = this.selectedOptions.color;
             const selections = [];
             const standardVariant = this.variants.find((variant) =>
-                (!selectedSize || variant.size === selectedSize) &&
-                (!selectedColor || variant.color === selectedColor) &&
-                !variant.name
+                (!selectedSize || this.normalizeVariantValue(variant.size) === this.normalizeVariantValue(selectedSize)) &&
+                (!selectedColor || this.normalizeVariantValue(variant.color) === this.normalizeVariantValue(selectedColor)) &&
+                !this.normalizeVariantValue(variant.name)
             );
 
             if (standardVariant && (selectedSize || selectedColor)) {
