@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id' => env('TELEGRAM_CHAT_ID'),
+        'webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
+    ],
+
+    'binance' => [
+        'pay_id' => env('BINANCE_PAY_ID'),
+        'qr_image' => env('BINANCE_PAY_QR_IMAGE', 'imgs/binance-pay-qr.png'),
+    ],
+
 ];

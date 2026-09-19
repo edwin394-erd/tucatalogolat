@@ -30,6 +30,7 @@ use App\Models\Product as ProductModel;
 use App\Models\Order as OrderModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\TelegramWebhookController;
 
 Route::get('/', Home::class)->middleware(['guest'])->name('home');
 Route::get('/Login', Login::class)->middleware(['guest'])->name('login');
@@ -62,6 +63,8 @@ Route::post('/logout', function () {
 
     return redirect()->route('login');
 })->middleware('auth')->name('logout');
+
+Route::post('/telegram/webhook', TelegramWebhookController::class)->name('telegram.webhook');
 
 Route::get('/debug-upload', [\App\Http\Controllers\DebugUploadController::class, 'show'])->middleware(['auth'])->name('debug.upload');
 Route::post('/debug-upload', [\App\Http\Controllers\DebugUploadController::class, 'upload'])->middleware(['auth'])->name('debug.upload.post');

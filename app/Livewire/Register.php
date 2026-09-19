@@ -9,6 +9,8 @@ use App\Models\Subscription;
 use App\Models\Plan;
 
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class Register extends Component
 {
@@ -109,11 +111,43 @@ class Register extends Component
             ]);
         }
 
+        $this->notifyTelegram($user);
+
         
 
         // Redirect or show a success message
         session()->flash('message', 'Registro exitoso. Por favor, inicia sesión.');
         return redirect()->route('configuracion');
+    }
+
+    private function notifyTelegram(User $user): void
+    {
+        $token = config('services.telegram.bot_token');
+        $chatId = config('services.telegram.chat_id');
+
+        if (blank($token) || blank($chatId)) {
+            return;
+        }
+
+        $message = "Nuevo registro\n"
+            . "Nombre: {$user->name}\n"
+            . "Correo: {$user->email}\n"
+            . "Teléfono: {$user->telephone}\n"
+            . "Fecha: " . now()->format('Y-m-d H:i:s');
+
+        try {
+            Http::timeout(5)
+                ->post("https://api.telegram.org/bot{$token}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $message,
+                ])
+                ->throw();
+        } catch (\Throwable $exception) {
+            Log::warning('Telegram registration notification failed', [
+                'user_id' => $user->id,
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
     }
 

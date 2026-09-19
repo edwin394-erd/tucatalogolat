@@ -12,6 +12,10 @@ class Subscription extends Model
         'starts_at',
         'expires_at',
         'status',
+        'payment_status',
+        'payment_proof_path',
+        'payment_submitted_at',
+        'payment_reviewed_at',
     ];
 
     public function user()
@@ -30,6 +34,8 @@ class Subscription extends Model
         return [
             'expires_at' => 'datetime',
             'starts_at' => 'datetime',
+            'payment_submitted_at' => 'datetime',
+            'payment_reviewed_at' => 'datetime',
         ];
     }
 }

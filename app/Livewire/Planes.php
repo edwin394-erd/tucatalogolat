@@ -2,15 +2,28 @@
 
 namespace App\Livewire;
 
+use App\Models\Plan;
+use App\Models\Subscription;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Planes extends Component
 {
+    use WithFileUploads;
+
     public $model;
+    public $proof;
+
+    protected $rules = [
+        'proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+    ];
 
     public function subscribe($planId)
     {
-        $plan = \App\Models\Plan::find($planId);
+        $plan = Plan::find($planId);
         if (!$plan) {
             $this->dispatch('alert', type: 'error', message: 'Plan no encontrado.');
             return;
@@ -36,13 +49,75 @@ class Planes extends Component
             return;
         }
 
-        $message = "Solicitud de suscripción al plan {$plan->name}:\n\nUsuario: {$user->name} ({$user->email})\nPlan: {$plan->name}\nPrecio: {$plan->price}\nDescripción: {$plan->description}";
+        $this->validate();
 
-        $encodedMessage = urlencode($message);
-        $whatsappUrl = "https://wa.me/584246054544?text={$encodedMessage}";
+        $existingRequest = $user->subscriptions()
+            ->where('plan_id', $plan->id)
+            ->where('payment_status', 'pending')
+            ->latest()
+            ->first();
 
-        $this->dispatch('alert', type: 'success', message: 'Solicitud enviada a WhatsApp. Te contactaremos pronto.');
-        $this->js("window.location.href = '$whatsappUrl';");
+        if ($existingRequest) {
+            $this->dispatch('alert', type: 'info', message: 'Ya tienes un comprobante pendiente de revisión para este plan.');
+            return;
+        }
+
+        $proofPath = $this->proof->store('subscription-proofs', 'public');
+        $subscription = Subscription::create([
+            'user_id' => $user->id,
+            'plan_id' => $plan->id,
+            'status' => 'pending',
+            'payment_status' => 'pending',
+            'payment_proof_path' => $proofPath,
+            'payment_submitted_at' => now(),
+        ]);
+
+        $this->notifyTelegram($subscription);
+        $this->reset('proof');
+        $this->dispatch('alert', type: 'success', message: 'Comprobante enviado. Te avisaremos cuando sea revisado.');
+    }
+
+    private function notifyTelegram(Subscription $subscription): void
+    {
+        $token = config('services.telegram.bot_token');
+        $chatId = config('services.telegram.chat_id');
+        $proofPath = Storage::disk('public')->path($subscription->payment_proof_path);
+
+        if (blank($token) || blank($chatId) || ! is_file($proofPath)) {
+            Log::warning('Telegram subscription notification skipped', ['subscription_id' => $subscription->id]);
+            return;
+        }
+
+        $user = $subscription->user;
+        $plan = $subscription->plan;
+        $message = "Nuevo comprobante de suscripción\n\n"
+            . "Usuario: {$user->name} ({$user->email})\n"
+            . "Plan: {$plan->name}\n"
+            . "Precio: {$plan->price}\n"
+            . "Solicitud: #{$subscription->id}";
+        $keyboard = json_encode(['inline_keyboard' => [[
+            ['text' => 'Aceptar', 'callback_data' => "subscription:approve:{$subscription->id}"],
+            ['text' => 'Denegar', 'callback_data' => "subscription:deny:{$subscription->id}"],
+        ]]], JSON_THROW_ON_ERROR);
+        $isImage = in_array(strtolower(pathinfo($proofPath, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png'], true);
+        $method = $isImage ? 'sendPhoto' : 'sendDocument';
+        $field = $isImage ? 'photo' : 'document';
+
+        try {
+            Http::timeout(15)
+                ->attach($field, fopen($proofPath, 'r'), basename($proofPath))
+                ->post("https://api.telegram.org/bot{$token}/{$method}", [
+                    'chat_id' => $chatId,
+                    'caption' => $message,
+                    'reply_markup' => $keyboard,
+                ])
+                ->throw();
+        } catch (\Throwable $exception) {
+            Log::warning('Telegram subscription notification failed', [
+                'subscription_id' => $subscription->id,
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 
     public function hola()
@@ -62,10 +137,19 @@ class Planes extends Component
             ->latest('expires_at')
             ->first();
 
+        $latestPaymentRequest = auth()->user()?->subscriptions()
+            ->with('plan')
+            ->whereIn('payment_status', ['pending', 'rejected'])
+            ->whereNotNull('payment_submitted_at')
+            ->latest('payment_submitted_at')
+            ->first();
+
         return view('livewire.planes')
         ->extends('layouts.auth2')
         ->section('content')
         ->with('model', $this->model)
-        ->with('currentSubscription', $currentSubscription);
+        ->with('currentSubscription', $currentSubscription)
+        ->with('latestPaymentRequest', $latestPaymentRequest)
+        ->with('binance', config('services.binance'));
     }
 }
