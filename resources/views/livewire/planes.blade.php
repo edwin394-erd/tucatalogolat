@@ -8,8 +8,8 @@
         @livewire('table', [
             'model' => 'Plan',
             'titulo' => __('messages.plans'),
-            'columns' => ['name', 'description', 'features', 'price', 'max_products', 'duration_in_days'],
-            'column_names' => [__('messages.name'), __('messages.description'), __('messages.features') ?? 'Características', __('messages.price'), __('messages.max_products'), __('messages.duration_days')],
+            'columns' => ['name', 'description', 'features', 'price', 'quarterly_offer', 'annual_offer', 'max_products', 'duration_in_days'],
+            'column_names' => [__('messages.name'), __('messages.description'), __('messages.features') ?? 'Características', __('messages.price'), 'Oferta trimestral', 'Oferta anual', __('messages.max_products'), __('messages.duration_days')],
             'filter_field' => null,
             'filter_value' => null,
             'searching_exceptions' => [],
@@ -82,18 +82,41 @@
     
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         @foreach(\App\Models\Plan::where('is_active', 1)->get() as $plan)
-            <div x-data="{ open: false }" class="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-950/10">
+            <div x-data="{ open: false, billingPeriod: 'monthly' }" class="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-950/10">
                 <div class="h-1.5 bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500"></div>
                 <div class="flex flex-1 flex-col p-6">
                     <div class="flex items-start justify-between gap-3">
                         <h2 class="text-xl font-bold text-slate-900">{{ $plan->name }}</h2>
-                        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-600">{{ $plan->duration_in_days }} días</span>
+                        <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-600">Mensual o anual</span>
                     </div>
                     <p class="mt-3 min-h-12 text-sm leading-6 text-slate-500">{{ $plan->description }}</p>
-                    <p class="mt-5 text-3xl font-black tracking-tight text-indigo-600">${{ number_format((float) $plan->price, 2) }}<span class="text-sm font-medium text-slate-400"> / plan</span></p>
-                    <div class="mt-5 flex items-center gap-2 border-t border-slate-100 pt-4 text-sm text-slate-600"><svg class="h-5 w-5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/></svg>Hasta {{ $plan->max_products }} productos</div>
+                    <div class="mt-5 space-y-2">
+                        <p class="text-3xl font-black tracking-tight text-indigo-600">${{ number_format((float) $plan->price, 2) }}<span class="text-sm font-medium text-slate-400"> / mes</span></p>
+                        @if($plan->quarterly_offer !== null)
+                            <p class="text-sm font-semibold text-slate-700">${{ number_format((float) $plan->quarterly_offer, 2) }} <span class="font-normal text-slate-400">/ trimestre</span></p>
+                        @endif
+                        @if($plan->annual_offer !== null)
+                            <p class="text-sm font-semibold text-slate-700">${{ number_format((float) $plan->annual_offer, 2) }} <span class="font-normal text-slate-400">/ año</span></p>
+                        @endif
+                    </div>
+                    <div class="mt-5 space-y-3 border-t border-slate-100 pt-4 text-sm text-slate-600">
+                        @if(filled($plan->features))
+                            @foreach(preg_split('/\r\n|\r|\n|;/', $plan->features) as $feature)
+                                @if(trim($feature) !== '')
+                                    <div class="flex items-start gap-2 leading-6">
+                                        <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/></svg>
+                                        <span>{{ trim($feature) }}</span>
+                                    </div>
+                                @endif
+                            @endforeach
+                        @endif
+                        <div class="flex items-start gap-2 leading-6">
+                            <svg class="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/></svg>
+                            <span>Hasta {{ $plan->max_products }} productos</span>
+                        </div>
+                    </div>
                 @if($currentSubscription?->plan_id === $plan->id)
-                    <span class="mt-6 inline-flex w-full cursor-not-allowed flex-col items-center justify-center rounded-xl bg-slate-100 px-4 py-3 text-slate-500" aria-label="Ya tienes este plan">
+                    <span class="mt-auto inline-flex w-full cursor-not-allowed flex-col items-center justify-center rounded-xl bg-slate-100 px-4 py-3 text-slate-500" aria-label="Ya tienes este plan">
                         <span class="font-semibold">Plan actual</span><span class="text-xs">
                             @if($currentSubscription->expires_at)
                                 {{ $remainingPlanDays }} días restantes
@@ -103,17 +126,32 @@
                         </span>
                         </span></span>
                 @else
-                    <button type="button" @click="open = true" class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-100"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/></svg>Elegir este plan</button>
+                    <button data-tour="plan-choice" type="button" @click="open = true" class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white transition hover:bg-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-100"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14"/></svg>Elegir este plan</button>
 
                     <div x-show="open" x-cloak x-transition.opacity @keydown.escape.window="open = false" class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm sm:items-center" @click.self="open = false">
-                        <div class="my-auto max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-3xl bg-white shadow-2xl" @click.stop>
-                            <div class="flex items-start justify-between border-b border-slate-100 p-6">
-                                <div><p class="text-xs font-bold uppercase tracking-wider text-indigo-600">Paso 1 de 2</p><h3 class="mt-1 text-xl font-bold text-slate-900">Paga y envía tu comprobante</h3><p class="mt-1 text-sm text-slate-500">{{ $plan->name }} · ${{ number_format((float) $plan->price, 2) }}</p></div>
+                        <div class="my-auto max-h-[calc(100vh-0.5rem)] w-full max-w-lg overflow-y-auto rounded-3xl bg-white shadow-2xl" @click.stop>
+                            <div class="flex items-start justify-between border-b border-slate-100 px-4 py-3 sm:p-6">
+                                <div><p class="text-xs font-bold uppercase tracking-wider text-indigo-600">Paso 1 de 2</p><h3 class="mt-1 text-xl font-bold text-slate-900">Paga y envía tu comprobante</h3><p class="mt-1 text-sm text-slate-500">{{ $plan->name }} · $<span x-text="billingPeriod === 'annual' ? '{{ number_format((float) ($plan->annual_offer ?? 0), 2) }}' : '{{ number_format((float) $plan->price, 2) }}'"></span></p></div>
                                 <button type="button" @click="open = false" class="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Cerrar modal">&times;</button>
                             </div>
-                            <div class="space-y-5 p-6">
+                            <div class="space-y-2 p-3 sm:space-y-5 sm:p-6">
+                                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-2.5 sm:p-4">
+                                    <p class="mb-2 text-sm font-bold text-slate-800 sm:mb-3">¿Qué modalidad deseas solicitar?</p>
+                                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                        <label class="flex cursor-pointer items-center justify-between rounded-xl border bg-white px-3 py-2.5 transition sm:px-4 sm:py-3" :class="billingPeriod === 'monthly' ? 'border-indigo-500 ring-2 ring-indigo-100' : 'border-slate-200'">
+                                            <span><span class="block text-sm font-bold text-slate-800">Mensual</span><span class="text-xs text-slate-500">${{ number_format((float) $plan->price, 2) }}</span></span>
+                                            <input type="radio" value="monthly" x-model="billingPeriod" class="text-indigo-600 focus:ring-indigo-500">
+                                        </label>
+                                        @if($plan->annual_offer !== null)
+                                            <label class="flex cursor-pointer items-center justify-between rounded-xl border bg-white px-3 py-2.5 transition sm:px-4 sm:py-3" :class="billingPeriod === 'annual' ? 'border-indigo-500 ring-2 ring-indigo-100' : 'border-slate-200'">
+                                                <span><span class="block text-sm font-bold text-slate-800">Anual</span><span class="text-xs text-slate-500">${{ number_format((float) $plan->annual_offer, 2) }}</span></span>
+                                                <input type="radio" value="annual" x-model="billingPeriod" class="text-indigo-600 focus:ring-indigo-500">
+                                            </label>
+                                        @endif
+                                    </div>
+                                </div>
                                 <div class="rounded-2xl border border-indigo-100 bg-indigo-50 p-4"><div class="flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h.01M11 15h2m-9 5h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2-2Z"/></svg></div><div><p class="text-sm font-bold text-indigo-950">Pago con Binance Pay</p><p class="text-xs text-indigo-700">Escanea el QR o usa el Pay ID</p></div></div><div class="mt-4 flex justify-center rounded-xl bg-white p-3"><img src="{{ asset($binance['qr_image']) }}" alt="Código QR de Binance Pay" class="h-40 w-40 object-contain"></div><div class="mt-3 flex items-center gap-2 rounded-xl bg-white px-3 py-2"><span class="min-w-0 flex-1 truncate font-mono text-xs text-slate-700">{{ $binance['pay_id'] ?: 'Configura BINANCE_PAY_ID' }}</span><button type="button" x-data x-on:click="navigator.clipboard.writeText(@js($binance['pay_id']))" class="shrink-0 rounded-lg bg-indigo-100 px-2.5 py-1.5 text-xs font-bold text-indigo-700 hover:bg-indigo-200">Copiar</button></div><p class="mt-2 text-xs text-indigo-700">Confirma el monto y envía el comprobante después del pago.</p></div>
-                                <form x-data="{ preview: null, fileName: '' }" wire:submit.prevent="subscribe({{ $plan->id }})" class="space-y-4" @alert.window="if ($event.detail?.type === 'success') open = false">
+                                <form x-data="{ preview: null, fileName: '' }" wire:submit.prevent="subscribe({{ $plan->id }}, billingPeriod)" class="space-y-4" @alert.window="if ($event.detail?.type === 'success') open = false">
                                     <div><label for="proof-{{ $plan->id }}" class="mb-2 block text-sm font-bold text-slate-800">Comprobante de pago</label><label for="proof-{{ $plan->id }}" class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-300 px-4 py-6 text-center transition hover:border-indigo-400 hover:bg-indigo-50"><template x-if="preview"><img :src="preview" alt="Vista previa del comprobante" class="mb-3 max-h-36 max-w-full rounded-xl object-contain shadow-sm"></template><svg x-show="!preview" class="h-8 w-8 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0L8 8m4-4 4 4M4 16.5v1A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5v-1"/></svg><span class="mt-2 text-sm font-semibold text-slate-700" x-text="fileName || 'Seleccionar imagen o PDF'"></span><span class="mt-1 text-xs text-slate-400">JPG, PNG o PDF · máximo 5 MB</span><input x-ref="proof" id="proof-{{ $plan->id }}" type="file" wire:model="proof" accept=".jpg,.jpeg,.png,.pdf" class="sr-only" @change="fileName = $event.target.files[0]?.name || ''; preview = $event.target.files[0]?.type?.startsWith('image/') ? URL.createObjectURL($event.target.files[0]) : null"></label><x-input-error for="proof" /></div>
                                     <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end"><button type="button" @click="open = false" class="rounded-xl px-4 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancelar</button><button type="submit" wire:loading.attr="disabled" wire:target="subscribe({{ $plan->id }})" class="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60"><span wire:loading.remove wire:target="subscribe({{ $plan->id }})">Enviar comprobante</span><span wire:loading wire:target="subscribe({{ $plan->id }})">Enviando...</span></button></div>
                                 </form>

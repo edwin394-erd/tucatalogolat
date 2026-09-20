@@ -12,6 +12,8 @@ class PlanForm extends Component
     public $description;
     public $features;
     public $price;
+    public $quarterly_offer;
+    public $annual_offer;
     public $max_products;
     public $duration_in_days;
     public $is_active;
@@ -21,6 +23,8 @@ class PlanForm extends Component
         'description' => 'nullable|string',
         'features' => 'nullable|string',
         'price' => 'required|numeric|min:0',
+        'quarterly_offer' => 'nullable|numeric|min:0',
+        'annual_offer' => 'nullable|numeric|min:0',
         'max_products' => 'required|integer|min:0',
         'duration_in_days' => 'required|integer|min:1',
         'is_active' => 'required|boolean',
@@ -37,6 +41,8 @@ class PlanForm extends Component
                 $this->description = $plan->description;
                 $this->features = $plan->features;
                 $this->price = $plan->price;
+                $this->quarterly_offer = $plan->quarterly_offer;
+                $this->annual_offer = $plan->annual_offer;
                 $this->max_products = $plan->max_products;
                 $this->duration_in_days = $plan->duration_in_days;
                 $this->is_active = $plan->is_active;
@@ -46,6 +52,8 @@ class PlanForm extends Component
             $this->description = '';
             $this->features = '';
             $this->price = '';
+            $this->quarterly_offer = '';
+            $this->annual_offer = '';
             $this->max_products = '';
             $this->duration_in_days = '';
             $this->is_active = true;
@@ -63,6 +71,8 @@ class PlanForm extends Component
                 'description' => $this->description,
                 'features' => $this->features,
                 'price' => $this->price,
+                'quarterly_offer' => $this->quarterly_offer ?: null,
+                'annual_offer' => $this->annual_offer ?: null,
                 'max_products' => $this->max_products,
                 'duration_in_days' => $this->duration_in_days,
                 'is_active' => $this->is_active,
@@ -74,6 +84,8 @@ class PlanForm extends Component
                 'description' => $this->description,
                 'features' => $this->features,
                 'price' => $this->price,
+                'quarterly_offer' => $this->quarterly_offer ?: null,
+                'annual_offer' => $this->annual_offer ?: null,
                 'max_products' => $this->max_products,
                 'duration_in_days' => $this->duration_in_days,
                 'is_active' => $this->is_active,

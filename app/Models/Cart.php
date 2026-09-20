@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
+use App\Models\InventoryStock;
 
 class Cart extends Model
 {
@@ -93,6 +94,11 @@ class Cart extends Model
             $variantSelections = [(int) $variantId];
         }
         sort($variantSelections);
+
+        if (! $this->canAddProduct($product, $quantity, $variantSelections)) {
+            return false;
+        }
+
         $variantDescription = $this->buildVariantDescription($variantSelections);
         $item = $this->items()
             ->where('product_id', $product->id)
@@ -122,6 +128,51 @@ class Cart extends Model
         }
 
         $this->load('items.product');
+
+        return true;
+    }
+
+    public function canAddProduct(Product $product, int $quantity, array $variantSelections = []): bool
+    {
+        $availableStock = $this->availableStock($product, $variantSelections);
+        if ($availableStock === null) {
+            return true;
+        }
+
+        $existingQuantity = $this->items()
+            ->where('product_id', $product->id)
+            ->get()
+            ->filter(fn ($item) => $this->sameVariantSelections($item->variant_selections, $variantSelections))
+            ->sum('quantity');
+
+        return $existingQuantity + $quantity <= $availableStock;
+    }
+
+    public function availableStock(Product $product, array $variantSelections = []): ?int
+    {
+        if (! $product->manage_stock) {
+            return null;
+        }
+
+        if ($product->variants()->exists()) {
+            if (empty($variantSelections)) {
+                return 0;
+            }
+
+            $variants = $product->variants()->whereIn('id', $variantSelections)->get();
+            if ($variants->count() !== count($variantSelections) || $variants->contains(fn ($variant) => ! $variant->available)) {
+                return 0;
+            }
+
+            $selectionKey = InventoryStock::selectionKey($variants);
+            $combinationStock = InventoryStock::where('product_id', $product->id)
+                ->where('selection_key', $selectionKey)
+                ->value('stock');
+
+            return $combinationStock === null ? 0 : (int) $combinationStock;
+        }
+
+        return (int) $product->stock;
     }
 
     private function sameVariantSelections(?array $stored, array $selected): bool

@@ -33,7 +33,7 @@ class Planes extends Component
         $this->validateOnly('proof');
     }
 
-    public function subscribe($planId)
+    public function subscribe($planId, string $billingPeriod = 'monthly')
     {
         $plan = Plan::find($planId);
         if (!$plan) {
@@ -44,6 +44,17 @@ class Planes extends Component
         $user = auth()->user();
         if (!$user) {
             $this->dispatch('alert', type: 'error', message: 'Usuario no autenticado.');
+            return;
+        }
+
+        if (! in_array($billingPeriod, ['monthly', 'annual'], true)) {
+            $this->dispatch('alert', type: 'error', message: 'Selecciona una modalidad válida.');
+            return;
+        }
+
+        $amount = $billingPeriod === 'annual' ? $plan->annual_offer : $plan->price;
+        if ($billingPeriod === 'annual' && $amount === null) {
+            $this->dispatch('alert', type: 'error', message: 'Este plan no tiene precio anual disponible.');
             return;
         }
 
@@ -78,6 +89,8 @@ class Planes extends Component
         $subscription = Subscription::create([
             'user_id' => $user->id,
             'plan_id' => $plan->id,
+            'billing_period' => $billingPeriod,
+            'amount' => $amount,
             'status' => 'pending',
             'payment_status' => 'pending',
             'payment_proof_path' => $proofPath,
@@ -105,7 +118,8 @@ class Planes extends Component
         $message = "Nuevo comprobante de suscripción\n\n"
             . "Usuario: {$user->name} ({$user->email})\n"
             . "Plan: {$plan->name}\n"
-            . "Precio: {$plan->price}\n"
+            . "Modalidad: " . ($subscription->billing_period === 'annual' ? 'Anual' : 'Mensual') . "\n"
+            . "Precio: {$subscription->amount}\n"
             . "Solicitud: #{$subscription->id}";
         $keyboard = json_encode(['inline_keyboard' => [[
             ['text' => 'Aceptar', 'callback_data' => "subscription:approve:{$subscription->id}"],

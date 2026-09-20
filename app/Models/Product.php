@@ -15,10 +15,17 @@ class Product extends Model
         'description',
         'price',
         'precio_descuento',
+        'stock',
+        'manage_stock',
         'visible',
         'category_id',
         'catalogo_id',
         'descuento_id',
+    ];
+
+    protected $casts = [
+        'visible' => 'boolean',
+        'manage_stock' => 'boolean',
     ];
 
     protected static function boot()

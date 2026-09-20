@@ -11,6 +11,8 @@ class Plan extends Model
         'description',
         'features',
         'price',
+        'quarterly_offer',
+        'annual_offer',
         'max_products',
         'duration_in_days',
         'is_active',

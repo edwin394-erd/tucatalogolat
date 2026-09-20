@@ -56,6 +56,15 @@
                 <textarea id="description" rows="4" wire:model="description" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-100 inset-shadow-sm rounded-lg border border-gray-300 focus:ring-gray-500 focus:border-gray-500 gg:bg-gray-600 gg:border-gray-500 gg:placeholder-gray-400 gg:text-white gg:focus:ring-gray-500 gg:focus:border-gray-500" placeholder="{{ __('messages.product_description_placeholder') }}"></textarea>
                 <x-input-error for="description" class="mt-2" />
             </div>
+
+            <div data-tour="manage-stock" class="col-span-full rounded-lg border border-indigo-100 bg-indigo-50 p-4">
+                <label for="manage_stock" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-800">
+                    <input type="checkbox" id="manage_stock" wire:model="manage_stock" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    Controlar inventario/stock para este producto
+                </label>
+                <p class="mt-1 pl-6 text-xs text-slate-600">Si está desactivado, el producto se podrá pedir sin límite de stock.</p>
+                <x-input-error for="manage_stock" class="mt-2" />
+            </div>
         </div>
 
         <label for="Imagen" class="block mb-2 text-sm font-medium text-gray-900 gg:text-white">{{ __('messages.product_image') }}</label>
@@ -107,7 +116,7 @@
         <br>
 
         <!-- Variantes -->
-        <div class="col-span-2 mt-4" wire:key="variants-section"
+        <div data-tour="variants" class="col-span-2 mt-4" wire:key="variants-section"
              x-data="{
                 sizeEnabled: @entangle('allowSizeVariants').live,
                 colorEnabled: @entangle('allowColorVariants').live,

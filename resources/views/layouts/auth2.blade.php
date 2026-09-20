@@ -24,6 +24,22 @@
     <title>tucatalogolat.lat</title>
  @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+   <style>
+      [data-tutorial-highlight="true"] {
+         position: relative;
+         z-index: 101;
+         border-radius: 0.75rem;
+         outline: 3px solid #f59e0b;
+         outline-offset: 4px;
+         box-shadow: 0 0 0 8px rgb(245 158 11 / 18%), 0 8px 24px rgb(15 23 42 / 20%);
+         animation: tutorial-pulse 1.8s ease-in-out infinite;
+      }
+
+      @keyframes tutorial-pulse {
+         0%, 100% { outline-color: #f59e0b; }
+         50% { outline-color: #fbbf24; }
+      }
+   </style>
 </head>
 
 
@@ -31,15 +47,29 @@
    tutorialOpen: false,
    tutorialStep: 0,
    tutorialSteps: [
-      { title: 'Tu panel de control', text: 'Aquí puedes consultar el estado de tu catálogo, pedidos, ventas, visitas y el tiempo restante de tu plan.', url: '{{ route('dashboard') }}' },
-      { title: 'Productos', text: 'Crea, edita, organiza imágenes y controla la visibilidad de los productos de tu catálogo.', url: '{{ route('products') }}' },
+      { title: 'Tu panel de control', text: 'Aquí puedes consultar el estado de tu catálogo, pedidos, ventas, visitas y el tiempo restante de tu plan.', url: '{{ route('dashboard') }}', target: '[data-tour=dashboard]' },
+      { title: 'Crear productos', text: 'Crea productos y activa el control de stock cuando necesites limitar existencias.', url: '{{ route('create', ['model' => 'Product']) }}', target: '[data-tour=manage-stock]' },
+      { title: 'Variantes', text: 'Agrega tallas, colores y variantes personalizadas para controlar el inventario por combinación.', url: '{{ route('create', ['model' => 'Product']) }}', target: '[data-tour=variants]' },
       { title: 'Categorías', text: 'Agrupa tus productos para que tus clientes encuentren rápidamente lo que buscan.', url: '{{ route('categories') }}' },
       { title: 'Pedidos', text: 'Revisa pedidos nuevos, filtra pendientes o completados y marca cada pedido cuando lo hayas atendido.', url: '{{ route('orders') }}' },
-      { title: 'Personalizar', text: 'Configura la información, redes sociales, plantillas, colores, logo y banner de tu catálogo.', url: '{{ route('configuracion') }}' },
+      { title: 'Inventario', text: 'Carga entradas y registra salidas desde estos botones. En el stock de cada producto puedes asignar cantidades pendientes de forma parcial a sus variantes.', url: '{{ route('inventory') }}', target: '[data-tour=inventory-entry]' },
+      { title: 'Personalizar', text: 'Configura la información general, redes sociales, logo y banner desde estas pestañas.', url: '{{ route('configuracion') }}', target: '[data-tour=customize-tabs]' },
+      { title: 'Plantillas y colores', text: 'En Diseño y estilo puedes cambiar la plantilla, seleccionar el tema y ajustar los colores de tu catálogo.', url: '{{ route('configuracion') }}', target: '[data-tour=design-tab]' },
       { title: 'Tu cuenta', text: 'Desde Cuenta puedes actualizar tus datos personales y credenciales.', url: '{{ route('cuenta') }}' },
-      { title: 'Planes', text: 'Consulta las opciones disponibles para tu suscripción. El plan activo se identifica como Plan actual.', url: '{{ route('planes') }}' }
+      { title: 'Planes', text: 'Elige un plan y luego selecciona la modalidad mensual o anual antes de enviar tu comprobante.', url: '{{ route('planes') }}', target: '[data-tour=plan-choice]' },
+      { title: 'Acceder a la tienda', text: 'Usa este botón para abrir tu catálogo público y verlo tal como lo ven tus clientes.', url: '{{ route('dashboard') }}', target: '[data-tour=store-link]' }
    ],
    initTutorial() {
+      const savedStep = window.sessionStorage.getItem('tucatalogo_tutorial_step');
+      if (savedStep === null) {
+         this.tutorialOpen = false;
+         this.tutorialStep = 0;
+         this.clearTutorialHighlight();
+         window.removeEventListener('livewire:navigated', window._tutorialNavigatedListener);
+         window._tutorialNavigatedListener = () => this.restoreTutorial();
+         window.addEventListener('livewire:navigated', window._tutorialNavigatedListener);
+         return;
+      }
       this.restoreTutorial();
       window.removeEventListener('livewire:navigated', window._tutorialNavigatedListener);
       window._tutorialNavigatedListener = () => this.restoreTutorial();
@@ -47,9 +77,30 @@
    },
    restoreTutorial() {
       const savedStep = window.sessionStorage.getItem('tucatalogo_tutorial_step');
-      if (savedStep === null) return;
+      if (savedStep === null) {
+         this.tutorialOpen = false;
+         this.tutorialStep = 0;
+         this.clearTutorialHighlight();
+         return;
+      }
       this.tutorialStep = Number(savedStep);
       this.tutorialOpen = true;
+      this.highlightTutorialTarget();
+   },
+   clearTutorialHighlight() {
+      document.querySelectorAll('[data-tutorial-highlight]').forEach((element) => element.removeAttribute('data-tutorial-highlight'));
+   },
+   highlightTutorialTarget() {
+      this.clearTutorialHighlight();
+      if (!this.tutorialOpen) return;
+      const targetSelector = this.tutorialSteps[this.tutorialStep]?.target;
+      if (!targetSelector) return;
+      setTimeout(() => {
+         const target = document.querySelector(targetSelector);
+         if (!target) return;
+         target.setAttribute('data-tutorial-highlight', 'true');
+         target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
    },
    startTutorial() {
       window.sessionStorage.setItem('tucatalogo_tutorial_step', '0');
@@ -60,10 +111,12 @@
       }
       this.tutorialStep = 0;
       this.tutorialOpen = true;
+      this.highlightTutorialTarget();
    },
    closeTutorial() {
       this.tutorialOpen = false;
       window.sessionStorage.removeItem('tucatalogo_tutorial_step');
+      document.querySelectorAll('[data-tutorial-highlight]').forEach((element) => element.removeAttribute('data-tutorial-highlight'));
    },
    navigateTutorial(url) {
       if (window.Livewire && typeof window.Livewire.navigate === 'function') {
@@ -79,12 +132,16 @@
       }
       const nextStep = this.tutorialStep + 1;
       window.sessionStorage.setItem('tucatalogo_tutorial_step', String(nextStep));
+      this.tutorialStep = nextStep;
+      this.highlightTutorialTarget();
       this.navigateTutorial(this.tutorialSteps[nextStep].url);
    },
    previousTutorial() {
       if (this.tutorialStep === 0) return;
       const previousStep = this.tutorialStep - 1;
       window.sessionStorage.setItem('tucatalogo_tutorial_step', String(previousStep));
+      this.tutorialStep = previousStep;
+      this.highlightTutorialTarget();
       this.navigateTutorial(this.tutorialSteps[previousStep].url);
    }
    }" x-init="initTutorial()" @keydown.escape.window="closeTutorial()" class="min-h-screen overflow-x-hidden bg-gradient-to-br from-yellow-50 to-indigo-100 bg-fixed inset-shadow-sm">
@@ -122,6 +179,12 @@
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 11v5m0-8h.01"/></svg>
                <span>Tutorial</span>
             </button>
+            @if(auth()->user()->catalogo)
+            <a data-tour="store-link" href="{{ route('catalogo', auth()->user()->catalogo->name_handle) }}" target="_blank" rel="noopener noreferrer" title="Ver tienda" aria-label="Ver tienda" class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-emerald-100 bg-emerald-50 px-2.5 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-300">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5 4.5 5h15l1.5 5.5M4 10.5V20h16v-9.5M8 20v-5h8v5M3 10.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/></svg>
+               <span>Ver tienda</span>
+            </a>
+            @endif
          </div>
          <li class="h-fit w-full">
             <a data-tour="dashboard" href="{{ route('dashboard') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
@@ -156,6 +219,13 @@
               <x-svg-products/>
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.products') }}</span>
                <span class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">{{ $productsCount }}</span>
+            </a>
+         </li>
+
+         <li class="h-fit w-full">
+            <a data-tour="inventory" href="{{ route('inventory') }}" wire:navigate.hover class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-200 group" wire:current='font-bold text-lg text-blue-500'>
+               <svg class="h-5 w-5 text-gray-500 transition duration-75 group-hover:text-gray-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7.5 12 3l8 4.5M4 7.5V17l8 4 8-4V7.5M4 7.5l8 4 8-4M12 11.5V21"/></svg>
+               <span class="flex-1 ms-3 whitespace-nowrap">Inventario</span>
             </a>
          </li>
         
@@ -204,7 +274,8 @@
             </a>
          </li>
 
-         <li class="h-fit w-full">
+         @if(auth()->user()->catalogo)
+         <li class="hidden">
             <a data-tour="catalog" href="{{ route('catalogo', auth()->user()->catalogo->name_handle) }}" class="flex w-full items-center rounded-xl p-2.5 text-gray-900 hover:bg-gray-100 group" wire:current='font-bold text-blue-500'>
              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900">
             <path d="M5.223 2.25c-.497 0-.974.198-1.325.55l-1.3 1.298A3.75 3.75 0 0 0 7.5 9.75c.627.47 1.406.75 2.25.75.844 0 1.624-.28 2.25-.75.626.47 1.406.75 2.25.75.844 0 1.623-.28 2.25-.75a3.75 3.75 0 0 0 4.902-5.652l-1.3-1.299a1.875 1.875 0 0 0-1.325-.549H5.223Z" />
@@ -214,6 +285,7 @@
                <span class="flex-1 ms-3 whitespace-nowrap">{{ __('messages.catalog') }}</span>
             </a>
          </li>
+         @endif
 
 
          @elseif(auth()->user()->role == 'admin')
@@ -252,8 +324,8 @@
 </aside>
 
 
-<div x-cloak x-show="tutorialOpen" x-transition.opacity class="pointer-events-none fixed inset-0 z-[100] flex items-end justify-end p-4 sm:p-6" role="dialog" aria-modal="false" aria-labelledby="tutorial-title">
-   <div x-show="tutorialOpen" x-transition class="pointer-events-auto w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-indigo-100 sm:p-6">
+<div x-cloak x-show="tutorialOpen" x-transition.opacity class="pointer-events-none fixed inset-0 z-[120] flex items-end justify-end p-4 sm:p-6" role="dialog" aria-modal="false" aria-labelledby="tutorial-title">
+   <div x-show="tutorialOpen" x-transition class="pointer-events-auto relative z-[121] w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl ring-1 ring-indigo-100 sm:p-6">
       <div class="flex items-start justify-between gap-4">
          <div>
             <p class="text-xs font-bold uppercase tracking-[0.18em] text-indigo-600">Recorrido rápido</p>

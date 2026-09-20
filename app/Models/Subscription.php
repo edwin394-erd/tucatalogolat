@@ -9,6 +9,8 @@ class Subscription extends Model
     protected $fillable = [
         'user_id',
         'plan_id',
+        'billing_period',
+        'amount',
         'starts_at',
         'expires_at',
         'status',
@@ -36,6 +38,7 @@ class Subscription extends Model
             'starts_at' => 'datetime',
             'payment_submitted_at' => 'datetime',
             'payment_reviewed_at' => 'datetime',
+            'amount' => 'decimal:2',
         ];
     }
 }

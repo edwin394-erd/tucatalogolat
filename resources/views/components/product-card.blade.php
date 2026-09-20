@@ -10,6 +10,7 @@
                 ->groupBy('size')
                 ->map(fn ($variants, $value) => [
                     'id' => 'size-' . $value,
+                    'variant_ids' => $variants->pluck('id')->map(fn ($id) => (int) $id)->values(),
                     'value' => $value,
                     'label' => $value,
                     'price_adjustment' => (float) $variants->first()->price_adjustment,
@@ -26,6 +27,7 @@
                 ->groupBy('color')
                 ->map(fn ($variants, $value) => [
                     'id' => 'color-' . $value,
+                    'variant_ids' => $variants->pluck('id')->map(fn ($id) => (int) $id)->values(),
                     'value' => $value,
                     'label' => $value,
                     'price_adjustment' => (float) $variants->first()->price_adjustment,
@@ -42,6 +44,7 @@
                 'name' => $groupName,
                 'options' => $variants->map(fn ($variant) => [
                     'id' => $variant->id,
+                    'variant_ids' => [(int) $variant->id],
                     'value' => $variant->id,
                     'label' => trim($variant->size ?: $variant->color) ?: 'Variante',
                     'price_adjustment' => (float) $variant->price_adjustment,
@@ -58,6 +61,12 @@
         rotationTimer: null,
         images: @js($item->fotos->map(fn ($foto) => asset('storage/' . $foto->url))->values()),
         basePrice: @js((float) ($item->precio_descuento ?? $item->price)),
+        stockManaged: @js((bool) $item->manage_stock),
+        stockUrl: @js(route('catalogo.variantStock', ['name' => $catalogo->name_handle, 'id' => $item->id])),
+        stockLoaded: false,
+        stockRequestFailed: false,
+        stockCombinations: [],
+        productStock: null,
         variants: @js($item->variants->map(fn ($variant) => [
             'id' => $variant->id,
             'name' => $variant->name,
@@ -72,6 +81,62 @@
         selectedVariantIds: [],
         selectedVariantId: '',
         variantError: false,
+        async refreshStock() {
+            if (!this.stockManaged) return;
+
+            this.stockLoaded = false;
+            this.stockRequestFailed = false;
+            try {
+                const response = await fetch(this.stockUrl, { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error('No se pudo consultar el stock');
+                const data = await response.json();
+                this.stockManaged = data.manage_stock !== false;
+                this.productStock = data.product_stock;
+                this.stockCombinations = data.combinations || [];
+            } catch (error) {
+                this.stockRequestFailed = true;
+                this.productStock = null;
+                this.stockCombinations = [];
+            } finally {
+                this.stockLoaded = true;
+                this.pruneUnavailableSelections();
+            }
+        },
+        optionIsAvailable(group, option) {
+            if (!option.available || !this.stockManaged || !this.stockLoaded || this.stockRequestFailed) return option.available;
+            if (this.productStock !== null) return this.productStock > 0;
+
+            const optionIds = (option.variant_ids || []).map(Number);
+            return this.stockCombinations.some((combination) => {
+                if (Number(combination.stock || 0) <= 0) return false;
+                const combinationIds = (combination.variant_selections || []).map(Number);
+                if (!optionIds.some((id) => combinationIds.includes(id))) return false;
+
+                return this.variantGroups.every((candidateGroup) => {
+                    if (candidateGroup.key === group.key || !this.selectedOptions[candidateGroup.key]) return true;
+                    const selectedOption = candidateGroup.options.find((candidate) =>
+                        String(candidate.value) === String(this.selectedOptions[candidateGroup.key])
+                    );
+                    return selectedOption && (selectedOption.variant_ids || []).some((id) => combinationIds.includes(Number(id)));
+                });
+            });
+        },
+        pruneUnavailableSelections() {
+            this.variantGroups.forEach((group) => {
+                const selectedValue = this.selectedOptions[group.key];
+                if (!selectedValue) return;
+                const selectedOption = group.options.find((option) => String(option.value) === String(selectedValue));
+                if (!selectedOption || !this.optionIsAvailable(group, selectedOption)) {
+                    delete this.selectedOptions[group.key];
+                }
+            });
+            this.resolveVariantSelections();
+        },
+        openProductModal() {
+            this.galleryIndex = 0;
+            this.showProductModal = true;
+            this.refreshStock();
+        },
         normalizeVariantValue(value) {
             return value === null || value === undefined ? '' : String(value).trim();
         },
@@ -115,12 +180,69 @@
             this.selectedVariantIds = [...new Set(selections)].sort((left, right) => left - right);
             this.selectedVariantId = this.selectedVariantIds.length ? String(this.selectedVariantIds[0]) : '';
         },
+        selectedVariantLineKey() {
+            if (!this.variants.length) return '{{ $item->id }}:0';
+            const allGroupsSelected = this.variantGroups.every((group) => this.selectedOptions[group.key]);
+            if (!allGroupsSelected || !this.selectedVariantIds.length) return '';
+            return '{{ $item->id }}:' + this.selectedVariantIds.join('-');
+        },
+        modalQuantity() {
+            const store = Alpine.store('cart');
+            if (!store) return 0;
+            const lineKey = this.selectedVariantLineKey();
+            if (lineKey) return Number(store.items[lineKey] || 0);
+            return this.variants.length ? 0 : store.quantityFor({{ $item->id }});
+        },
+        selectedStock() {
+            if (!this.stockManaged || !this.stockLoaded) return null;
+            if (this.productStock !== null) return Number(this.productStock || 0);
+            const selectedIds = this.selectedVariantIds.map(Number).sort((left, right) => left - right);
+            const combination = this.stockCombinations.find((candidate) => {
+                const candidateIds = (candidate.variant_selections || []).map(Number).sort((left, right) => left - right);
+                return candidateIds.length === selectedIds.length && candidateIds.every((id, index) => id === selectedIds[index]);
+            });
+            return combination ? Number(combination.stock || 0) : 0;
+        },
+        totalStock() {
+            if (!this.stockManaged || !this.stockLoaded) return null;
+            if (this.productStock !== null) return Number(this.productStock || 0);
+            return this.stockCombinations.reduce((total, combination) => total + Number(combination.stock || 0), 0);
+        },
+        decreaseProductQuantity() {
+            const lineKey = this.selectedVariantLineKey();
+            if (lineKey && window.cartDecreaseLine) {
+                window.cartDecreaseLine(lineKey);
+                return;
+            }
+            window.cartDecrease({{ $item->id }});
+        },
+        showStockLimit(available) {
+            window.dispatchEvent(new CustomEvent('cart-stock-limit', { detail: { productId: {{ $item->id }}, requested: Number(available) + 1, accepted: Number(available) } }));
+        },
+        async increaseProductQuantity() {
+            if (this.stockManaged) {
+                if (!this.stockLoaded) await this.refreshStock();
+                const available = this.totalStock();
+                const current = Alpine.store('cart') ? Alpine.store('cart').quantityFor({{ $item->id }}) : 0;
+                if (available !== null && current >= available) {
+                    this.showStockLimit(available);
+                    return;
+                }
+            }
+            window.cartIncrease({{ $item->id }});
+        },
         selectVariant(group, option) {
-            this.selectedOptions[group.key] = option.value;
+            if (!this.optionIsAvailable(group, option)) return;
+            if (String(this.selectedOptions[group.key]) === String(option.value)) {
+                delete this.selectedOptions[group.key];
+            } else {
+                this.selectedOptions[group.key] = option.value;
+            }
             this.resolveVariantSelections();
             this.variantError = false;
+            this.$nextTick(() => this.pruneUnavailableSelections());
         },
-        addSelectedVariant() {
+        async addSelectedVariant() {
             const allGroupsSelected = this.variantGroups.every((group) => this.selectedOptions[group.key]);
             this.resolveVariantSelections();
             if (this.variants.length > 0 && (!this.selectedVariantIds.length || !allGroupsSelected)) {
@@ -132,6 +254,15 @@
             if (selectedVariants.some((variant) => !variant.available)) {
                 this.showVariantError();
                 return;
+            }
+
+            if (this.stockManaged) {
+                if (!this.stockLoaded) await this.refreshStock();
+                const available = this.selectedStock();
+                if (available !== null && this.modalQuantity() >= available) {
+                    this.showStockLimit(available);
+                    return;
+                }
             }
 
             this.variantError = false;
@@ -147,7 +278,7 @@
             clearInterval(this.rotationTimer);
             this.rotationTimer = null;
         },
-    }" @click="galleryIndex = 0; showProductModal = true" @keydown.enter.prevent="galleryIndex = 0; showProductModal = true" @keydown.space.prevent="galleryIndex = 0; showProductModal = true" tabindex="0" role="button" class="relative rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col h-full group border border-black/5 bg-[var(--bg-card-aside)] shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.14)] transition-shadow duration-500 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10">
+    }" @click="openProductModal()" @keydown.enter.prevent="openProductModal()" @keydown.space.prevent="openProductModal()" tabindex="0" role="button" class="relative rounded-2xl sm:rounded-3xl overflow-hidden flex flex-col h-full group border border-black/5 bg-[var(--bg-card-aside)] shadow-[0_2px_10px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.14)] transition-shadow duration-500 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10">
 
     {{-- Imagen --}}
     <div class="relative w-full aspect-square overflow-hidden shrink-0" @mouseenter="startRotation()" @mouseleave="stopRotation()">
@@ -207,7 +338,7 @@
         {{-- Acción principal --}}
         <div x-data class="mt-auto pt-0.5">
             <template x-if="(Alpine.store('cart') && Alpine.store('cart').quantityFor({{ $item->id }})) == 0">
-                <button type="button" x-on:click.stop="variants.length ? (showProductModal = true) : window.cartAdd({{ $item->id }})" title="Agregar al carrito"
+                <button type="button" x-on:click.stop="variants.length ? openProductModal() : increaseProductQuantity()" title="Agregar al carrito"
                         class="w-full h-8 sm:h-10 rounded-xl sm:rounded-2xl inline-flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold shadow-md transition-all duration-200 hover:shadow-lg hover:brightness-105 active:scale-[0.98]"
                         style="background-color: var(--primary-btn); color: {{ $iconColor }};">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 sm:w-4.5 sm:h-4.5">
@@ -222,14 +353,14 @@
                 <div class="flex items-center justify-between w-full h-8 sm:h-10 rounded-xl sm:rounded-2xl border border-black/10 bg-white/50 backdrop-blur-sm px-1 sm:px-1.5 shadow-inner">
                     <button type="button" @click.stop="window.cartDecrease({{ $item->id }})" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white/70 text-sm sm:text-base font-semibold transition hover:bg-white active:scale-95 text-[var(--text-secondary)]">−</button>
                     <div class="flex-1 text-center text-xs sm:text-sm font-bold text-[var(--text-secondary)]" x-text="Alpine.store('cart') ? Alpine.store('cart').quantityFor({{ $item->id }}) : 0"></div>
-                    <button type="button" @click.stop="window.cartIncrease({{ $item->id }})" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
+                    <button type="button" @click.stop="variants.length ? openProductModal() : increaseProductQuantity()" class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl text-sm sm:text-base font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
                 </div>
             </template>
         </div>
     </div>
 
     {{-- Modal: bottom-sheet en móvil, dialog centrado en desktop --}}
-    <div x-show="showProductModal" x-cloak x-transition.opacity class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div x-show="showProductModal" x-cloak x-transition.opacity @click.stop class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
         <div x-show="showProductModal"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-full sm:translate-y-0 sm:scale-95"
@@ -304,11 +435,15 @@
                                 </div>
                                 <div class="flex flex-wrap gap-2">
                                     <template x-for="option in group.options" :key="option.id">
-                                        <button type="button" @click.stop="selectVariant(group, option)" :disabled="!option.available"
-                                            :class="option.available ? (String(selectedOptions[group.key]) === String(option.value) ? 'border-white shadow-lg ring-2 ring-[var(--primary-btn)]' : 'border-transparent shadow-sm hover:brightness-110') : 'cursor-not-allowed border-black/[0.06] bg-black/[0.02] text-[var(--text-secondary)] opacity-45 line-through'"
-                                                :style="option.available ? (String(selectedOptions[group.key]) === String(option.value) ? 'background-color: color-mix(in srgb, var(--primary-btn) 88%, black); color: {{ $iconColor }};' : 'background-color: var(--primary-btn); color: {{ $iconColor }};') : ''"
-                                                class="min-h-11 rounded-xl border px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--primary-btn)] focus:ring-offset-1"
-                                                x-text="optionLabel(option)"></button>
+                                        <button type="button" @click.stop="selectVariant(group, option)" :disabled="!optionIsAvailable(group, option)"
+                                            :aria-pressed="String(selectedOptions[group.key]) === String(option.value)"
+                                            :class="optionIsAvailable(group, option) ? (String(selectedOptions[group.key]) === String(option.value) ? 'z-10 scale-105 border-white shadow-xl ring-4 ring-[var(--primary-btn)] ring-offset-2' : 'border-transparent shadow-sm hover:scale-[1.03] hover:brightness-110') : 'cursor-not-allowed border-black/[0.06] bg-black/[0.02] text-[var(--text-secondary)] opacity-45 line-through'"
+                                                :style="optionIsAvailable(group, option) ? (String(selectedOptions[group.key]) === String(option.value) ? 'background-color: color-mix(in srgb, var(--primary-btn) 88%, black); color: {{ $iconColor }};' : 'background-color: var(--primary-btn); color: {{ $iconColor }};') : ''"
+                                                class="relative min-h-11 overflow-hidden rounded-xl border px-4 py-2 text-sm font-semibold transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-[var(--primary-btn)] focus:ring-offset-1"
+                                                >
+                                            <span x-text="optionLabel(option)"></span>
+                                            <span x-show="!optionIsAvailable(group, option)" class="pointer-events-none absolute inset-x-1 top-1/2 h-0.5 -rotate-[15deg] bg-red-500 shadow-sm" aria-hidden="true"></span>
+                                        </button>
                                     </template>
                                 </div>
                             </section>
@@ -336,7 +471,7 @@
             </main>
 
             <footer class="flex items-center justify-end gap-3 border-t border-black/5 px-5 sm:px-6 py-3 sm:py-4 shrink-0" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">
-                <template x-if="variants.length > 0 || (Alpine.store('cart') && Alpine.store('cart').quantityFor({{ $item->id }})) == 0">
+                <template x-if="modalQuantity() == 0">
                     <button type="button" x-data="{ anim:false }" @click.stop="anim = true; addSelectedVariant(); setTimeout(() => anim = false, 350)"
                             :class="anim ? 'scale-105 shadow-2xl ring-4 ring-black/5' : ''"
                             class="w-full sm:w-auto rounded-2xl px-6 py-2.5 text-sm font-semibold transition transform duration-200 ease-out hover:scale-105 active:scale-95 shadow-md"
@@ -345,11 +480,11 @@
                     </button>
                 </template>
 
-                <template x-if="variants.length === 0 && (Alpine.store('cart') && Alpine.store('cart').quantityFor({{ $item->id }})) > 0">
+                <template x-if="modalQuantity() > 0">
                     <div class="flex items-center justify-between w-full sm:w-auto min-w-[140px] h-11 rounded-2xl border border-black/10 bg-white/50 backdrop-blur-sm px-1.5 shadow-inner">
-                        <button type="button" @click.stop="window.cartDecrease({{ $item->id }})" class="w-8 h-8 rounded-xl bg-white/70 text-lg font-semibold transition hover:bg-white active:scale-95 text-[var(--text-secondary)]">−</button>
-                        <div class="flex-1 text-center text-sm font-bold text-[var(--text-secondary)]" x-text="Alpine.store('cart') ? Alpine.store('cart').quantityFor({{ $item->id }}) : 0"></div>
-                        <button type="button" @click.stop="window.cartIncrease({{ $item->id }})" class="w-8 h-8 rounded-xl text-lg font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
+                        <button type="button" @click.stop="decreaseProductQuantity()" class="w-8 h-8 rounded-xl bg-white/70 text-lg font-semibold transition hover:bg-white active:scale-95 text-[var(--text-secondary)]">−</button>
+                        <div class="flex-1 text-center text-sm font-bold text-[var(--text-secondary)]" x-text="modalQuantity()"></div>
+                        <button type="button" @click.stop="variants.length ? addSelectedVariant() : increaseProductQuantity()" class="w-8 h-8 rounded-xl text-lg font-semibold transition hover:brightness-105 active:scale-95" style="background-color: var(--primary-btn); color: {{ $iconColor }};">+</button>
                     </div>
                 </template>
             </footer>

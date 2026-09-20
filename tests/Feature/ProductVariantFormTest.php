@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Livewire\ProductForm;
+use App\Livewire\ProductStock;
 use App\Models\Catalogo;
+use App\Models\InventoryStock;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -214,6 +216,14 @@ class ProductVariantFormTest extends TestCase
             ['name' => 'Dorsal', 'size' => 'Ronaldo', 'color' => '', 'price_adjustment' => 0, 'stock' => 0, 'available' => true],
         ]);
 
+        InventoryStock::create([
+            'catalogo_id' => $catalogo->id,
+            'product_id' => $product->id,
+            'selection_key' => 'Dorsal|Messi|',
+            'variant_selections' => [$product->variants()->first()->id],
+            'stock' => 7,
+        ]);
+
         \App\Models\foto::create([
             'imageable_id' => $product->id,
             'imageable_type' => \App\Models\Product::class,
@@ -234,6 +244,147 @@ class ProductVariantFormTest extends TestCase
             ->call('save');
 
         $this->assertDatabaseCount('product_variants', 0);
+        $this->assertDatabaseHas('products', ['id' => $product->id, 'stock' => 7]);
+        $this->assertDatabaseCount('inventory_stocks', 0);
+    }
+
+    public function test_pending_stock_remains_visible_after_a_new_combination_is_added(): void
+    {
+        $user = User::create([
+            'name' => 'Stock User',
+            'email' => 'stock-pending@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'country' => 'Mexico',
+            'city' => 'Monterrey',
+            'address' => 'Calle 6',
+            'telephone' => '5557778888',
+        ]);
+
+        $catalogo = Catalogo::create([
+            'user_id' => $user->id,
+            'name' => 'Tienda Stock',
+            'name_handle' => 'tienda-stock',
+        ]);
+
+        $category = \App\Models\Category::create([
+            'catalogo_id' => $catalogo->id,
+            'name' => 'Ropa',
+        ]);
+
+        $product = \App\Models\Product::create([
+            'catalogo_id' => $catalogo->id,
+            'category_id' => $category->id,
+            'name' => 'Camiseta',
+            'price' => 199,
+            'description' => 'Prueba',
+            'manage_stock' => true,
+            'visible' => true,
+        ]);
+
+        $product->variants()->create([
+            'name' => '',
+            'size' => 'M',
+            'color' => 'Rojo',
+            'price_adjustment' => 0,
+            'stock' => 0,
+            'available' => true,
+        ]);
+
+        InventoryStock::create([
+            'catalogo_id' => $catalogo->id,
+            'product_id' => $product->id,
+            'selection_key' => 'M|Rojo|legacy',
+            'variant_selections' => [],
+            'stock' => 4,
+        ]);
+        InventoryStock::create([
+            'catalogo_id' => $catalogo->id,
+            'product_id' => $product->id,
+            'selection_key' => '|M|Rojo',
+            'variant_selections' => [$product->variants()->first()->id],
+            'stock' => 6,
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(ProductStock::class, ['id' => $product->id])
+            ->assertSee('4')
+            ->assertSee('6');
+    }
+
+    public function test_removing_a_variant_removes_its_inventory_combinations(): void
+    {
+        $user = User::create([
+            'name' => 'Remove Variant User',
+            'email' => 'remove-variant-stock@example.com',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'country' => 'Mexico',
+            'city' => 'Monterrey',
+            'address' => 'Calle 7',
+            'telephone' => '5558889999',
+        ]);
+
+        $catalogo = Catalogo::create([
+            'user_id' => $user->id,
+            'name' => 'Tienda Variantes',
+            'name_handle' => 'tienda-variantes',
+        ]);
+        $category = \App\Models\Category::create([
+            'catalogo_id' => $catalogo->id,
+            'name' => 'Ropa',
+        ]);
+        $product = \App\Models\Product::create([
+            'catalogo_id' => $catalogo->id,
+            'category_id' => $category->id,
+            'name' => 'Camiseta',
+            'price' => 199,
+            'description' => 'Prueba',
+            'manage_stock' => true,
+            'visible' => true,
+        ]);
+
+        $product->variants()->createMany([
+            ['name' => 'Tamaño', 'size' => 'Grande', 'color' => '', 'price_adjustment' => 0, 'stock' => 0, 'available' => true],
+            ['name' => 'Tamaño', 'size' => 'Pequeño', 'color' => '', 'price_adjustment' => 0, 'stock' => 0, 'available' => true],
+            ['name' => 'Material', 'size' => 'Algodón', 'color' => '', 'price_adjustment' => 0, 'stock' => 0, 'available' => true],
+        ]);
+
+        InventoryStock::create([
+            'catalogo_id' => $catalogo->id,
+            'product_id' => $product->id,
+            'selection_key' => 'Tamaño|Grande|||Material|Algodón|',
+            'variant_selections' => [],
+            'stock' => 5,
+        ]);
+
+        \App\Models\foto::create([
+            'imageable_id' => $product->id,
+            'imageable_type' => \App\Models\Product::class,
+            'url' => 'products/remove-variant.jpg',
+        ]);
+
+        $this->actingAs($user);
+
+        Livewire::test(ProductForm::class, ['ItemId' => $product->id])
+            ->set('existingImages', [['id' => 1, 'url' => 'products/remove-variant.jpg']])
+            ->set('customVariants', [[
+                'name' => 'Material',
+                'values' => [[
+                    'value' => 'Algodón',
+                    'price_adjustment' => 0,
+                    'available' => true,
+                ]],
+            ]])
+            ->set('name', 'Camiseta')
+            ->set('price', 199)
+            ->set('category', $category->id)
+            ->set('visible', true)
+            ->set('description', 'Prueba')
+            ->call('save');
+
+        $this->assertDatabaseCount('inventory_stocks', 0);
     }
 
     public function test_cart_keeps_two_selected_variants_as_separate_lines(): void

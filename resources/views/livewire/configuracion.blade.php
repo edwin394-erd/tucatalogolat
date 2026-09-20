@@ -53,6 +53,7 @@
     <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">{{ __('messages.configure_catalog') }}</h1>
+
             <p class="text-sm text-gray-500">Personaliza la información, apariencia y redes sociales de tu catálogo.</p>
         </div>
     </div>
@@ -63,6 +64,7 @@
                 <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m0 3.75h.008M10.29 3.86l-7.1 12.28A1.5 1.5 0 004.49 18.4h15.02a1.5 1.5 0 001.3-2.26l-7.1-12.28a1.5 1.5 0 00-2.6 0z"/></svg>
                 <div>
                     <p class="text-sm font-bold">Primero completa la información de tu marca</p>
+
                     <p class="mt-1 text-xs leading-5">Agrega descripción, logo y banner. Después podrás elegir la plantilla y los colores.</p>
                 </div>
             </div>
@@ -71,10 +73,8 @@
         <div class="mb-6 flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900 sm:flex-row sm:items-center sm:justify-between" role="alert">
             <div class="flex items-start gap-3">
                 <svg class="mt-0.5 h-5 w-5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m0 3.75h.008M10.29 3.86l-7.1 12.28A1.5 1.5 0 004.49 18.4h15.02a1.5 1.5 0 001.3-2.26l-7.1-12.28a1.5 1.5 0 00-2.6 0z"/></svg>
-                <div>
                     <p class="text-sm font-bold">Completa primero el diseño de tu catálogo</p>
                     <p class="mt-1 text-xs leading-5">Selecciona una plantilla y una paleta de colores. Son pasos obligatorios para publicar tu catálogo.</p>
-                </div>
             </div>
             <button type="button" @click="activeTab = 'design'" class="shrink-0 rounded-lg bg-amber-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-amber-700">Ir a Diseño y Estilo</button>
         </div>
@@ -82,7 +82,7 @@
 
     <!-- Navegación por Pestañas -->
     <div class="flex border-b border-gray-200 mb-8 overflow-x-auto no-scrollbar">
-        <button type="button" @click="activeTab = 'general'"
+        <button data-tour="customize-tabs" type="button" @click="activeTab = 'general'"
             :class="activeTab === 'general' ? 'border-indigo-600 text-indigo-600 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
             class="py-3 px-5 border-b-2 font-medium text-sm transition-all flex items-center gap-2 whitespace-nowrap">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -96,7 +96,7 @@
             Redes Sociales
         </button>
 
-        <button type="button" @click="activeTab = 'design'"
+        <button data-tour="design-tab" type="button" @click="activeTab = 'design'"
             :class="activeTab === 'design' ? 'border-indigo-600 text-indigo-600 font-bold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
             class="py-3 px-5 border-b-2 font-medium text-sm transition-all flex items-center gap-2 whitespace-nowrap">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
@@ -108,7 +108,17 @@
     </div>
 
     <!-- Formulario Unificado -->
-    <form wire:submit.prevent="saveChanges" enctype="multipart/form-data">
+    <form id="configuration-form" wire:submit="saveChanges" enctype="multipart/form-data">
+        @if ($errors->any())
+            <div class="mb-5 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700" role="alert">
+                <p class="font-semibold">No se pudieron guardar los cambios.</p>
+                <ul class="mt-1 list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <!-- ================= PESTAÑA 1: INFORMACIÓN Y MARCA ================= -->
         <div x-show="activeTab === 'general'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
@@ -198,6 +208,14 @@
         </div>
 
         <!-- ================= PESTAÑA 2: REDES SOCIALES ================= -->
+        <div x-show="activeTab === 'general'" class="mt-8 border-t border-gray-200 pt-5 flex justify-end">
+            <button type="submit" form="configuration-form" wire:loading.attr="disabled" wire:target="saveChanges" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60 text-white font-semibold text-sm rounded-lg shadow-md transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                <span wire:loading.remove wire:target="saveChanges">Guardar Cambios</span>
+                <span wire:loading wire:target="saveChanges">Guardando...</span>
+            </button>
+        </div>
+
         <div x-show="activeTab === 'social'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
@@ -230,6 +248,14 @@
         </div>
 
         <!-- ================= PESTAÑA 3: DISEÑO Y ESTILO ================= -->
+        <div x-show="activeTab === 'social'" class="mt-8 border-t border-gray-200 pt-5 flex justify-end">
+            <button type="submit" form="configuration-form" wire:loading.attr="disabled" wire:target="saveChanges" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60 text-white font-semibold text-sm rounded-lg shadow-md transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                <span wire:loading.remove wire:target="saveChanges">Guardar Cambios</span>
+                <span wire:loading wire:target="saveChanges">Guardando...</span>
+            </button>
+        </div>
+
         <div x-show="activeTab === 'design'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0">
             <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.9fr)] gap-8 items-start">
                 <div>
@@ -498,7 +524,9 @@
            <!-- Modal Editor Personalizado con Preview de Contraste en Vivo -->
         <div x-show="openCustom" 
             x-cloak
-            x-data="{
+            @keydown.escape.window="openCustom = false"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div x-data="{
                 bg: @entangle('bg_custom').live,
                 cardBg: @entangle('secondary_custom').live,
                 primary: @entangle('primary_custom').live,
@@ -521,10 +549,9 @@
                     if (r >= 3) return { text: '⚠ Aceptable (' + r + ')', class: 'bg-yellow-100 text-yellow-700 border border-yellow-200' };
                     return { text: '✗ Ilegible (' + r + ')', class: 'bg-red-100 text-red-700 border border-red-200' };
                 }
-            }" 
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            }" class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
             
-            <div @click.away="openCustom = false" class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+            <div @click.away="openCustom = false">
                 <div class="flex items-center justify-between border-b pb-3 mb-4">
                     <h4 class="font-bold text-gray-800">Personalizar Paleta de Colores</h4>
                     <button type="button" @click="openCustom = false" class="text-gray-400 hover:text-gray-600 font-bold">✕</button>
@@ -582,13 +609,14 @@
         </div>
         </div>
 
-        <!-- Botón de Guardar Fijo/Persistente -->
-        <div class="mt-8 pt-5 border-t border-gray-200 flex justify-end">
-            <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg shadow-md transition flex items-center gap-2">
+        <div x-show="activeTab === 'design'" class="mt-8 border-t border-gray-200 pt-5 flex justify-end">
+            <button type="submit" wire:loading.attr="disabled" wire:target="saveChanges" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:cursor-wait disabled:opacity-60 text-white font-semibold text-sm rounded-lg shadow-md transition flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Guardar Cambios
+                <span wire:loading.remove wire:target="saveChanges">Guardar Cambios</span>
+                <span wire:loading wire:target="saveChanges">Guardando...</span>
             </button>
         </div>
 
     </form>
+
 </div>

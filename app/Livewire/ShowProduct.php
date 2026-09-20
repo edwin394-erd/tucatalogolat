@@ -45,7 +45,10 @@ class ShowProduct extends Component
         }
 
         $cart = \App\Models\Cart::current($catalogo->id);
-        $cart->addProduct($product, 1, $this->selectedVariantId);
+        if (! $cart->addProduct($product, 1, $this->selectedVariantId ? [$this->selectedVariantId] : [])) {
+            session()->now('message', 'La cantidad solicitada supera el stock disponible.');
+            return;
+        }
 
         session()->now('message', __('messages.added_to_cart'));
     }

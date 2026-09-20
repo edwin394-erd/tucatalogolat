@@ -40,10 +40,12 @@ class Cart extends Component
     {
         $item = $this->cart->items()->find($itemId);
 
-        if ($item) {
+        if ($item && $item->product && $this->cart->canAddProduct($item->product, 1, $item->variant_selections ?? [])) {
             $item->quantity += 1;
             $item->save();
             session()->now('message', __('messages.added_to_cart'));
+        } elseif ($item) {
+            session()->now('message', 'No hay suficiente stock disponible.');
         }
 
         $this->refreshCart();

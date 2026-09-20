@@ -56,6 +56,8 @@
 <div
     x-data="{ show: false, message: '', timer: null }"
     @cart-added.window="message = $event.detail?.message || 'Producto agregado al carrito.'; show = true; clearTimeout(timer); timer = setTimeout(() => show = false, 5000)"
+    @cart-stock-limit.window="show = false; clearTimeout(timer)"
+    @inventory-movement-saved.window="message = $event.detail?.message || 'Movimiento de inventario registrado.'; show = true; clearTimeout(timer); timer = setTimeout(() => show = false, 5000)"
     x-show="show"
     x-transition:enter="transition ease-out duration-300 transform"
     x-transition:enter-start="opacity-0 translate-x-full"
@@ -73,5 +75,28 @@
             <button @click="show = false" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 focus:outline-none" aria-label="Cerrar alerta">&times;</button>
         </div>
         <div class="absolute bottom-0 left-0 h-1 bg-green-500 rounded-b-lg animate-progress-bar"></div>
+    </div>
+</div>
+
+<div
+    x-data="{ show: false, message: '', timer: null }"
+    @cart-stock-limit.window="message = 'Solo hay ' + Number($event.detail?.accepted || 0) + ' disponibles'; show = true; clearTimeout(timer); timer = setTimeout(() => show = false, 5000)"
+    x-show="show"
+    x-transition:enter="transition ease-out duration-300 transform"
+    x-transition:enter-start="opacity-0 translate-x-full"
+    x-transition:enter-end="opacity-100 translate-x-0"
+    x-transition:leave="transition ease-in duration-300 transform"
+    x-transition:leave-start="opacity-100 translate-x-0"
+    x-transition:leave-end="opacity-0 translate-x-full"
+    class="fixed top-5 right-5 z-[100]"
+    x-cloak
+>
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg max-w-xs w-full relative" role="alert">
+        <div class="flex items-center space-x-3">
+            <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+            <span class="text-gray-900 dark:text-white font-semibold flex-1" x-text="message"></span>
+            <button @click="show = false" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 focus:outline-none" aria-label="Cerrar alerta">&times;</button>
+        </div>
+        <div class="absolute bottom-0 left-0 h-1 bg-red-500 rounded-b-lg animate-progress-bar"></div>
     </div>
 </div>

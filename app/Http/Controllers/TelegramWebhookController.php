@@ -40,7 +40,7 @@ class TelegramWebhookController extends Controller
                 'status' => 'active',
                 'payment_status' => 'approved',
                 'starts_at' => now(),
-                'expires_at' => now()->addDays($subscription->plan->duration_in_days),
+                'expires_at' => now()->addDays($subscription->billing_period === 'annual' ? 365 : 30),
                 'payment_reviewed_at' => now(),
             ]);
             $text = "Solicitud #{$subscription->id} aprobada para {$subscription->user->name}.";

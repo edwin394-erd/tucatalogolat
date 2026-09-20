@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Category;
+use App\Models\InventoryStock;
 use App\Models\Product;
 use App\Models\foto;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,7 @@ class ProductForm extends Component
     public $existingImages = []; // Imágenes guardadas en la base de datos
     public $imagesToDelete = []; // IDs de imágenes que se marcaron para eliminar
     public $visible;
+    public $manage_stock = false;
     public $maximoProductos;
     public $productosActuales;
     public $variants = []; // Variantes del producto
@@ -43,6 +45,7 @@ class ProductForm extends Component
             'price' => 'required|numeric|min:0',
             'category' => 'required|exists:categories,id',
             'visible' => 'required|boolean',
+            'manage_stock' => 'required|boolean',
             'description' => 'nullable|string',
             'images' => 'array|max:5',
             'images.*' => 'mimes:jpeg,png,jpg,gif,webp|max:2048',
@@ -113,6 +116,7 @@ class ProductForm extends Component
                 $this->category = $product->category_id;
                 $this->precio_descuento = $product->precio_descuento;
                 $this->visible = (bool) $product->visible;
+                $this->manage_stock = (bool) $product->manage_stock;
                 $this->description = $product->description;
                 $this->existingImages = $product->fotos->toArray();
 
@@ -121,10 +125,7 @@ class ProductForm extends Component
                 // $sizeOptions/$colorOptions más abajo — cargar TODAS aquí causaba
                 // que save() las duplicara al editar (una copia regenerada por
                 // combinación + una copia arrastrada tal cual desde la BD).
-                $this->variants = $product->variants
-                    ->filter(fn ($variant) => blank($variant->name))
-                    ->values()
-                    ->toArray();
+                $this->variants = [];
 
                 $this->allowSizeVariants = $product->variants
                     ->contains(fn ($variant) => blank($variant->name) && filled($variant->size));
@@ -349,6 +350,7 @@ class ProductForm extends Component
             'precio_descuento' => $this->precio_descuento,
             'visible' => (int) $this->visible,
             'description' => $this->description,
+            'manage_stock' => (bool) $this->manage_stock,
         ];
 
         if ($this->ItemId) {
@@ -366,6 +368,9 @@ class ProductForm extends Component
             $data['catalogo_id'] = auth()->user()->catalogo->id;
             $product = Product::create($data);
         }
+
+        $hadVariants = $product->variants()->exists();
+        $previousBaseStock = (int) $product->stock;
 
         // Optimización y guardado de nuevas imágenes
         try {
@@ -483,8 +488,14 @@ class ProductForm extends Component
             }
         }
 
-        // Manejar variantes
-        $product->variants()->delete(); // Eliminar existentes
+        // Preserve legacy variant stock when editing existing options.
+        $existingVariantStocks = $product->variants
+            ->keyBy(fn ($existingVariant) => implode('|', [
+                trim((string) $existingVariant->name),
+                trim((string) $existingVariant->size),
+                trim((string) $existingVariant->color),
+            ]))
+            ->map(fn ($existingVariant) => (int) $existingVariant->stock);
 
         $customVariantRows = [];
         foreach ($this->customVariants as $customVariant) {
@@ -510,6 +521,9 @@ class ProductForm extends Component
             }
         }
 
+        // Manejar variantes
+        $product->variants()->delete(); // Eliminar existentes
+
         foreach (array_merge($generatedVariants, $this->variants, $customVariantRows) as $variant) {
             $name = trim((string) ($variant['name'] ?? ''));
             $size = trim((string) ($variant['size'] ?? ''));
@@ -517,18 +531,73 @@ class ProductForm extends Component
             $available = (bool) ($variant['available'] ?? true);
 
             if ($name !== '' || $size !== '' || $color !== '') {
+                $variantKey = implode('|', [$name, $size, $color]);
                 $product->variants()->create([
                     'name' => $name,
                     'size' => $size,
                     'color' => $color,
                     'price_adjustment' => (float) ($variant['price_adjustment'] ?? 0),
-                    'stock' => (int) ($variant['stock'] ?? 0),
+                    'stock' => $existingVariantStocks->get($variantKey, (int) ($variant['stock'] ?? 0)),
                     'available' => $available,
                 ]);
             }
         }
 
+        // Mantener las existencias y actualizar solo los IDs de las variantes recreadas.
+        $savedVariants = $product->variants()->get();
+        $variantGroups = collect();
+        $standardVariants = $savedVariants->filter(fn ($variant) => blank($variant->name));
+
+        if ($standardVariants->isNotEmpty()) {
+            $variantGroups->push($standardVariants->values());
+        }
+
+        $savedVariants->filter(fn ($variant) => filled($variant->name))
+            ->groupBy('name')
+            ->each(fn ($variants) => $variantGroups->push($variants->values()));
+
+        $combinations = collect([collect()]);
+        foreach ($variantGroups as $variantGroup) {
+            $combinations = $combinations->flatMap(function ($selectedVariants) use ($variantGroup) {
+                return $variantGroup->map(fn ($variant) => $selectedVariants->concat([$variant]));
+            })->values();
+        }
+
+        $selectionMap = $combinations->mapWithKeys(fn ($combination) => [
+            InventoryStock::selectionKey($combination) => $combination->pluck('id')->map(fn ($id) => (int) $id)->sort()->values()->all(),
+        ]);
+
+        InventoryStock::where('product_id', $product->id)->get()->each(function ($stock) use ($selectionMap) {
+            if ($selectionMap->has($stock->selection_key)) {
+                $stock->update(['variant_selections' => $selectionMap->get($stock->selection_key)]);
+            }
+        });
+
+        if ($product->variants()->count() > 0 && ! $hadVariants && $previousBaseStock > 0 && $this->manage_stock) {
+            $baseStock = InventoryStock::firstOrCreate(
+                ['product_id' => $product->id, 'selection_key' => 'base'],
+                ['catalogo_id' => $product->catalogo_id, 'variant_selections' => [], 'stock' => 0]
+            );
+            $baseStock->increment('stock', $previousBaseStock);
+            $product->update(['stock' => 0]);
+        }
+
+        if ($product->variants()->count() === 0) {
+            $variantStock = (int) InventoryStock::where('product_id', $product->id)->sum('stock');
+
+            if ($variantStock > 0) {
+                $product->increment('stock', $variantStock);
+            }
+
+            InventoryStock::where('product_id', $product->id)->delete();
+        }
+
         session()->flash('message', $this->ItemId ? __('messages.product_updated') : __('messages.product_created'));
+        if (! $this->ItemId) {
+            $this->redirectRoute('products.stock', ['id' => $product->id, 'open' => 'entry']);
+            return;
+        }
+
         $this->redirectRoute('products');
     }
 }

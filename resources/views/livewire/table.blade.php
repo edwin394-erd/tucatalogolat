@@ -127,6 +127,11 @@
                 @endforeach
 
             <td class="px-4 py-4 flex flex-col sm:flex-row gap-2 justify-end {{ $index === count($items) - 1 ? 'rounded-br-xl' : '' }}">
+                    @if ($model === 'Product' && $item->manage_stock)
+                    <a href="{{ route('products.stock', ['id' => $item->id]) }}" wire:navigate.hover aria-label="Ver stock" title="Ver stock" class="inline-flex items-center justify-center rounded-lg border border-indigo-200 px-3 py-2 text-indigo-700 hover:bg-indigo-50">
+                        Ver stock
+                    </a>
+                    @endif
                     @if ($model === 'Order')
                         <button wire:click="toggleOrderDetails({{ $item->id }})" class="bg-white border border-indigo-200 hover:bg-indigo-50 text-indigo-700 shadow-sm rounded-lg px-3 py-2 text-sm">
                             {{ $expandedOrderId === $item->id ? 'Ocultar pedido' : 'Ver pedido' }}
@@ -262,6 +267,11 @@
                 </div>
 
                 <div class="flex shrink-0 items-center gap-1">
+                    @if ($model === 'Product' && $item->manage_stock)
+                        <a href="{{ route('products.stock', ['id' => $item->id]) }}" wire:navigate.hover aria-label="Ver stock" title="Ver stock" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-indigo-700 hover:bg-indigo-50">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5m0 14h16M8 16v-4m4 4V8m4 8v-7"/></svg>
+                        </a>
+                    @endif
                     @if ($model !== 'Order')
                         <a
                             href="{{ route('edit', ['model' => $model, 'id' => $item->id]) }}"

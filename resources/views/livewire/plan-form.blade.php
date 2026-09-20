@@ -24,6 +24,18 @@
     </div>
 
     <div>
+        <label for="quarterly_offer" class="block text-sm font-medium text-gray-700">Oferta trimestral</label>
+        <input type="number" step="0.01" wire:model="quarterly_offer" id="quarterly_offer" placeholder="Opcional" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        @error('quarterly_offer') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    </div>
+
+    <div>
+        <label for="annual_offer" class="block text-sm font-medium text-gray-700">Oferta anual</label>
+        <input type="number" step="0.01" wire:model="annual_offer" id="annual_offer" placeholder="Opcional" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        @error('annual_offer') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    </div>
+
+    <div>
         <label for="max_products" class="block text-sm font-medium text-gray-700">{{ __('messages.max_products') }}</label>
         <input type="number" wire:model="max_products" id="max_products" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
         @error('max_products') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror

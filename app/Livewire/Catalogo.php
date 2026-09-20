@@ -158,7 +158,10 @@ class Catalogo extends Component
         $product = Product::where('catalogo_id', $catalogo->id)->findOrFail($productId);
 
         $cart = Cart::current($catalogo->id);
-        $cart->addProduct($product);
+        if (! $cart->addProduct($product)) {
+            session()->now('message', 'Este producto no tiene stock disponible.');
+            return;
+        }
 
         $this->cartItemCount = $cart->count;
         session()->now('message', __('messages.added_to_cart'));

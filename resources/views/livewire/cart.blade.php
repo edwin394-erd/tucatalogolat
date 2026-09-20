@@ -164,6 +164,9 @@
             function cartPage(){
                 return {
                     itemsData: {!! json_encode($itemsPayload) !!},
+                    stockUrlTemplate: @js(route('catalogo.variantStock', ['name' => $catalogo->name_handle, 'id' => '__PRODUCT__'])),
+                    stockCache: {},
+                    stockRequests: {},
                     checkoutOpen: false,
                     checkoutLoading: false,
                     checkoutError: '',
@@ -217,7 +220,42 @@
                         window.addEventListener('cart-updated', () => { /* reactive via store */ });
                         window.addEventListener('cart-reset', () => { try { var store = Alpine.store('cart'); if (store) { store.items = {}; store.products = {}; store.variants = {}; store.selections = {}; store.save(); } } catch(e){} });
                     },
-                    increase(pid){ window.cartIncrease(pid); },
+                    async increase(pid){
+                        var line = this.itemsData[pid];
+                        if (!line) { window.cartIncrease(pid); return; }
+
+                        var productId = Number(line.product_id);
+                        if (!this.stockCache[productId]) {
+                            if (!this.stockRequests[productId]) {
+                                this.stockRequests[productId] = fetch(this.stockUrlTemplate.replace('__PRODUCT__', productId), { headers: { Accept: 'application/json' } })
+                                    .then(function(response){ if (!response.ok) throw new Error('No se pudo consultar el stock'); return response.json(); })
+                                    .then((data) => { this.stockCache[productId] = data; return data; })
+                                    .finally(() => { delete this.stockRequests[productId]; });
+                            }
+                            try { await this.stockRequests[productId]; } catch (error) { window.cartIncrease(pid); return; }
+                        }
+
+                        var stock = this.stockCache[productId];
+                        if (stock.manage_stock) {
+                            var available = stock.product_stock;
+                            if (available === null) {
+                                var selectedIds = (line.variant_selections || []).map(Number).sort(function(left, right){ return left - right; });
+                                var combination = (stock.combinations || []).find(function(candidate){
+                                    var candidateIds = (candidate.variant_selections || []).map(Number).sort(function(left, right){ return left - right; });
+                                    return candidateIds.length === selectedIds.length && candidateIds.every(function(id, index){ return id === selectedIds[index]; });
+                                });
+                                available = combination ? Number(combination.stock || 0) : 0;
+                            }
+
+                            var current = Number((Alpine.store('cart').items || {})[pid] || 0);
+                            if (current >= Number(available)) {
+                                window.dispatchEvent(new CustomEvent('cart-stock-limit', { detail: { productId: productId, requested: current + 1, accepted: Number(available) } }));
+                                return;
+                            }
+                        }
+
+                        window.cartIncrease(pid);
+                    },
                     decrease(pid){ window.cartDecrease(pid); },
                     remove(pid){ try { if (Alpine.store('cart')) { delete Alpine.store('cart').items[pid]; delete Alpine.store('cart').products[pid]; delete Alpine.store('cart').variants[pid]; Alpine.store('cart').save(); Alpine.store('cart')._scheduleSync(); window.dispatchEvent(new CustomEvent('cart-updated',{ detail: { count: Alpine.store('cart').count() } })); } } catch(e){} },
                     clear(){ if (window.cartReset) window.cartReset(); },

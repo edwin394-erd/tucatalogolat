@@ -8,6 +8,10 @@ use App\Livewire\ForgotPassword;
 use App\Livewire\ResetPassword;
 use App\Livewire\Dashboard;
 use App\Livewire\Products;
+use App\Livewire\Inventory;
+use App\Livewire\InventoryEntry;
+use App\Livewire\InventoryExit;
+use App\Livewire\ProductStock;
 use App\Livewire\Categories;
 use App\Livewire\Descuentos;
 use App\Livewire\Configuracion;
@@ -28,6 +32,8 @@ use App\Models\Cart as CartModel;
 use App\Models\CartItem as CartItemModel;
 use App\Models\Product as ProductModel;
 use App\Models\Order as OrderModel;
+use App\Models\InventoryMovement;
+use App\Models\InventoryStock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use App\Http\Controllers\TelegramWebhookController;
@@ -41,6 +47,10 @@ Route::view('/terminos-y-condiciones', 'legal.terms')->name('terms');
 
 Route::get('/Dashboard', Dashboard::class)->middleware(['auth'])->name('dashboard');
 Route::get('/Products', Products::class)->middleware(['auth'])->name('products');
+Route::get('/Products/{id}/Stock', ProductStock::class)->middleware(['auth'])->name('products.stock');
+Route::get('/Inventory', Inventory::class)->middleware(['auth'])->name('inventory');
+Route::get('/Inventory/Entry/{product_id?}', InventoryEntry::class)->middleware(['auth'])->name('inventory.entry');
+Route::get('/Inventory/Exit/{product_id?}', InventoryExit::class)->middleware(['auth'])->name('inventory.exit');
 Route::get('/Orders', Orders::class)->middleware(['auth'])->name('orders');
 Route::get('/Categories', Categories::class)->middleware(['auth'])->name('categories');
 Route::get('/Descuentos', Descuentos::class)->middleware(['auth'])->name('descuentos');
@@ -71,6 +81,41 @@ Route::post('/debug-upload', [\App\Http\Controllers\DebugUploadController::class
 
 // Las rutas comodín como /{name} siempre deben ir al final
 Route::get('/{name}/product/{id}', ShowProduct::class)->name('product-show');
+Route::get('/{name}/product/{id}/variant-stock', function ($name, $id) {
+	$catalogo = CatalogoModel::resolveByName($name);
+	abort_unless($catalogo, 404, 'Catalogo no encontrado');
+
+	$product = ProductModel::where('catalogo_id', $catalogo->id)
+		->with('variants:id,product_id,available')
+		->findOrFail($id);
+
+	if (! $product->manage_stock) {
+		return response()->json(['manage_stock' => false]);
+	}
+
+	if ($product->variants->isEmpty()) {
+		return response()->json([
+			'manage_stock' => true,
+			'product_stock' => (int) $product->stock,
+			'combinations' => [],
+		]);
+	}
+
+	$combinations = InventoryStock::where('product_id', $product->id)
+		->get(['variant_selections', 'stock'])
+		->map(fn ($stock) => [
+			'variant_selections' => array_values(array_map('intval', $stock->variant_selections ?? [])),
+			'stock' => (int) $stock->stock,
+		])
+		->values();
+
+	return response()->json([
+		'manage_stock' => true,
+		'product_stock' => null,
+		'combinations' => $combinations,
+	]);
+})->name('catalogo.variantStock');
+
 Route::get('/{name}/cart', Cart::class)->name('catalogo.cart');
 // JSON endpoint to return current cart item count for a catalog
 Route::get('/{name}/cart-count', function($name){
@@ -153,6 +198,8 @@ Route::post('/{name}/cart-sync', function(Request $request, $name){
 			return $stored === $selectionIds;
 		});
 		if ($existing) {
+			$availableStock = $cart->availableStock($product, $selectionIds);
+			if ($availableStock !== null && $qty > $availableStock) continue;
 			$existing->quantity = $qty;
 			$existing->save();
 		} else {
@@ -221,7 +268,18 @@ Route::post('/{name}/checkout', function (Request $request, $name) {
 		return response()->json(['message' => 'El catálogo no tiene un número de WhatsApp válido configurado.'], 422);
 	}
 
-    $encodedMessage = urlencode($message);
+	foreach ($cart->items as $item) {
+		if (! $item->product || ! $item->product->manage_stock) continue;
+
+		$selectionIds = array_values(array_unique(array_map('intval', $item->variant_selections ?? [])));
+		if (empty($selectionIds) && $item->variant_id) $selectionIds = [(int) $item->variant_id];
+		$availableStock = $cart->availableStock($item->product, $selectionIds);
+		if ($item->quantity > $availableStock) {
+			return response()->json(['message' => "No hay suficiente stock para {$item->product->name}."], 422);
+		}
+	}
+
+	$encodedMessage = urlencode($message);
 	$order = DB::transaction(function () use ($cart, $catalogo, $validated) {
 		$total = $cart->items->sum(fn ($item) => $item->quantity * $item->price);
 		$order = OrderModel::create([
@@ -249,6 +307,58 @@ Route::post('/{name}/checkout', function (Request $request, $name) {
 				'unit_price' => $item->price,
 				'total' => $item->quantity * $item->price,
 			]);
+
+			$selectionIds = array_values(array_unique(array_map('intval', $item->variant_selections ?? [])));
+			if (empty($selectionIds) && $item->variant_id) {
+				$selectionIds = [(int) $item->variant_id];
+			}
+
+			if ($item->product?->manage_stock && ! empty($selectionIds)) {
+				$selectedVariants = collect();
+				foreach ($selectionIds as $selectionId) {
+					$variant = $item->product?->variants()->whereKey($selectionId)->first();
+					if (! $variant) {
+						continue;
+					}
+
+					$variant->decrement('stock', $item->quantity);
+					$selectedVariants->push($variant);
+				}
+
+				if ($selectedVariants->isNotEmpty()) {
+					$selectionKey = InventoryStock::selectionKey($selectedVariants);
+					$inventoryStock = InventoryStock::where('product_id', $item->product_id)
+						->where('selection_key', $selectionKey)
+						->lockForUpdate()
+						->first();
+					if ($inventoryStock) {
+						$inventoryStock->decrement('stock', $item->quantity);
+					}
+
+					InventoryMovement::create([
+						'catalogo_id' => $catalogo->id,
+						'product_id' => $item->product_id,
+						'variant_id' => $selectedVariants->first()->id,
+						'variant_description' => $selectedVariants->map(fn ($variant) => trim(implode(' ', array_filter([$variant->name ? $variant->name . ':' : null, $variant->size, $variant->color]))))->implode(' / '),
+						'type' => 'exit',
+						'quantity' => $item->quantity,
+						'note' => 'Salida por pedido',
+						'reference_type' => OrderModel::class,
+						'reference_id' => $order->id,
+					]);
+				}
+			} elseif ($item->product?->manage_stock) {
+				$item->product->decrement('stock', $item->quantity);
+				InventoryMovement::create([
+					'catalogo_id' => $catalogo->id,
+					'product_id' => $item->product_id,
+					'type' => 'exit',
+					'quantity' => $item->quantity,
+					'note' => 'Salida por pedido',
+					'reference_type' => OrderModel::class,
+					'reference_id' => $order->id,
+				]);
+			}
 		}
 
 		return $order;

@@ -206,7 +206,15 @@
 							<div class="flex-1">
 								<h4 class="text-xl font-semibold">{{ $plan->name }}</h4>
 								<p class="mt-2 text-gray-600">{{ $plan->description }}</p>
-								<div class="mt-4 text-3xl font-bold">${{ number_format((float) $plan->price, 2) }}<span class="text-base font-medium text-gray-600">/mes</span></div>
+								<div class="mt-4 space-y-1">
+									<div class="text-3xl font-bold">${{ number_format((float) $plan->price, 2) }}<span class="text-base font-medium text-gray-600">/mes</span></div>
+									@if($plan->quarterly_offer !== null)
+										<div class="text-sm font-semibold text-gray-700">${{ number_format((float) $plan->quarterly_offer, 2) }}<span class="font-medium text-gray-500">/trimestre</span></div>
+									@endif
+									@if($plan->annual_offer !== null)
+										<div class="text-sm font-semibold text-gray-700">${{ number_format((float) $plan->annual_offer, 2) }}<span class="font-medium text-gray-500">/año</span></div>
+									@endif
+								</div>
 								<ul class="mt-4 text-sm text-gray-600 space-y-2">
 									@foreach (explode(';', $plan->features) as $feature)
 										<li class="flex items-start gap-2">
